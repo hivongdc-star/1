@@ -2,7 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 const { loadUsers } = require("../utils/storage");
 const { getExpNeeded, getRealm } = require("../utils/xp");
 
-// emoji
+// emoji cho tộc
 const raceEmojis = {
   nhan: "👤 Nhân",
   ma: "😈 Ma",
@@ -11,6 +11,7 @@ const raceEmojis = {
   than: "⚡ Thần",
 };
 
+// emoji cho ngũ hành
 const elementEmojis = {
   kim: "⚔️ Kim",
   moc: "🌿 Mộc",
@@ -30,15 +31,18 @@ module.exports = {
       return msg.reply("⚠️ Bạn chưa có nhân vật. Hãy dùng `-crate` để tạo!");
     }
 
-    // Cảnh giới + tầng
+    // Lấy cảnh giới + exp
     const realm = getRealm(user.level || 1);
     const expNow = user.exp || 0;
     const expNeed = getExpNeeded(user.level || 1);
 
-    // Embed
+    // Tên hiển thị: nếu đã đổi tên thì lấy name, không thì dùng username Discord
+    const displayName = user.name || msg.author.username;
+
+    // Embed profile
     const embed = new EmbedBuilder()
       .setColor("Purple")
-      .setTitle(`📜 Hồ sơ *${msg.author.username}*`)
+      .setTitle(`📜 Hồ sơ *${displayName}*`)
       .setThumbnail(msg.author.displayAvatarURL({ dynamic: true }))
       .addFields(
         {

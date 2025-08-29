@@ -14,18 +14,20 @@ module.exports = {
     exec("git pull", (error, stdout, stderr) => {
       if (error) {
         return message.channel.send(
-          `❌ Lỗi khi git pull: \`${error.message}\``
+          `❌ Lỗi khi git pull:\n\`\`\`${error.message}\`\`\``
         );
       }
+
       if (stderr && !stderr.includes("Already up to date")) {
-        return message.channel.send(`⚠️ Cảnh báo: \`${stderr}\``);
+        message.channel.send(`⚠️ Cảnh báo:\n\`\`\`${stderr}\`\`\``);
       }
 
-      message.channel.send(`✅ Update thành công:\n\`\`\`${stdout}\`\`\``);
-
-      // restart bot bằng cách thoát process
-      message.channel.send("♻️ Restart bot...");
-      process.exit(0);
+      message.channel
+        .send(`✅ Update thành công:\n\`\`\`${stdout}\`\`\``)
+        .then(() => {
+          message.channel.send("♻️ Restart bot bằng PM2...");
+          process.exit(0); // PM2 sẽ tự restart
+        });
     });
   },
 };
