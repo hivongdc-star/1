@@ -5,12 +5,7 @@ module.exports = {
   name: "reset",
   aliases: ["rs"],
   run: async (client, msg, args) => {
-    // chỉ admin hoặc owner mới được reset
-    if (!msg.member.permissions.has("Administrator")) {
-      return msg.reply("⚠️ Bạn không có quyền dùng lệnh này.");
-    }
-
-    // check có tag user không
+    // bắt buộc tag user
     const target = msg.mentions.users.first();
     if (!target) {
       return msg.reply(
@@ -18,30 +13,24 @@ module.exports = {
       );
     }
 
-    // load data
+    // load user data
     const users = loadUsers();
-
     if (!users[target.id]) {
       return msg.reply("❌ Người này chưa có nhân vật để reset!");
     }
 
-    // Xoá user cũ
+    // xoá user cũ
     delete users[target.id];
     saveUsers(users);
 
-    // Tạo lại user với mặc định (Nhân + Kim)
-    const newUser = createUser(target.id, "nhan", "kim");
+    // tạo mới mặc định
+    createUser(target.id, "nhan", "kim");
 
     const embed = new EmbedBuilder()
       .setColor("Red")
       .setTitle("♻️ Reset nhân vật")
       .setDescription(
-        `Nhân vật của **${target.username}** đã được reset về trạng thái ban đầu.`
-      )
-      .addFields(
-        { name: "Tộc", value: "👤 Nhân", inline: true },
-        { name: "Ngũ hành", value: "⚔️ Kim", inline: true },
-        { name: "Cảnh giới", value: "Luyện Khí - Tầng 1", inline: true }
+        `Nhân vật của **${target.username}** đã được reset về trạng thái ban đầu (Nhân + Kim).`
       )
       .setFooter({ text: "✨ Hãy tu luyện chăm chỉ từ đầu!" });
 
