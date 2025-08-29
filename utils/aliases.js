@@ -1,0 +1,16 @@
+module.exports = {
+  profile: ["p"],
+  help: ["h"],
+  crate: ["create", "c"],
+  change: ["chg"],
+  danhhieu: ["dh"],
+  tieunhu: ["tn"],
+  doiten: ["dn"],
+  bio: ["b"],
+  avt: ["a"],
+  thachdau: ["td"],
+  acp: ["accept"],
+  huy: ["cancel"],
+  shop: ["s"],
+  daily: ["d"],
+};
