@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require("discord.js");
 const { loadUsers } = require("../utils/storage");
+const { getExpNeeded, getRealm } = require("../utils/xp");
 
 // emoji
 const raceEmojis = {
@@ -18,26 +19,6 @@ const elementEmojis = {
   tho: "⛰️ Thổ",
 };
 
-const realms = [
-  "Luyện Khí",
-  "Trúc Cơ",
-  "Kết Đan",
-  "Nguyên Anh",
-  "Hóa Thần",
-  "Hợp Thể",
-  "Độ Kiếp",
-  "Đại Thừa",
-  "Tán Tiên",
-  "Chân Tiên",
-  "Địa Tiên",
-  "Thiên Tiên",
-  "Kim Tiên",
-  "Tiên Quân",
-  "Tiên Vương",
-  "Tiên Hoàng",
-  "Tiên Đế",
-];
-
 module.exports = {
   name: "profile",
   aliases: ["p"],
@@ -49,20 +30,10 @@ module.exports = {
       return msg.reply("⚠️ Bạn chưa có nhân vật. Hãy dùng `-crate` để tạo!");
     }
 
-    // Tính cảnh giới + tầng
-    let exp = user.exp || 0;
-    let base = 100;
-    let level = 0;
-
-    while (exp >= base) {
-      exp -= base;
-      level++;
-      base = Math.floor(base * 1.1);
-    }
-
-    const realmIndex = Math.floor(level / 10);
-    const stage = (level % 10) + 1;
-    const realm = realmIndex < realms.length ? realms[realmIndex] : "Siêu việt";
+    // Cảnh giới + tầng
+    const realm = getRealm(user.level || 1);
+    const expNow = user.exp || 0;
+    const expNeed = getExpNeeded(user.level || 1);
 
     // Embed
     const embed = new EmbedBuilder()
@@ -82,17 +53,17 @@ module.exports = {
         },
         {
           name: "🌿 Ngũ hành",
-          value: elementEmojis[user.he] || "Chưa chọn",
+          value: elementEmojis[user.element] || "Chưa chọn",
           inline: true,
         },
         {
           name: "⚔️ Cảnh giới",
-          value: `${realm} – Tầng ${stage}`,
+          value: `${realm}`,
           inline: true,
         },
         {
           name: "✨ EXP",
-          value: `${user.exp || 0}`,
+          value: `${expNow} / ${expNeed}`,
           inline: true,
         },
         {
@@ -127,7 +98,7 @@ module.exports = {
         },
         {
           name: "💎 Linh thạch",
-          value: `${user.linhThach || 0}`,
+          value: `${user.currency || 0}`,
           inline: true,
         },
         {

@@ -10,12 +10,12 @@ module.exports = {
 
     if (!args[0]) {
       return msg.channel.send(
-        `🎖️ Danh hiệu hiện tại: **${user.title || "Chưa có"}**`
+        `🎖️ Danh hiệu hiện tại: **${user.danhHieu || "Chưa có"}**`
       );
     }
 
     const newTitle = args.join(" ");
-    user.title = newTitle;
+    user.danhHieu = newTitle;
     saveUsers(users);
 
     msg.channel.send(`✅ Danh hiệu mới: **${newTitle}**`);
