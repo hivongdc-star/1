@@ -1,6 +1,5 @@
 // element.js
 module.exports = {
-  // Key chữ thường không dấu (để đồng bộ với storage.js và xp.js)
   kim: { armor: 2, defense: 1, hp: 5 },
   moc: { mana: 3, attack: 1, hp: 3 },
   thuy: { mana: 4, hp: 5, defense: 1 },
@@ -8,11 +7,11 @@ module.exports = {
   tho: { defense: 3, armor: 2, hp: 7 },
 };
 
-// Map hiển thị ra giao diện (profile card)
+// Map hiển thị
 module.exports.display = {
-  kim: "Kim ⚔️",
-  moc: "Mộc 🌳",
-  thuy: "Thủy 💧",
-  hoa: "Hỏa 🔥",
-  tho: "Thổ 🪨",
+  kim: "⚔️ Kim",
+  moc: "🌿 Mộc",
+  thuy: "💧 Thủy",
+  hoa: "🔥 Hỏa",
+  tho: "⛰️ Thổ",
 };

@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const elements = require("./element");
 
 const dataPath = path.join(__dirname, "../data/users.json");
 
@@ -15,24 +16,21 @@ function saveUsers(users) {
   fs.writeFileSync(dataPath, JSON.stringify(users, null, 2));
 }
 
-// chỉ đọc user, không auto tạo
 function getUser(id) {
   const users = loadUsers();
   return users[id] || null;
 }
 
-// tạo user mới
 function createUser(id, race, element) {
   const users = loadUsers();
   if (!users[id]) {
-    // base stats
     let hp = 100,
       mana = 100,
       attack = 10,
       defense = 10,
       armor = 10;
 
-    // bonus theo Tộc
+    // Bonus theo Tộc
     switch (race) {
       case "ma":
         attack += 5;
@@ -51,37 +49,17 @@ function createUser(id, race, element) {
         hp += 10;
         break;
       default:
-        break; // nhân = cân bằng
+        break;
     }
 
-    // bonus theo Hệ
-    switch (element) {
-      case "kim":
-        armor += 2;
-        defense += 1;
-        hp += 5;
-        break;
-      case "moc":
-        mana += 3;
-        attack += 1;
-        hp += 3;
-        break;
-      case "thuy":
-        mana += 4;
-        hp += 5;
-        defense += 1;
-        break;
-      case "hoa":
-        attack += 4;
-        hp += 3;
-        break;
-      case "tho":
-        defense += 3;
-        armor += 2;
-        hp += 7;
-        break;
-      default:
-        break;
+    // Bonus theo Ngũ hành
+    const gains = elements[element];
+    if (gains) {
+      if (gains.hp) hp += gains.hp;
+      if (gains.mana) mana += gains.mana;
+      if (gains.attack) attack += gains.attack;
+      if (gains.defense) defense += gains.defense;
+      if (gains.armor) armor += gains.armor;
     }
 
     users[id] = {
@@ -91,7 +69,7 @@ function createUser(id, race, element) {
       level: 1,
       realm: "Luyện Khí - Tầng 1",
       race,
-      element, // luôn dùng element thay vì he
+      element,
       hp,
       maxHp: hp,
       mana,

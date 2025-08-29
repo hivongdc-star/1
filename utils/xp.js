@@ -1,6 +1,6 @@
 const { loadUsers, saveUsers } = require("./storage");
 const realms = require("./realms");
-const elements = require("./element"); // ✅ đúng tên file
+const elements = require("./element");
 const { baseExp, expMultiplier } = require("./config");
 
 function getExpNeeded(level) {
@@ -19,32 +19,17 @@ function addXp(userId, amount) {
     users[userId].level++;
     leveledUp = true;
 
-    // Tăng chỉ số theo ngũ hành
+    // cộng chỉ số theo hệ
     const ele = users[userId].element;
-    if (elements[ele]) {
-      const gains = elements[ele];
-      for (let stat in gains) {
-        switch (stat) {
-          case "attack":
-            users[userId].cong = (users[userId].cong || 0) + gains[stat];
-            break;
-          case "defense":
-            users[userId].thu = (users[userId].thu || 0) + gains[stat];
-            break;
-          case "armor":
-            users[userId].giap = (users[userId].giap || 0) + gains[stat];
-            break;
-          case "hp":
-            users[userId].hp = (users[userId].hp || 0) + gains[stat];
-            break;
-          case "mana":
-            users[userId].mana = (users[userId].mana || 0) + gains[stat];
-            break;
-        }
-      }
+    const gains = elements[ele];
+    if (gains) {
+      Object.keys(gains).forEach((stat) => {
+        users[userId][stat] = (users[userId][stat] || 0) + gains[stat];
+      });
     }
   }
 
+  users[userId].realm = getRealm(users[userId].level);
   saveUsers(users);
   return leveledUp;
 }
