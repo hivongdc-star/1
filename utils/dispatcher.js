@@ -6,21 +6,23 @@ const { addXp } = require("./xp");
 const { earnFromChat } = require("./currency");
 
 let commands = new Map();
-const cooldowns = new Map(); // cooldown cho XP
+const cooldowns = new Map(); // cooldown cho auto XP
 
-// Load commands trong thư mục /commands
+/**
+ * Load tất cả command trong thư mục /commands
+ */
 function loadCommands() {
   const cmdFiles = fs
     .readdirSync(path.join(__dirname, "../commands"))
     .filter((f) => f.endsWith(".js"));
 
   cmdFiles.forEach((file) => {
-    const cmd = require(`../commands/${file}`);
+    const cmd = require(path.join(__dirname, "../commands", file));
     if (!cmd || !cmd.name) return;
 
     commands.set(cmd.name, cmd);
 
-    // alias trong file
+    // alias trong command file
     if (cmd.aliases) {
       cmd.aliases.forEach((a) => commands.set(a, cmd));
     }
@@ -30,9 +32,13 @@ function loadCommands() {
       aliases[cmd.name].forEach((a) => commands.set(a, cmd));
     }
   });
+
+  console.log(`✅ Loaded ${commands.size} commands`);
 }
 
-// Xử lý lệnh
+/**
+ * Xử lý khi user gọi lệnh
+ */
 function handleCommand(client, msg, args) {
   let cmdName = args[0].replace("-", "").toLowerCase();
   const cmd = commands.get(cmdName);
@@ -49,19 +55,21 @@ function handleCommand(client, msg, args) {
   }
 }
 
-// Dispatcher chính
+/**
+ * Khởi động Dispatcher
+ */
 function startDispatcher(client) {
   loadCommands();
 
   client.on("messageCreate", (msg) => {
     if (msg.author.bot) return;
 
-    // --- Auto XP mỗi 15s ---
+    // --- Auto EXP mỗi 15s ---
     const now = Date.now();
     const last = cooldowns.get(msg.author.id) || 0;
     if (now - last >= 15000) {
       addXp(msg.author.id, 5); // mỗi 15s chat +5 EXP
-      earnFromChat(msg.author.id); // mỗi tin nhắn +1 linh thạch (tối đa 1000/ngày)
+      earnFromChat(msg.author.id); // +1 linh thạch, tối đa 1000/ngày
       cooldowns.set(msg.author.id, now);
     }
 

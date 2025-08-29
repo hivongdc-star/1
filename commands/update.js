@@ -17,7 +17,7 @@ module.exports = {
           `❌ Lỗi khi git pull: \`${error.message}\``
         );
       }
-      if (stderr) {
+      if (stderr && !stderr.includes("Already up to date")) {
         return message.channel.send(`⚠️ Cảnh báo: \`${stderr}\``);
       }
 
