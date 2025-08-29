@@ -28,7 +28,7 @@ module.exports = {
     const user = users[msg.author.id];
 
     if (!user) {
-      return msg.reply("⚠️ Bạn chưa có nhân vật. Hãy dùng `-crate` để tạo!");
+      return msg.reply("⚠️ Bạn chưa có nhân vật. Hãy dùng `-create` để tạo!");
     }
 
     // Lấy cảnh giới + exp
@@ -36,7 +36,7 @@ module.exports = {
     const expNow = user.exp || 0;
     const expNeed = getExpNeeded(user.level || 1);
 
-    // Tên hiển thị: nếu đã đổi tên thì lấy name, không thì dùng username Discord
+    // Tên hiển thị
     const displayName = user.name || msg.author.username;
 
     // Embed profile
@@ -47,12 +47,12 @@ module.exports = {
       .addFields(
         {
           name: "🌟 Danh hiệu",
-          value: user.danhHieu || "Chưa có",
+          value: user.title || "Chưa có",
           inline: true,
         },
         {
           name: "🧬 Tộc",
-          value: raceEmojis[user.toc] || "Chưa chọn",
+          value: raceEmojis[user.race] || "Chưa chọn",
           inline: true,
         },
         {
@@ -77,17 +77,17 @@ module.exports = {
         },
         {
           name: "🔥 Công",
-          value: `${user.cong || 10}`,
+          value: `${user.attack || user.cong || 10}`,
           inline: true,
         },
         {
           name: "🛡️ Thủ",
-          value: `${user.thu || 10}`,
+          value: `${user.defense || user.thu || 10}`,
           inline: true,
         },
         {
           name: "📦 Giáp",
-          value: `${user.giap || 10}`,
+          value: `${user.armor || user.giap || 10}`,
           inline: true,
         },
         {
@@ -97,12 +97,12 @@ module.exports = {
         },
         {
           name: "💢 Nộ",
-          value: `${user.no || 0}`,
+          value: `${user.fury || user.no || 0}`,
           inline: true,
         },
         {
           name: "💎 Linh thạch",
-          value: `${user.currency || 0}`,
+          value: `${user.linhthach || user.currency || 0}`,
           inline: true,
         },
         {
