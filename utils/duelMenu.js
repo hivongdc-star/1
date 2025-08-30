@@ -1,4 +1,3 @@
-// utils/duelMenu.js
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
@@ -34,6 +33,8 @@ function createBattleEmbed(state, users) {
   }
 
   function playerField(u) {
+    if (!u) return "❌ Lỗi user";
+
     let buffsText = "";
     if (u.buffs?.length > 0) {
       buffsText =
@@ -74,12 +75,12 @@ function createBattleEmbed(state, users) {
     .setDescription(desc)
     .addFields(
       {
-        name: `${elementEmojis[p1.element] || ""} ${p1.name}`,
+        name: `${elementEmojis[p1?.element] || ""} ${p1?.name || "???"}`,
         value: playerField(p1),
         inline: true,
       },
       {
-        name: `${elementEmojis[p2.element] || ""} ${p2.name}`,
+        name: `${elementEmojis[p2?.element] || ""} ${p2?.name || "???"}`,
         value: playerField(p2),
         inline: true,
       }
@@ -90,6 +91,16 @@ function createBattleEmbed(state, users) {
 
 // 📌 Menu chọn skill
 function createSkillMenu(user, userId, isTurn) {
+  if (!user || !user.element || !skills[user.element]) {
+    return new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId(`duel-skill-${userId}`)
+        .setPlaceholder("❌ Không có skill")
+        .setDisabled(true)
+        .addOptions([{ label: "Không có skill", value: "none" }])
+    );
+  }
+
   const skillList = skills[user.element] || [];
 
   const menu = new StringSelectMenuBuilder()
@@ -97,19 +108,15 @@ function createSkillMenu(user, userId, isTurn) {
     .setPlaceholder(isTurn ? "Chọn skill để sử dụng" : "Chưa tới lượt của bạn")
     .setDisabled(!isTurn);
 
-  if (skillList.length === 0) {
-    menu.addOptions([{ label: "Không có skill", value: "none" }]);
-  } else {
-    menu.addOptions(
-      skillList.map((s) => ({
-        label: `${s.name}`,
-        description: `${s.description} | Mana:${s.cost?.mana || 0}, Nộ:${
-          s.cost?.fury || 0
-        }`,
-        value: s.name,
-      }))
-    );
-  }
+  menu.addOptions(
+    skillList.map((s) => ({
+      label: s.name,
+      description: `${s.description} | Mana:${s.cost?.mana || 0}, Nộ:${
+        s.cost?.fury || 0
+      }`,
+      value: s.name,
+    }))
+  );
 
   return new ActionRowBuilder().addComponents(menu);
 }
@@ -145,17 +152,22 @@ async function handleSkillInteraction(interaction, client) {
     });
   }
 
-  await interaction.deferUpdate();
   const skillName = interaction.values[0];
   const state = useSkill(userId, skillName);
   const users = loadUsers();
 
   if (!state) {
-    return interaction.followUp({
+    return interaction.reply({
       content: "❌ Trận đấu không tồn tại!",
       ephemeral: true,
     });
   }
+
+  // acknowledge ngay (tránh double ack lỗi 10062/40060)
+  await interaction.reply({
+    content: `✅ Bạn đã dùng skill: **${skillName}**`,
+    ephemeral: true,
+  });
 
   if (state.finished) {
     resetAfterBattle(state);
@@ -170,11 +182,6 @@ async function handleSkillInteraction(interaction, client) {
   for (const dm of state.dmChannels) {
     await sendBattleEmbeds(client, state, dm);
   }
-
-  await interaction.followUp({
-    content: `✅ Bạn đã dùng skill: **${skillName}**`,
-    ephemeral: true,
-  });
 }
 
 module.exports = { sendBattleEmbeds, handleSkillInteraction };
