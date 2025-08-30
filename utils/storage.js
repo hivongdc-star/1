@@ -1,6 +1,8 @@
+// utils/storage.js
 const fs = require("fs");
 const path = require("path");
 const elements = require("./element");
+const races = require("./races");
 
 const dataPath = path.join(__dirname, "../data/users.json");
 
@@ -30,39 +32,17 @@ function createUser(id, race, element) {
       defense = 10,
       armor = 10;
 
-    // Bonus theo Tộc
-    switch (race) {
-      case "ma":
-        attack += 5;
-        break;
-      case "tien":
-        mana += 30;
-        hp -= 10;
-        break;
-      case "yeu":
-        hp += 50;
-        attack -= 2;
-        break;
-      case "than":
-        attack += 3;
-        defense += 3;
-        hp += 10;
-        break;
-      default:
-        break;
+    // bonus element ban đầu
+    const eleBonus = elements[element];
+    if (eleBonus) {
+      hp += eleBonus.hp || 0;
+      mana += eleBonus.mana || 0;
+      attack += eleBonus.attack || 0;
+      defense += eleBonus.defense || 0;
+      armor += eleBonus.armor || 0;
     }
 
-    // Bonus theo Ngũ hành
-    const gains = elements[element];
-    if (gains) {
-      if (gains.hp) hp += gains.hp;
-      if (gains.mana) mana += gains.mana;
-      if (gains.attack) attack += gains.attack;
-      if (gains.defense) defense += gains.defense;
-      if (gains.armor) armor += gains.armor;
-    }
-
-    users[id] = {
+    let user = {
       id,
       name: "Chưa đặt tên",
       exp: 0,
@@ -79,11 +59,18 @@ function createUser(id, race, element) {
       armor,
       fury: 0,
       linhthach: 0,
-      inventory: {},
-      title: null,
       bio: "",
+      title: null,
+      inventory: {},
       dailyStones: { date: null, earned: 0 },
     };
+
+    // bonus theo race
+    if (races[race]) {
+      races[race].bonus(user);
+    }
+
+    users[id] = user;
     saveUsers(users);
   }
   return users[id];

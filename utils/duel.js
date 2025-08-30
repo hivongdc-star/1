@@ -8,13 +8,18 @@ const challenges = {};
 function normalizeUser(u) {
   if (!u) return null;
   u.maxHp = u.maxHp || 100;
-  u.hp = u.hp > 0 ? u.hp : u.maxHp;
+  if (u.hp === undefined || u.hp <= 0) u.hp = u.maxHp;
+
   u.maxMana = u.maxMana || 100;
   if (u.mana === undefined) u.mana = u.maxMana;
+
   if (u.fury === undefined) u.fury = 0;
-  u.cong = u.cong || u.attack || 10;
-  u.thu = u.thu || u.defense || 10;
-  u.giap = u.giap || u.armor || 10;
+
+  // ✅ Đồng bộ stat: chỉ dùng attack / defense / armor
+  u.attack = u.attack || 10;
+  u.defense = u.defense || 10;
+  u.armor = u.armor || 10;
+
   return u;
 }
 
@@ -78,7 +83,8 @@ function useSkill(userId, skillName) {
   }
 
   if (skill.effect) {
-    dmg = skill.effect(attacker, defender, dmg);
+    const extra = skill.effect(attacker, defender, dmg);
+    if (typeof extra === "number" && extra > 0) dmg = extra;
   }
 
   if (defender.hp < 0) defender.hp = 0;

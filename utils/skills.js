@@ -1,7 +1,7 @@
 const { heal, addShield, addBuff } = require("./dmg");
 
 const skills = {
-  Kim: [
+  kim: [
     {
       name: "Kim Cương Trảm",
       type: "normal",
@@ -43,7 +43,7 @@ const skills = {
     },
   ],
 
-  Mộc: [
+  moc: [
     {
       name: "Thanh Mộc Kích",
       type: "normal",
@@ -83,7 +83,7 @@ const skills = {
     },
   ],
 
-  Thủy: [
+  thuy: [
     {
       name: "Lam Thủy Tiễn",
       type: "normal",
@@ -123,7 +123,7 @@ const skills = {
     },
   ],
 
-  Hỏa: [
+  hoa: [
     {
       name: "Xích Viêm Trảm",
       type: "normal",
@@ -163,7 +163,7 @@ const skills = {
     },
   ],
 
-  Thổ: [
+  tho: [
     {
       name: "Thạch Phách Quyền",
       type: "normal",

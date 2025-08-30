@@ -1,16 +1,9 @@
+// commands/profile.js
 const { EmbedBuilder } = require("discord.js");
 const { loadUsers } = require("../utils/storage");
 const { getExpNeeded, getRealm } = require("../utils/xp");
 const elements = require("../utils/element");
-
-// emoji cho tộc
-const raceEmojis = {
-  nhan: "👤 Nhân",
-  ma: "😈 Ma",
-  tien: "👼 Tiên",
-  yeu: "🦊 Yêu",
-  than: "⚡ Thần",
-};
+const races = require("../utils/races");
 
 module.exports = {
   name: "profile",
@@ -18,16 +11,12 @@ module.exports = {
   run: async (client, msg) => {
     const users = loadUsers();
     const user = users[msg.author.id];
-
-    if (!user) {
+    if (!user)
       return msg.reply("⚠️ Bạn chưa có nhân vật. Hãy dùng `-create` để tạo!");
-    }
 
-    // Cảnh giới + exp
     const realm = getRealm(user.level || 1);
     const expNow = user.exp || 0;
     const expNeed = getExpNeeded(user.level || 1);
-
     const displayName = user.name || msg.author.username;
 
     const embed = new EmbedBuilder()
@@ -38,7 +27,9 @@ module.exports = {
         { name: "🌟 Danh hiệu", value: user.title || "Chưa có", inline: true },
         {
           name: "🧬 Tộc",
-          value: raceEmojis[user.race] || "Chưa chọn",
+          value:
+            races[user.race]?.emoji + " " + races[user.race]?.name ||
+            "Chưa chọn",
           inline: true,
         },
         {

@@ -1,29 +1,25 @@
+// commands/create.js
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
   EmbedBuilder,
 } = require("discord.js");
-const { loadUsers, saveUsers, createUser } = require("../utils/storage");
-const races = require("../utils/races");
+const { loadUsers, saveUsers } = require("../utils/storage");
 const elements = require("../utils/element");
+const races = require("../utils/races");
 
 module.exports = {
-  name: "reset",
-  aliases: ["rs"],
+  name: "create",
+  aliases: ["c"],
   run: async (client, msg) => {
     const users = loadUsers();
-    if (!users[msg.author.id]) {
-      return msg.reply("⚠️ Bạn chưa có nhân vật để reset.");
+    if (users[msg.author.id]) {
+      return msg.reply("⚠️ Bạn đã có nhân vật rồi! Dùng `-profile` để xem.");
     }
 
-    // xoá nhân vật cũ
-    delete users[msg.author.id];
-    saveUsers(users);
-
-    // gửi menu chọn lại
     const raceMenu = new StringSelectMenuBuilder()
-      .setCustomId("reset_select_race")
-      .setPlaceholder("🧬 Chọn lại Tộc")
+      .setCustomId("select_race")
+      .setPlaceholder("🧬 Chọn Tộc")
       .addOptions(
         Object.entries(races).map(([key, r]) => ({
           label: r.name,
@@ -33,62 +29,60 @@ module.exports = {
       );
 
     const elementMenu = new StringSelectMenuBuilder()
-      .setCustomId("reset_select_element")
-      .setPlaceholder("🌿 Chọn lại Ngũ hành")
-      .addOptions(
-        Object.entries(elements.display).map(([key, label]) => ({
-          label: label.replace(/^[^ ]+ /, ""),
-          value: key,
-          emoji: label.split(" ")[0],
-        }))
-      );
+      .setCustomId("select_element")
+      .setPlaceholder("🌿 Chọn Ngũ hành")
+      .addOptions([
+        { label: "Kim", value: "kim", emoji: "⚔️" },
+        { label: "Mộc", value: "moc", emoji: "🌿" },
+        { label: "Thủy", value: "thuy", emoji: "💧" },
+        { label: "Hỏa", value: "hoa", emoji: "🔥" },
+        { label: "Thổ", value: "tho", emoji: "⛰️" },
+      ]);
 
     const row1 = new ActionRowBuilder().addComponents(raceMenu);
     const row2 = new ActionRowBuilder().addComponents(elementMenu);
 
     const embed = new EmbedBuilder()
-      .setColor("Red")
-      .setTitle("♻️ Reset nhân vật")
-      .setDescription(
-        `Nhân vật của **${msg.author.username}** đã được xoá.\n` +
-          `👉 Hãy chọn lại **Tộc** và **Ngũ hành** để bắt đầu lại từ đầu!`
-      );
+      .setTitle("✨ Tạo Nhân Vật")
+      .setDescription("Chọn **Tộc** và **Ngũ hành** để bắt đầu tu luyện!")
+      .setColor("Purple");
 
-    const reply = await msg.channel.send({
+    const reply = await msg.reply({
       embeds: [embed],
       components: [row1, row2],
     });
 
     let selectedRace = null;
     let selectedElement = null;
-
     const collector = reply.createMessageComponentCollector({ time: 60000 });
 
     collector.on("collect", async (interaction) => {
       if (interaction.user.id !== msg.author.id) {
         return interaction.reply({
-          content: "⚠️ Bạn chỉ có thể reset chính nhân vật của mình!",
+          content: "⚠️ Đây không phải lựa chọn của bạn!",
           ephemeral: true,
         });
       }
 
-      if (interaction.customId === "reset_select_race") {
+      if (interaction.customId === "select_race") {
         selectedRace = interaction.values[0];
         await interaction.reply({
-          content: `🧬 Bạn đã chọn lại **${races[selectedRace].name}**`,
+          content: `🧬 Bạn đã chọn **${races[selectedRace].name}**`,
           ephemeral: true,
         });
       }
 
-      if (interaction.customId === "reset_select_element") {
+      if (interaction.customId === "select_element") {
         selectedElement = interaction.values[0];
         await interaction.reply({
-          content: `🌿 Bạn đã chọn lại **${elements.display[selectedElement]}**`,
+          content: `🌿 Bạn đã chọn **${elements.display[selectedElement]}**`,
           ephemeral: true,
         });
       }
 
       if (selectedRace && selectedElement) {
+        // tạo user
+        const { createUser } = require("../utils/storage");
         const newUser = createUser(
           msg.author.id,
           selectedRace,
@@ -96,7 +90,7 @@ module.exports = {
         );
 
         const confirm = new EmbedBuilder()
-          .setTitle("✅ Reset thành công!")
+          .setTitle("✅ Nhân vật đã tạo thành công!")
           .setColor("Green")
           .setDescription(
             `🧬 **Tộc:** ${races[selectedRace].emoji} ${races[selectedRace].name}\n` +
@@ -105,8 +99,7 @@ module.exports = {
               `❤️ Máu: ${newUser.hp} | 🔷 Mana: ${newUser.mana}\n` +
               `🔥 Công: ${newUser.attack} | 🛡️ Thủ: ${newUser.defense} | 📦 Giáp: ${newUser.armor}\n` +
               `💢 Nộ: ${newUser.fury} | 💎 Linh Thạch: ${newUser.linhthach}`
-          )
-          .setFooter({ text: "✨ Hãy tu luyện chăm chỉ từ đầu!" });
+          );
 
         await msg.channel.send({ embeds: [confirm] });
         collector.stop();
@@ -116,7 +109,7 @@ module.exports = {
     collector.on("end", () => {
       if (!selectedRace || !selectedElement) {
         msg.channel.send(
-          "⏳ Reset không hoàn tất, hãy dùng lại lệnh `-reset`."
+          "⏳ Bạn chưa hoàn tất chọn Tộc và Ngũ hành, hãy thử lại!"
         );
       }
     });

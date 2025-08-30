@@ -1,3 +1,4 @@
+// utils/xp.js
 const { loadUsers, saveUsers } = require("./storage");
 const realms = require("./realms");
 const elements = require("./element");
@@ -23,13 +24,22 @@ function addXp(userId, amount) {
     const ele = users[userId].element;
     const gains = elements[ele];
     if (gains) {
-      Object.keys(gains).forEach((stat) => {
+      for (let stat in gains) {
         users[userId][stat] = (users[userId][stat] || 0) + gains[stat];
+      }
+    }
+
+    // breakthrough cảnh giới
+    if (users[userId].level % 10 === 1) {
+      let multiplier = 1.5;
+      if (users[userId].race === "than") multiplier = 1.6;
+
+      ["hp", "mana", "attack", "defense", "armor"].forEach((stat) => {
+        users[userId][stat] = Math.floor(users[userId][stat] * multiplier);
       });
     }
   }
 
-  users[userId].realm = getRealm(users[userId].level);
   saveUsers(users);
   return leveledUp;
 }
