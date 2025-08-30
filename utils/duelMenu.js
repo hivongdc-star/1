@@ -9,6 +9,7 @@ const { loadUsers } = require("./storage");
 const skills = require("./skills");
 const { createBar } = require("./barHelper");
 
+// Emoji ngũ hành
 const elementEmojis = {
   kim: "⚔️",
   moc: "🌿",
@@ -17,6 +18,7 @@ const elementEmojis = {
   tho: "⛰️",
 };
 
+// 📌 Tạo embed trận đấu
 function createBattleEmbed(state, users) {
   const p1 = users[state.players[0]];
   const p2 = users[state.players[1]];
@@ -86,6 +88,7 @@ function createBattleEmbed(state, users) {
     .setFooter({ text: "✨ Hãy dùng skill khéo léo để giành chiến thắng!" });
 }
 
+// 📌 Menu chọn skill
 function createSkillMenu(user, userId, isTurn) {
   const skillList = skills[user.element] || [];
 
@@ -111,6 +114,7 @@ function createSkillMenu(user, userId, isTurn) {
   return new ActionRowBuilder().addComponents(menu);
 }
 
+// 📌 Gửi embed trận đấu
 async function sendBattleEmbeds(client, state, channel) {
   const users = loadUsers();
   const p1 = users[state.players[0]];
@@ -131,6 +135,7 @@ async function sendBattleEmbeds(client, state, channel) {
   await channel.send({ embeds: [embed], components: [row1, row2] });
 }
 
+// 📌 Xử lý chọn skill
 async function handleSkillInteraction(interaction, client) {
   const userId = interaction.customId.split("duel-skill-")[1];
   if (interaction.user.id !== userId) {

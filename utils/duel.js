@@ -33,7 +33,7 @@ function createBattleState(p1Id, p2Id) {
     turn: p1Id,
     logs: [],
     finished: false,
-    dmChannels: [], // sẽ lưu DM của 2 người chơi
+    dmChannels: [], // lưu DM của 2 người chơi
   };
 }
 
@@ -99,7 +99,10 @@ function useSkill(userId, skillName) {
 
   if (defender.hp < 0) defender.hp = 0;
 
-  attacker.fury = Math.max(0, Math.min(100, attacker.fury + (skill.furyGain || 0)));
+  attacker.fury = Math.max(
+    0,
+    Math.min(100, attacker.fury + (skill.furyGain || 0))
+  );
 
   let log = `💥 ${attacker.name} dùng **${skill.name}**`;
   if (skill.multiplier > 0)
@@ -128,4 +131,17 @@ function useSkill(userId, skillName) {
 function resetAfterBattle(state) {
   const users = loadUsers();
   for (const pid of state.players) {
-    const u = normalizeUse
+    const u = normalizeUser(users[pid], pid);
+    if (!u) continue;
+    u.hp = u.maxHp;
+    u.mana = u.maxMana;
+    u.fury = 0;
+    u.shield = 0;
+    u.buffs = [];
+  }
+  saveUsers(users);
+
+  for (const pid of state.players) delete battles[pid];
+}
+
+module.exports = { battles, challenges, startDuel, useSkill, resetAfterBattle };
