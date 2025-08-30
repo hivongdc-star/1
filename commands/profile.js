@@ -5,6 +5,14 @@ const { getExpNeeded, getRealm } = require("../utils/xp");
 const elements = require("../utils/element");
 const races = require("../utils/races");
 
+const elementColors = {
+  Kim: "Grey",
+  Mộc: "Green",
+  Thủy: "Blue",
+  Hỏa: "Red",
+  Thổ: "Yellow",
+};
+
 module.exports = {
   name: "profile",
   aliases: ["p"],
@@ -20,25 +28,29 @@ module.exports = {
     const displayName = user.name || msg.author.username;
 
     const embed = new EmbedBuilder()
-      .setColor("Purple")
+      .setColor(elementColors[user.element] || "Purple")
       .setTitle(`📜 Hồ sơ *${displayName}*`)
       .setThumbnail(msg.author.displayAvatarURL({ dynamic: true }))
       .addFields(
         { name: "🌟 Danh hiệu", value: user.title || "Chưa có", inline: true },
         {
           name: "🧬 Tộc",
-          value:
-            races[user.race]?.emoji + " " + races[user.race]?.name ||
-            "Chưa chọn",
+          value: races[user.race]
+            ? `${races[user.race].emoji} ${races[user.race].name}`
+            : "Chưa chọn",
           inline: true,
         },
         {
           name: "🌿 Ngũ hành",
-          value: elements.display[user.element] || "Chưa chọn",
+          value: elements.display?.[user.element] || "Chưa chọn",
           inline: true,
         },
         { name: "⚔️ Cảnh giới", value: `${realm}`, inline: true },
-        { name: "✨ EXP", value: `${expNow} / ${expNeed}`, inline: true },
+        {
+          name: "✨ EXP",
+          value: `${expNow.toLocaleString()} / ${expNeed.toLocaleString()}`,
+          inline: true,
+        },
         { name: "❤️ Máu", value: `${user.hp}`, inline: true },
         { name: "🔥 Công", value: `${user.attack}`, inline: true },
         { name: "🛡️ Thủ", value: `${user.defense}`, inline: true },
@@ -46,7 +58,12 @@ module.exports = {
         { name: "🔷 Năng lượng", value: `${user.mana}`, inline: true },
         { name: "💢 Nộ", value: `${user.fury}`, inline: true },
         { name: "💎 Linh thạch", value: `${user.linhthach}`, inline: true },
-        { name: "📖 Bio", value: user.bio || "Chưa có" }
+        {
+          name: "📖 Bio",
+          value: user.bio
+            ? user.bio.slice(0, 200) + (user.bio.length > 200 ? "..." : "")
+            : "Chưa có",
+        }
       )
       .setFooter({ text: "✨ Tu luyện chăm chỉ để tiến xa hơn!" });
 

@@ -4,6 +4,7 @@ const { sendBattleEmbeds } = require("../utils/duelMenu");
 
 module.exports = {
   name: "acp",
+  aliases: ["accept", "chapnhan"],
   description: "Chấp nhận thách đấu",
   async run(client, message) {
     const challenge = challenges[message.author.id];
@@ -11,21 +12,39 @@ module.exports = {
       return message.reply("❌ Hiện không có lời thách đấu nào dành cho bạn!");
     }
 
-    const opponentId = challenge.challengerId;
-    const state = startDuel(opponentId, message.author.id);
-    delete challenges[message.author.id];
+    const challengerId = challenge.challengerId;
+    const defenderId = message.author.id;
+
+    // tạo state trận đấu
+    const state = startDuel(challengerId, defenderId);
+    delete challenges[defenderId];
 
     if (!state) {
       return message.reply(
-        "❌ Không thể bắt đầu trận đấu (dữ liệu nhân vật lỗi)!"
+        "❌ Không thể bắt đầu trận đấu (thiếu dữ liệu nhân vật)!"
       );
     }
 
-    await message.channel.send(
-      `🔥 Trận đấu giữa <@${opponentId}> và <@${message.author.id}> đã bắt đầu!`
-    );
+    const challenger = await client.users.fetch(challengerId);
+    const defender = message.author;
 
-    // Thử DM, nếu fail thì gửi trong channel công khai
-    sendBattleEmbeds(client, state, message.channel);
+    try {
+      const dm1 = await challenger.createDM();
+      const dm2 = await defender.createDM();
+
+      state.dmChannels = [dm1, dm2];
+
+      await dm1.send(`🔥 Trận đấu với **${defender.username}** đã bắt đầu!`);
+      await dm2.send(`🔥 Trận đấu với **${challenger.username}** đã bắt đầu!`);
+
+      // gửi embed/menu vào DM cả hai bên
+      await sendBattleEmbeds(client, state, dm1);
+      await sendBattleEmbeds(client, state, dm2);
+    } catch (e) {
+      console.error("Không thể gửi DM:", e);
+      message.channel.send(
+        "❌ Không thể DM cho người chơi (có thể họ tắt DM)."
+      );
+    }
   },
 };

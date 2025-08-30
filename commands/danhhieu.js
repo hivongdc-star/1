@@ -1,3 +1,4 @@
+// commands/danhhieu.js
 const { loadUsers, saveUsers } = require("../utils/storage");
 
 module.exports = {
@@ -10,14 +11,25 @@ module.exports = {
 
     if (!args[0]) {
       return msg.channel.send(
-        `🎖️ Danh hiệu hiện tại: **${user.danhHieu || "Chưa có"}**`
+        `🎖️ Danh hiệu hiện tại: **${user.title || "Chưa có"}**`
       );
     }
 
+    if (args[0].toLowerCase() === "xoa") {
+      user.title = null;
+      saveUsers(users);
+      return msg.channel.send("🗑️ Danh hiệu đã được xóa.");
+    }
+
     const newTitle = args.join(" ");
-    user.danhHieu = newTitle;
+    if (newTitle.length > 30) {
+      return msg.channel.send("⚠️ Danh hiệu quá dài, tối đa 30 ký tự.");
+    }
+
+    const safeTitle = newTitle.replace(/[*_`~|]/g, "");
+    user.title = safeTitle;
     saveUsers(users);
 
-    msg.channel.send(`✅ Danh hiệu mới: **${newTitle}**`);
+    msg.channel.send(`✅ Danh hiệu mới: **${safeTitle}**`);
   },
 };
