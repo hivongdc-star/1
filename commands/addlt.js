@@ -1,34 +1,42 @@
-const { addStones } = require("../utils/currency");
-const { loadUsers } = require("../utils/storage");
-const { OWNER_ID } = process.env;
+const { loadUsers, saveUsers } = require("../utils/storage");
 
 module.exports = {
   name: "addlt",
-  description: "Cộng linh thạch cho nhân vật chỉ định (Admin Only)",
-  async run(client, message, args) {
-    if (message.author.id !== OWNER_ID) {
-      return message.reply("❌ Bạn không có quyền dùng lệnh này.");
+  description: "Thêm Linh thạch cho một người chơi (chỉ admin)",
+  aliases: ["addstone"],
+  run: async (client, msg, args) => {
+    const ownerId = process.env.OWNER_ID;
+    if (msg.author.id !== ownerId) {
+      return msg.reply("❌ Bạn không có quyền dùng lệnh này.");
     }
 
-    const target = message.mentions.users.first();
-    if (!target) {
-      return message.reply("⚠️ Vui lòng mention người cần cộng linh thạch.");
-    }
+    const userId = msg.mentions.users.first()?.id || args[0];
+    const amount = parseInt(args[1] || args[0]);
 
-    const amount = parseInt(args[1]);
-    if (isNaN(amount) || amount <= 0) {
-      return message.reply("⚠️ Vui lòng nhập số linh thạch hợp lệ.");
+    if (!userId || isNaN(amount)) {
+      return msg.reply(
+        "❌ Cú pháp: `-addlt @user <số>` hoặc `-addlt <số>` (cho chính mình)."
+      );
     }
-
-    const userId = target.id;
-    addStones(userId, amount);
 
     const users = loadUsers();
-    const user = users[userId];
-    if (!user) return message.reply("❌ Nhân vật này chưa được tạo.");
+    const targetId = userId.match(/^\d+$/) ? userId : msg.author.id;
 
-    return message.reply(
-      `✅ Đã cộng ${amount} 💎 linh thạch cho **${user.name}**. (Tổng: ${user.currency})`
-    );
+    if (!users[targetId]) {
+      return msg.reply("❌ Người chơi này chưa có nhân vật.");
+    }
+
+    users[targetId].lt = (users[targetId].lt || 0) + amount;
+    saveUsers(users);
+
+    if (targetId === msg.author.id) {
+      return msg.reply(
+        `✅ Bạn đã nhận thêm **${amount}** 💎 Linh thạch. Tổng: **${users[targetId].lt}**`
+      );
+    } else {
+      return msg.reply(
+        `✅ Đã cộng **${amount}** 💎 Linh thạch cho <@${targetId}>. Tổng: **${users[targetId].lt}**`
+      );
+    }
   },
 };

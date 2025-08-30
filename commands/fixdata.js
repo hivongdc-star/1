@@ -3,7 +3,7 @@ const OWNER_ID = process.env.OWNER_ID;
 
 module.exports = {
   name: "fixdata",
-  description: "Tự động cập nhật data users.json theo chỉ số mới (chỉ admin)",
+  description: "Cập nhật users.json với chỉ số mới (chỉ admin)",
   aliases: ["fd"],
 
   run(client, msg) {
@@ -14,7 +14,6 @@ module.exports = {
     const users = loadUsers();
     let fixed = 0;
 
-    // Chỉ số chuẩn
     const defaults = {
       name: "Chưa đặt tên",
       exp: 0,
@@ -30,7 +29,7 @@ module.exports = {
       defense: 10,
       armor: 10,
       fury: 0,
-      linhthach: 0,
+      lt: 0, // ✅ đổi từ linhthach sang lt
       inventory: {},
       title: null,
       bio: "",

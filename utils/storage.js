@@ -1,4 +1,3 @@
-// utils/storage.js
 const fs = require("fs");
 const path = require("path");
 const elements = require("./element");
@@ -20,7 +19,16 @@ function saveUsers(users) {
 
 function getUser(id) {
   const users = loadUsers();
-  return users[id] || null;
+  const u = users[id];
+  if (!u) return null;
+
+  // ✅ normalize dữ liệu cũ
+  if (u.lt === undefined) u.lt = 0;
+  if (u.fury === undefined) u.fury = 0;
+  if (!u.inventory) u.inventory = {};
+  if (!u.dailyStones) u.dailyStones = { date: null, earned: 0 };
+
+  return u;
 }
 
 function createUser(id, race, element) {
@@ -32,7 +40,6 @@ function createUser(id, race, element) {
       defense = 10,
       armor = 10;
 
-    // bonus element ban đầu
     const eleBonus = elements[element];
     if (eleBonus) {
       hp += eleBonus.hp || 0;
@@ -58,14 +65,13 @@ function createUser(id, race, element) {
       defense,
       armor,
       fury: 0,
-      linhthach: 0,
+      lt: 0, // ✅ Linh thạch rút gọn
       bio: "",
       title: null,
       inventory: {},
       dailyStones: { date: null, earned: 0 },
     };
 
-    // bonus theo race (nếu có)
     if (races[race] && typeof races[race].bonus === "function") {
       races[race].bonus(user);
     }

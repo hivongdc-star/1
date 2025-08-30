@@ -1,13 +1,13 @@
 const { loadUsers, saveUsers } = require("./storage");
 const { dailyReward, maxDailyChatStones } = require("./config");
 
-const chatTracker = {}; // track linh thạch từ chat
+const chatTracker = {}; // track LT từ chat
 
 function addStones(userId, amount) {
   const users = loadUsers();
   if (!users[userId]) return;
 
-  users[userId].currency = (users[userId].currency || 0) + amount;
+  users[userId].lt = (users[userId].lt || 0) + amount; // ✅ dùng lt
   saveUsers(users);
 }
 
@@ -39,13 +39,13 @@ function claimDaily(userId) {
   users[userId].dailyStreak = (users[userId].dailyStreak || 0) + 1;
 
   const reward = dailyReward + (users[userId].dailyStreak - 1) * 5;
-  users[userId].currency = (users[userId].currency || 0) + reward;
+  users[userId].lt = (users[userId].lt || 0) + reward; // ✅ dùng lt
 
   saveUsers(users);
 
   return {
     success: true,
-    message: `✅ Bạn đã nhận ${reward} 💎 linh thạch (chuỗi ${users[userId].dailyStreak} ngày).`,
+    message: `✅ Bạn đã nhận ${reward} 💎 Linh thạch (chuỗi ${users[userId].dailyStreak} ngày).`,
   };
 }
 

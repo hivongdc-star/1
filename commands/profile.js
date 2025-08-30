@@ -60,11 +60,7 @@ module.exports = {
           inline: true,
         },
         { name: "💢 Nộ", value: String(user.fury ?? 0), inline: true },
-        {
-          name: "💎 Linh thạch",
-          value: String(user.linhthach ?? 0),
-          inline: true,
-        },
+        { name: "💎 Linh thạch", value: String(user.lt ?? 0), inline: true },
         {
           name: "📖 Bio",
           value: user.bio

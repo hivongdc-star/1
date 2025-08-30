@@ -10,6 +10,6 @@ module.exports = {
       return msg.reply("⚠️ Bạn chưa có nhân vật. Hãy dùng `-create` để tạo!");
     }
 
-    msg.reply(`💎 Bạn hiện có **${user.linhthach ?? 0} Linh thạch**.`);
+    return msg.reply(`💎 Bạn hiện có **${user.lt ?? 0} Linh thạch**.`);
   },
 };
