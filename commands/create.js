@@ -4,9 +4,9 @@ const {
   StringSelectMenuBuilder,
   EmbedBuilder,
 } = require("discord.js");
-const { loadUsers, saveUsers } = require("../utils/storage");
-const elements = require("../utils/element");
+const { loadUsers, createUser } = require("../utils/storage");
 const races = require("../utils/races");
+const elements = require("../utils/element");
 
 module.exports = {
   name: "create",
@@ -17,6 +17,7 @@ module.exports = {
       return msg.reply("⚠️ Bạn đã có nhân vật rồi! Dùng `-profile` để xem.");
     }
 
+    // Menu chọn Tộc
     const raceMenu = new StringSelectMenuBuilder()
       .setCustomId("select_race")
       .setPlaceholder("🧬 Chọn Tộc")
@@ -28,16 +29,18 @@ module.exports = {
         }))
       );
 
+    // Menu chọn Ngũ hành
     const elementMenu = new StringSelectMenuBuilder()
       .setCustomId("select_element")
       .setPlaceholder("🌿 Chọn Ngũ hành")
-      .addOptions([
-        { label: "Kim", value: "kim", emoji: "⚔️" },
-        { label: "Mộc", value: "moc", emoji: "🌿" },
-        { label: "Thủy", value: "thuy", emoji: "💧" },
-        { label: "Hỏa", value: "hoa", emoji: "🔥" },
-        { label: "Thổ", value: "tho", emoji: "⛰️" },
-      ]);
+      .addOptions(
+        Object.entries(elements.display).map(([key, label]) => {
+          const parts = label.split(" ");
+          const emoji = parts[0] || "❓";
+          const text = parts.slice(1).join(" ") || key;
+          return { label: text, value: key, emoji };
+        })
+      );
 
     const row1 = new ActionRowBuilder().addComponents(raceMenu);
     const row2 = new ActionRowBuilder().addComponents(elementMenu);
@@ -81,8 +84,6 @@ module.exports = {
       }
 
       if (selectedRace && selectedElement) {
-        // tạo user
-        const { createUser } = require("../utils/storage");
         const newUser = createUser(
           msg.author.id,
           selectedRace,
