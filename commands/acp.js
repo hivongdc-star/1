@@ -28,33 +28,45 @@ module.exports = {
 
     state.dmChannels = [];
 
-    // thử gửi cho challenger
+    // gửi cho challenger
     try {
       const dm1 = await challenger.createDM();
-      await dm1.send(`🔥 Trận đấu với **${defender.username}** đã bắt đầu!`);
       state.dmChannels.push(dm1);
-    } catch {
+    } catch (e) {
+      console.error("❌ DM lỗi challenger:", e.message);
       message.channel.send(
         `⚠️ Không thể DM cho <@${challengerId}> → trận đấu sẽ hiển thị ở kênh này.`
       );
       state.dmChannels.push(message.channel);
     }
 
-    // thử gửi cho defender
+    // gửi cho defender
     try {
       const dm2 = await defender.createDM();
-      await dm2.send(`🔥 Trận đấu với **${challenger.username}** đã bắt đầu!`);
       state.dmChannels.push(dm2);
-    } catch {
+    } catch (e) {
+      console.error("❌ DM lỗi defender:", e.message);
       message.channel.send(
         `⚠️ Không thể DM cho <@${defenderId}> → trận đấu sẽ hiển thị ở kênh này.`
       );
       state.dmChannels.push(message.channel);
     }
 
-    // gửi embed/menu vào tất cả channel hợp lệ
+    // ⚔️ Thêm log mở đầu vào state
+    state.logs.push(
+      `⚔️ Trận đấu giữa ${challenger.username} và ${defender.username} đã bắt đầu!`
+    );
+
+    // 🔥 gửi embed + menu skill ngay từ đầu
     for (const ch of state.dmChannels) {
-      await sendBattleEmbeds(client, state, ch);
+      try {
+        await sendBattleEmbeds(client, state, ch);
+      } catch (err) {
+        console.error("❌ Lỗi khi gọi duelMenu:", err);
+        message.channel.send(
+          "⚠️ Không thể hiển thị bảng skill, xem log để biết chi tiết."
+        );
+      }
     }
   },
 };

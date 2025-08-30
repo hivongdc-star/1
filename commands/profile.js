@@ -1,4 +1,3 @@
-// commands/profile.js
 const { EmbedBuilder } = require("discord.js");
 const { loadUsers } = require("../utils/storage");
 const { getExpNeeded, getRealm } = require("../utils/xp");
@@ -22,9 +21,9 @@ module.exports = {
     if (!user)
       return msg.reply("⚠️ Bạn chưa có nhân vật. Hãy dùng `-create` để tạo!");
 
-    const realm = getRealm(user.level || 1);
-    const expNow = user.exp || 0;
-    const expNeed = getExpNeeded(user.level || 1);
+    const realm = getRealm(user.level ?? 1);
+    const expNow = user.exp ?? 0;
+    const expNeed = getExpNeeded(user.level ?? 1);
     const displayName = user.name || msg.author.username;
 
     const embed = new EmbedBuilder()
@@ -45,19 +44,27 @@ module.exports = {
           value: elements.display?.[user.element] || "Chưa chọn",
           inline: true,
         },
-        { name: "⚔️ Cảnh giới", value: `${realm}`, inline: true },
+        { name: "⚔️ Cảnh giới", value: String(realm), inline: true },
         {
           name: "✨ EXP",
           value: `${expNow.toLocaleString()} / ${expNeed.toLocaleString()}`,
           inline: true,
         },
-        { name: "❤️ Máu", value: `${user.hp}`, inline: true },
-        { name: "🔥 Công", value: `${user.attack}`, inline: true },
-        { name: "🛡️ Thủ", value: `${user.defense}`, inline: true },
-        { name: "📦 Giáp", value: `${user.armor}`, inline: true },
-        { name: "🔷 Năng lượng", value: `${user.mana}`, inline: true },
-        { name: "💢 Nộ", value: `${user.fury}`, inline: true },
-        { name: "💎 Linh thạch", value: `${user.linhthach}`, inline: true },
+        { name: "❤️ Máu", value: String(user.hp ?? 100), inline: true },
+        { name: "🔥 Công", value: String(user.attack ?? 10), inline: true },
+        { name: "🛡️ Thủ", value: String(user.defense ?? 10), inline: true },
+        { name: "📦 Giáp", value: String(user.armor ?? 10), inline: true },
+        {
+          name: "🔷 Năng lượng",
+          value: String(user.mana ?? 100),
+          inline: true,
+        },
+        { name: "💢 Nộ", value: String(user.fury ?? 0), inline: true },
+        {
+          name: "💎 Linh thạch",
+          value: String(user.linhthach ?? 0),
+          inline: true,
+        },
         {
           name: "📖 Bio",
           value: user.bio
