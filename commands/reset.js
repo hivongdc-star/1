@@ -20,30 +20,37 @@ module.exports = {
     delete users[msg.author.id];
     saveUsers(users);
 
-    // menu chọn lại tộc
+    // Debug
+    console.log("👉 Races options (reset):", Object.entries(races));
+    console.log(
+      "👉 Elements options (reset):",
+      Object.entries(elements.display)
+    );
+
     const raceMenu = new StringSelectMenuBuilder()
       .setCustomId("reset_select_race")
       .setPlaceholder("🧬 Chọn lại Tộc")
       .addOptions(
         Object.entries(races).map(([key, r]) => ({
-          label: (r.name || key).substring(0, 25),
-          value: key.substring(0, 100),
-          emoji: r.emoji || "✨",
+          label: (r?.name || key || "Unknown").toString().substring(0, 25),
+          value: (key || "unknown").toString().substring(0, 100),
+          emoji: r?.emoji || "✨",
         }))
       );
 
-    // menu chọn lại ngũ hành
     const elementMenu = new StringSelectMenuBuilder()
       .setCustomId("reset_select_element")
       .setPlaceholder("🌿 Chọn lại Ngũ hành")
       .addOptions(
         Object.entries(elements.display).map(([key, raw]) => {
-          const parts = raw.trim().split(/\s+/);
+          const safeRaw = (raw || "").trim();
+          const parts = safeRaw.split(/\s+/);
           const emoji = parts[0] || "✨";
-          const name = parts.slice(1).join(" ") || key;
+          const name = parts.slice(1).join(" ") || key || "Unknown";
+
           return {
-            label: name.substring(0, 25),
-            value: key.substring(0, 100),
+            label: name.toString().substring(0, 25),
+            value: (key || "unknown").toString().substring(0, 100),
             emoji,
           };
         })
@@ -79,7 +86,9 @@ module.exports = {
       if (interaction.customId === "reset_select_race") {
         selectedRace = interaction.values[0];
         await interaction.reply({
-          content: `🧬 Bạn đã chọn lại **${races[selectedRace].name}**`,
+          content: `🧬 Bạn đã chọn lại **${
+            races[selectedRace]?.name || "Unknown"
+          }**`,
           ephemeral: true,
         });
       }
@@ -87,7 +96,9 @@ module.exports = {
       if (interaction.customId === "reset_select_element") {
         selectedElement = interaction.values[0];
         await interaction.reply({
-          content: `🌿 Bạn đã chọn lại **${elements.display[selectedElement]}**`,
+          content: `🌿 Bạn đã chọn lại **${
+            elements.display[selectedElement] || "Unknown"
+          }**`,
           ephemeral: true,
         });
       }
@@ -103,8 +114,12 @@ module.exports = {
           .setTitle("✅ Reset thành công!")
           .setColor("Green")
           .setDescription(
-            `🧬 **Tộc:** ${races[selectedRace].emoji} ${races[selectedRace].name}\n` +
-              `🌿 **Ngũ hành:** ${elements.display[selectedElement]}\n` +
+            `🧬 **Tộc:** ${races[selectedRace]?.emoji || "✨"} ${
+              races[selectedRace]?.name || "Unknown"
+            }\n` +
+              `🌿 **Ngũ hành:** ${
+                elements.display[selectedElement] || "Unknown"
+              }\n` +
               `⚔️ **Cảnh giới:** ${newUser.realm}\n` +
               `❤️ Máu: ${newUser.hp} | 🔷 Mana: ${newUser.mana}\n` +
               `🔥 Công: ${newUser.attack} | 🛡️ Thủ: ${newUser.defense} | 📦 Giáp: ${newUser.armor}\n` +

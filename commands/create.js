@@ -9,12 +9,16 @@ const elements = require("../utils/element");
 
 module.exports = {
   name: "create",
-  aliases: ["c", "crate"], // thêm alias tránh gõ nhầm
+  aliases: ["c", "crate"],
   run: async (client, msg) => {
     const users = loadUsers();
     if (users[msg.author.id]) {
       return msg.reply("⚠️ Bạn đã có nhân vật rồi! Dùng `-profile` để xem.");
     }
+
+    // Debug in console
+    console.log("👉 Races options:", Object.entries(races));
+    console.log("👉 Elements options:", Object.entries(elements.display));
 
     // menu chọn tộc
     const raceMenu = new StringSelectMenuBuilder()
@@ -22,9 +26,9 @@ module.exports = {
       .setPlaceholder("🧬 Chọn Tộc")
       .addOptions(
         Object.entries(races).map(([key, r]) => ({
-          label: (r.name || key).substring(0, 25),
-          value: key.substring(0, 100),
-          emoji: r.emoji || "✨",
+          label: (r?.name || key || "Unknown").toString().substring(0, 25),
+          value: (key || "unknown").toString().substring(0, 100),
+          emoji: r?.emoji || "✨",
         }))
       );
 
@@ -34,12 +38,14 @@ module.exports = {
       .setPlaceholder("🌿 Chọn Ngũ hành")
       .addOptions(
         Object.entries(elements.display).map(([key, raw]) => {
-          const parts = raw.trim().split(/\s+/);
+          const safeRaw = (raw || "").trim();
+          const parts = safeRaw.split(/\s+/);
           const emoji = parts[0] || "✨";
-          const name = parts.slice(1).join(" ") || key;
+          const name = parts.slice(1).join(" ") || key || "Unknown";
+
           return {
-            label: name.substring(0, 25),
-            value: key.substring(0, 100),
+            label: name.toString().substring(0, 25),
+            value: (key || "unknown").toString().substring(0, 100),
             emoji,
           };
         })
@@ -73,7 +79,9 @@ module.exports = {
       if (interaction.customId === "select_race") {
         selectedRace = interaction.values[0];
         await interaction.reply({
-          content: `🧬 Bạn đã chọn **${races[selectedRace].name}**`,
+          content: `🧬 Bạn đã chọn **${
+            races[selectedRace]?.name || "Unknown"
+          }**`,
           ephemeral: true,
         });
       }
@@ -81,7 +89,9 @@ module.exports = {
       if (interaction.customId === "select_element") {
         selectedElement = interaction.values[0];
         await interaction.reply({
-          content: `🌿 Bạn đã chọn **${elements.display[selectedElement]}**`,
+          content: `🌿 Bạn đã chọn **${
+            elements.display[selectedElement] || "Unknown"
+          }**`,
           ephemeral: true,
         });
       }
@@ -97,8 +107,12 @@ module.exports = {
           .setTitle("✅ Nhân vật đã tạo thành công!")
           .setColor("Green")
           .setDescription(
-            `🧬 **Tộc:** ${races[selectedRace].emoji} ${races[selectedRace].name}\n` +
-              `🌿 **Ngũ hành:** ${elements.display[selectedElement]}\n` +
+            `🧬 **Tộc:** ${races[selectedRace]?.emoji || "✨"} ${
+              races[selectedRace]?.name || "Unknown"
+            }\n` +
+              `🌿 **Ngũ hành:** ${
+                elements.display[selectedElement] || "Unknown"
+              }\n` +
               `⚔️ **Cảnh giới:** ${newUser.realm}\n` +
               `❤️ Máu: ${newUser.hp} | 🔷 Mana: ${newUser.mana}\n` +
               `🔥 Công: ${newUser.attack} | 🛡️ Thủ: ${newUser.defense} | 📦 Giáp: ${newUser.armor}\n` +
