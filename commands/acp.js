@@ -15,10 +15,8 @@ module.exports = {
     const challengerId = challenge.challengerId;
     const defenderId = message.author.id;
 
-    // tạo state trận đấu
     const state = startDuel(challengerId, defenderId);
     delete challenges[defenderId];
-
     if (!state) {
       return message.reply(
         "❌ Không thể bắt đầu trận đấu (thiếu dữ liệu nhân vật)!"
@@ -28,23 +26,35 @@ module.exports = {
     const challenger = await client.users.fetch(challengerId);
     const defender = message.author;
 
+    state.dmChannels = [];
+
+    // thử gửi cho challenger
     try {
       const dm1 = await challenger.createDM();
-      const dm2 = await defender.createDM();
-
-      state.dmChannels = [dm1, dm2];
-
       await dm1.send(`🔥 Trận đấu với **${defender.username}** đã bắt đầu!`);
-      await dm2.send(`🔥 Trận đấu với **${challenger.username}** đã bắt đầu!`);
-
-      // gửi embed/menu vào DM cả hai bên
-      await sendBattleEmbeds(client, state, dm1);
-      await sendBattleEmbeds(client, state, dm2);
-    } catch (e) {
-      console.error("Không thể gửi DM:", e);
+      state.dmChannels.push(dm1);
+    } catch {
       message.channel.send(
-        "❌ Không thể DM cho người chơi (có thể họ tắt DM)."
+        `⚠️ Không thể DM cho <@${challengerId}> → trận đấu sẽ hiển thị ở kênh này.`
       );
+      state.dmChannels.push(message.channel);
+    }
+
+    // thử gửi cho defender
+    try {
+      const dm2 = await defender.createDM();
+      await dm2.send(`🔥 Trận đấu với **${challenger.username}** đã bắt đầu!`);
+      state.dmChannels.push(dm2);
+    } catch {
+      message.channel.send(
+        `⚠️ Không thể DM cho <@${defenderId}> → trận đấu sẽ hiển thị ở kênh này.`
+      );
+      state.dmChannels.push(message.channel);
+    }
+
+    // gửi embed/menu vào tất cả channel hợp lệ
+    for (const ch of state.dmChannels) {
+      await sendBattleEmbeds(client, state, ch);
     }
   },
 };
