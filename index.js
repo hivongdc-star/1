@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { Client, GatewayIntentBits, Partials } = require("discord.js");
+const { Client, GatewayIntentBits, Partials, Events } = require("discord.js");
 const { startDispatcher } = require("./utils/dispatcher");
 const { handleSkillInteraction } = require("./utils/duelMenu");
 
@@ -13,14 +13,14 @@ const client = new Client({
   partials: [Partials.Channel], // cần để nhận DM
 });
 
-// dùng clientReady (v15) → hết warning
-client.once("clientReady", () => {
+// đúng event name là "ready"
+client.once(Events.ClientReady, () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
   startDispatcher(client);
 });
 
 // xử lý interaction (skill menu)
-client.on("interactionCreate", async (interaction) => {
+client.on(Events.InteractionCreate, async (interaction) => {
   try {
     if (!interaction.isStringSelectMenu()) return;
 
@@ -29,7 +29,8 @@ client.on("interactionCreate", async (interaction) => {
     }
   } catch (err) {
     console.error("❌ Interaction error:", err);
-    if (!interaction.replied) {
+
+    if (!interaction.replied && !interaction.deferred) {
       try {
         await interaction.reply({
           content: "⚠️ Có lỗi xảy ra khi xử lý skill!",

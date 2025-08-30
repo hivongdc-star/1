@@ -3,7 +3,7 @@ const { heal, addShield, addBuff } = require("./dmg");
 const skills = {
   kim: [
     {
-      name: "Kim Cương Trảm",
+      name: "Cương Phong Trảm Kích",
       type: "normal",
       cost: { mana: 0, fury: 0 },
       multiplier: 0.8,
@@ -11,41 +11,41 @@ const skills = {
       description: "Nhát chém cơ bản.",
     },
     {
-      name: "Thiết Tỏa Liên",
+      name: "Kim Cang Trảm Giáp",
       type: "buff",
       cost: { mana: 0, fury: 0 },
       multiplier: 0,
       furyGain: 0,
-      description: "Hồi 30 mana, buff xuyên giáp 15 trong 3 lượt.",
+      description: "Hồi 30 mana, buff xuyên giáp 20% (2 lượt).",
       effect: (attacker) => {
         attacker.mana = Math.min(attacker.maxMana || 100, attacker.mana + 30);
-        addBuff(attacker, "ignoreArmor", 15, 3);
+        addBuff(attacker, "ignoreArmor", 0.2, 2); // bỏ qua 20% DEF trong 2 lượt
         return 0;
       },
     },
     {
-      name: "Ngân Thạch Quyền",
+      name: "Thiên Toái Kim Quang",
       type: "mana",
       cost: { mana: 40, fury: 0 },
       multiplier: 2.0,
       furyGain: 10,
       description: "Cú đấm xuyên thủng, sát thương lớn.",
-      ignoreArmor: 20,
+      ignoreArmor: 0.3, // bỏ qua 30% DEF
     },
     {
-      name: "Thần Kim Giới",
+      name: "Kim Lang Khiếu Nguyệt",
       type: "fury",
       cost: { mana: 0, fury: 100 },
       multiplier: 3.5,
       furyGain: -100,
       description: "Kim chi cực hạn, sát thương khủng khiếp.",
-      ignoreArmor: 30,
+      ignoreArmor: 0.5, // bỏ qua 50% DEF
     },
   ],
 
   moc: [
     {
-      name: "Thanh Mộc Kích",
+      name: "Thanh Diệp Loạn Trảm",
       type: "normal",
       cost: { mana: 0, fury: 0 },
       multiplier: 0.8,
@@ -53,12 +53,12 @@ const skills = {
       description: "Đòn đánh cơ bản.",
     },
     {
-      name: "Sinh Cơ Vĩnh",
+      name: "Sinh Cơ Chi Khí",
       type: "buff",
       cost: { mana: 0, fury: 0 },
       multiplier: 0,
       furyGain: 0,
-      description: "Hồi 30 mana và 20% máu.",
+      description: "Hồi 30 mana và 20% máu (hồi ngay lập tức).",
       effect: (attacker) => {
         attacker.mana = Math.min(attacker.maxMana || 100, attacker.mana + 30);
         heal(attacker, Math.floor((attacker.maxHp || 100) * 0.2));
@@ -66,7 +66,7 @@ const skills = {
       },
     },
     {
-      name: "Lục Diệp Trảm",
+      name: "Vạn Diệp Cuồng Trảm",
       type: "mana",
       cost: { mana: 40, fury: 0 },
       multiplier: 2.0,
@@ -74,7 +74,7 @@ const skills = {
       description: "Lá xanh hóa kiếm, sát thương cao.",
     },
     {
-      name: "Thiên Mộc Diệt",
+      name: "Thiên Mộc Giáng Lâm",
       type: "fury",
       cost: { mana: 0, fury: 100 },
       multiplier: 3.5,
@@ -85,7 +85,7 @@ const skills = {
 
   thuy: [
     {
-      name: "Lam Thủy Tiễn",
+      name: "Thủy Ảnh Hàn Tiễn",
       type: "normal",
       cost: { mana: 0, fury: 0 },
       multiplier: 0.8,
@@ -93,7 +93,7 @@ const skills = {
       description: "Đòn thủy tiễn cơ bản.",
     },
     {
-      name: "Băng Tỏa Thuật",
+      name: "Băng Tâm Hộ Thể",
       type: "buff",
       cost: { mana: 0, fury: 0 },
       multiplier: 0,
@@ -106,7 +106,7 @@ const skills = {
       },
     },
     {
-      name: "Hàn Băng Trảm",
+      name: "Nguyệt Ảnh Thiên Hàn",
       type: "mana",
       cost: { mana: 40, fury: 0 },
       multiplier: 2.0,
@@ -114,7 +114,7 @@ const skills = {
       description: "Kiếm băng, sát thương lớn.",
     },
     {
-      name: "Thủy Long Ấn",
+      name: "Kính Hoa Thủy Nguyệt",
       type: "fury",
       cost: { mana: 0, fury: 100 },
       multiplier: 3.5,
@@ -125,7 +125,7 @@ const skills = {
 
   hoa: [
     {
-      name: "Xích Viêm Trảm",
+      name: "Liệt Diễm Bạo Quyền",
       type: "normal",
       cost: { mana: 0, fury: 0 },
       multiplier: 0.8,
@@ -133,12 +133,12 @@ const skills = {
       description: "Đòn lửa cơ bản.",
     },
     {
-      name: "Liệt Diễm Cầu",
+      name: "Hỏa Linh Cuồng Thể",
       type: "buff",
       cost: { mana: 0, fury: 0 },
       multiplier: 0,
       furyGain: 0,
-      description: "Hồi 30 mana, buff +20% damage trong 2 lượt.",
+      description: "Hồi 30 mana, buff +20% công (2 lượt).",
       effect: (attacker) => {
         attacker.mana = Math.min(attacker.maxMana || 100, attacker.mana + 30);
         addBuff(attacker, "buffDmg", 1.2, 2);
@@ -146,7 +146,7 @@ const skills = {
       },
     },
     {
-      name: "Hỏa Phượng Minh",
+      name: "Nhật Diễm Thiên Viêm",
       type: "mana",
       cost: { mana: 40, fury: 0 },
       multiplier: 2.2,
@@ -154,7 +154,7 @@ const skills = {
       description: "Phượng hoàng lửa, sát thương cực mạnh.",
     },
     {
-      name: "Vạn Hỏa Diệt",
+      name: "Phật Nộ Hỏa Liên",
       type: "fury",
       cost: { mana: 0, fury: 100 },
       multiplier: 3.8,
@@ -165,7 +165,7 @@ const skills = {
 
   tho: [
     {
-      name: "Thạch Phách Quyền",
+      name: "Phá Địa Trấn Quyền",
       type: "normal",
       cost: { mana: 0, fury: 0 },
       multiplier: 0.8,
@@ -173,12 +173,12 @@ const skills = {
       description: "Đòn đấm đất đá.",
     },
     {
-      name: "Sơn Thể Thuật",
+      name: "Sơn Hà Thạch Thể",
       type: "buff",
       cost: { mana: 0, fury: 0 },
       multiplier: 0,
       furyGain: 0,
-      description: "Hồi 30 mana, buff +20% def/giáp trong 2 lượt.",
+      description: "Hồi 30 mana, buff +20% thủ/giáp (2 lượt).",
       effect: (attacker) => {
         attacker.mana = Math.min(attacker.maxMana || 100, attacker.mana + 30);
         addBuff(attacker, "buffDef", 0.2, 2);
@@ -186,7 +186,7 @@ const skills = {
       },
     },
     {
-      name: "Thổ Long Kích",
+      name: "Thổ Long Liệt Địa",
       type: "mana",
       cost: { mana: 40, fury: 0 },
       multiplier: 2.0,
@@ -194,7 +194,7 @@ const skills = {
       description: "Triệu hồi thổ long, sát thương mạnh.",
     },
     {
-      name: "Thiên Thạch Giới",
+      name: "Thiên Diễn Đoạn Không",
       type: "fury",
       cost: { mana: 0, fury: 100 },
       multiplier: 3.5,

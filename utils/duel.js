@@ -6,24 +6,20 @@ const { calculateDamage, tickBuffs } = require("./dmg");
 const battles = {};
 const challenges = {};
 
+// chuẩn hóa user trước combat
 function normalizeUser(u, id) {
   if (!u) return null;
-  u.id = u.id || id;
-
+  u.id = id;
   u.maxHp = u.maxHp || 100;
-  if (u.hp === undefined || u.hp <= 0) u.hp = u.maxHp;
-
+  u.hp = Math.min(u.hp ?? u.maxHp, u.maxHp);
   u.maxMana = u.maxMana || 100;
-  if (u.mana === undefined) u.mana = u.maxMana;
-
-  if (u.fury === undefined) u.fury = 0;
-  u.attack = u.attack || 10;
-  u.defense = u.defense || 10;
-  u.armor = u.armor || 10;
-
+  u.mana = Math.min(u.mana ?? u.maxMana, u.maxMana);
+  u.fury = u.fury ?? 0;
+  u.attack = u.attack ?? 10;
+  u.defense = u.defense ?? 10;
+  u.armor = u.armor ?? 10;
   u.buffs = u.buffs || [];
   u.shield = u.shield || 0;
-
   return u;
 }
 
@@ -33,7 +29,7 @@ function createBattleState(p1Id, p2Id) {
     turn: p1Id,
     logs: [],
     finished: false,
-    dmChannels: [], // lưu DM của 2 người chơi
+    channels: [], // nơi gửi update (DM hoặc channel chính)
   };
 }
 
@@ -44,20 +40,16 @@ function startDuel(p1Id, p2Id) {
   if (!p1 || !p2) return null;
 
   const state = createBattleState(p1Id, p2Id);
-
   battles[p1Id] = { opponentId: p2Id, state };
   battles[p2Id] = { opponentId: p1Id, state };
-
   delete challenges[p1Id];
   delete challenges[p2Id];
-
   return state;
 }
 
 function useSkill(userId, skillName) {
   const battle = battles[userId];
   if (!battle) return null;
-
   const state = battle.state;
   if (state.finished || state.turn !== userId) return state;
 
@@ -88,7 +80,7 @@ function useSkill(userId, skillName) {
 
   let dmg = 0;
   if (skill.multiplier > 0) {
-    dmg = require("./dmg").calculateDamage(attacker, defender, skill);
+    dmg = calculateDamage(attacker, defender, skill);
     defender.hp -= dmg;
   }
 
@@ -97,8 +89,7 @@ function useSkill(userId, skillName) {
     if (typeof extra === "number" && extra > 0) dmg = extra;
   }
 
-  if (defender.hp < 0) defender.hp = 0;
-
+  defender.hp = Math.max(0, defender.hp);
   attacker.fury = Math.max(
     0,
     Math.min(100, attacker.fury + (skill.furyGain || 0))
@@ -140,7 +131,6 @@ function resetAfterBattle(state) {
     u.buffs = [];
   }
   saveUsers(users);
-
   for (const pid of state.players) delete battles[pid];
 }
 
