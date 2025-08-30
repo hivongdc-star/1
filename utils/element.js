@@ -1,10 +1,10 @@
-// element.js
+// utils/element.js
 module.exports = {
-  kim: { hp: 6, mana: 2, attack: 2, defense: 3, armor: 3 }, // Trâu, thiên về thủ + giáp
-  moc: { hp: 5, mana: 5, attack: 3, defense: 2, armor: 2 }, // Cân bằng, thiên về mana
-  thuy: { hp: 7, mana: 4, attack: 2, defense: 3, armor: 2 }, // Nhiều máu, mana ổn định
-  hoa: { hp: 5, mana: 2, attack: 5, defense: 2, armor: 2 }, // Công cao, máu vừa
-  tho: { hp: 8, mana: 2, attack: 2, defense: 4, armor: 4 }, // Tank cứng, thủ + giáp cao
+  kim: { hp: 30, mana: 10, attack: 10, defense: 15, armor: 15 }, // Trâu thủ/giáp
+  moc: { hp: 20, mana: 25, attack: 15, defense: 10, armor: 8 }, // Nhiều mana + cân bằng
+  thuy: { hp: 35, mana: 20, attack: 10, defense: 12, armor: 10 }, // Máu trâu + mana ổn định
+  hoa: { hp: 20, mana: 10, attack: 30, defense: 8, armor: 8 }, // Công cực cao
+  tho: { hp: 40, mana: 8, attack: 10, defense: 20, armor: 20 }, // Tank khủng
 };
 
 // Map hiển thị

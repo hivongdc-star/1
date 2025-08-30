@@ -1,52 +1,45 @@
+// commands/create.js
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
   EmbedBuilder,
 } = require("discord.js");
-const { loadUsers, createUser } = require("../utils/storage");
+const { createUser, loadUsers } = require("../utils/storage");
 const races = require("../utils/races");
 const elements = require("../utils/element");
 
 module.exports = {
   name: "create",
-  aliases: ["c", "crate"],
+  aliases: ["c"],
   run: async (client, msg) => {
     const users = loadUsers();
     if (users[msg.author.id]) {
       return msg.reply("⚠️ Bạn đã có nhân vật rồi! Dùng `-profile` để xem.");
     }
 
-    // Debug in console
-    console.log("👉 Races options:", Object.entries(races));
-    console.log("👉 Elements options:", Object.entries(elements.display));
-
-    // menu chọn tộc
+    // Menu chọn Tộc
     const raceMenu = new StringSelectMenuBuilder()
       .setCustomId("select_race")
       .setPlaceholder("🧬 Chọn Tộc")
       .addOptions(
         Object.entries(races).map(([key, r]) => ({
-          label: (r?.name || key || "Unknown").toString().substring(0, 25),
-          value: (key || "unknown").toString().substring(0, 100),
-          emoji: r?.emoji || "✨",
+          label: r.name.substring(0, 25), // label ≤ 25
+          value: key, // key chuẩn: nhan, ma, tien, yeu, than
+          emoji: r.emoji,
         }))
       );
 
-    // menu chọn ngũ hành
+    // Menu chọn Ngũ hành
     const elementMenu = new StringSelectMenuBuilder()
       .setCustomId("select_element")
       .setPlaceholder("🌿 Chọn Ngũ hành")
       .addOptions(
         Object.entries(elements.display).map(([key, raw]) => {
-          const safeRaw = (raw || "").trim();
-          const parts = safeRaw.split(/\s+/);
-          const emoji = parts[0] || "✨";
-          const name = parts.slice(1).join(" ") || key || "Unknown";
-
+          const [emoji, name] = raw.split(" ");
           return {
-            label: name.toString().substring(0, 25),
-            value: (key || "unknown").toString().substring(0, 100),
-            emoji,
+            label: name.substring(0, 25),
+            value: key, // key chuẩn: kim, moc, thuy, hoa, tho
+            emoji: emoji,
           };
         })
       );
@@ -79,9 +72,7 @@ module.exports = {
       if (interaction.customId === "select_race") {
         selectedRace = interaction.values[0];
         await interaction.reply({
-          content: `🧬 Bạn đã chọn **${
-            races[selectedRace]?.name || "Unknown"
-          }**`,
+          content: `🧬 Bạn đã chọn **${races[selectedRace].emoji} ${races[selectedRace].name}**`,
           ephemeral: true,
         });
       }
@@ -89,13 +80,12 @@ module.exports = {
       if (interaction.customId === "select_element") {
         selectedElement = interaction.values[0];
         await interaction.reply({
-          content: `🌿 Bạn đã chọn **${
-            elements.display[selectedElement] || "Unknown"
-          }**`,
+          content: `🌿 Bạn đã chọn **${elements.display[selectedElement]}**`,
           ephemeral: true,
         });
       }
 
+      // Khi đã chọn đủ
       if (selectedRace && selectedElement) {
         const newUser = createUser(
           msg.author.id,
@@ -107,12 +97,8 @@ module.exports = {
           .setTitle("✅ Nhân vật đã tạo thành công!")
           .setColor("Green")
           .setDescription(
-            `🧬 **Tộc:** ${races[selectedRace]?.emoji || "✨"} ${
-              races[selectedRace]?.name || "Unknown"
-            }\n` +
-              `🌿 **Ngũ hành:** ${
-                elements.display[selectedElement] || "Unknown"
-              }\n` +
+            `🧬 **Tộc:** ${races[selectedRace].emoji} ${races[selectedRace].name}\n` +
+              `🌿 **Ngũ hành:** ${elements.display[selectedElement]}\n` +
               `⚔️ **Cảnh giới:** ${newUser.realm}\n` +
               `❤️ Máu: ${newUser.hp} | 🔷 Mana: ${newUser.mana}\n` +
               `🔥 Công: ${newUser.attack} | 🛡️ Thủ: ${newUser.defense} | 📦 Giáp: ${newUser.armor}\n` +

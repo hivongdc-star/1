@@ -65,8 +65,8 @@ function createUser(id, race, element) {
       dailyStones: { date: null, earned: 0 },
     };
 
-    // bonus theo race
-    if (races[race]) {
+    // bonus theo race (nếu có)
+    if (races[race] && typeof races[race].bonus === "function") {
       races[race].bonus(user);
     }
 

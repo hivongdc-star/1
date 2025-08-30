@@ -1,3 +1,4 @@
+// commands/reset.js
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
@@ -13,45 +14,36 @@ module.exports = {
   run: async (client, msg) => {
     const users = loadUsers();
     if (!users[msg.author.id]) {
-      return msg.reply("⚠️ Bạn chưa có nhân vật để reset!");
+      return msg.reply("⚠️ Bạn chưa có nhân vật để reset.");
     }
 
-    // xoá nhân vật cũ
+    // Xoá nhân vật cũ
     delete users[msg.author.id];
     saveUsers(users);
 
-    // Debug
-    console.log("👉 Races options (reset):", Object.entries(races));
-    console.log(
-      "👉 Elements options (reset):",
-      Object.entries(elements.display)
-    );
-
+    // Menu chọn lại Tộc
     const raceMenu = new StringSelectMenuBuilder()
       .setCustomId("reset_select_race")
       .setPlaceholder("🧬 Chọn lại Tộc")
       .addOptions(
         Object.entries(races).map(([key, r]) => ({
-          label: (r?.name || key || "Unknown").toString().substring(0, 25),
-          value: (key || "unknown").toString().substring(0, 100),
-          emoji: r?.emoji || "✨",
+          label: r.name.substring(0, 25),
+          value: key,
+          emoji: r.emoji,
         }))
       );
 
+    // Menu chọn lại Ngũ hành
     const elementMenu = new StringSelectMenuBuilder()
       .setCustomId("reset_select_element")
       .setPlaceholder("🌿 Chọn lại Ngũ hành")
       .addOptions(
         Object.entries(elements.display).map(([key, raw]) => {
-          const safeRaw = (raw || "").trim();
-          const parts = safeRaw.split(/\s+/);
-          const emoji = parts[0] || "✨";
-          const name = parts.slice(1).join(" ") || key || "Unknown";
-
+          const [emoji, name] = raw.split(" ");
           return {
-            label: name.toString().substring(0, 25),
-            value: (key || "unknown").toString().substring(0, 100),
-            emoji,
+            label: name.substring(0, 25),
+            value: key,
+            emoji: emoji,
           };
         })
       );
@@ -63,7 +55,7 @@ module.exports = {
       .setColor("Red")
       .setTitle("♻️ Reset nhân vật")
       .setDescription(
-        `Nhân vật cũ của **${msg.author.username}** đã bị xoá.\n👉 Hãy chọn lại **Tộc** và **Ngũ hành** để bắt đầu lại!`
+        `Nhân vật của **${msg.author.username}** đã được xoá.\n👉 Hãy chọn lại **Tộc** và **Ngũ hành** để bắt đầu lại từ đầu!`
       );
 
     const reply = await msg.channel.send({
@@ -78,7 +70,7 @@ module.exports = {
     collector.on("collect", async (interaction) => {
       if (interaction.user.id !== msg.author.id) {
         return interaction.reply({
-          content: "⚠️ Bạn chỉ có thể reset nhân vật của chính mình!",
+          content: "⚠️ Bạn chỉ có thể reset chính nhân vật của mình!",
           ephemeral: true,
         });
       }
@@ -86,9 +78,7 @@ module.exports = {
       if (interaction.customId === "reset_select_race") {
         selectedRace = interaction.values[0];
         await interaction.reply({
-          content: `🧬 Bạn đã chọn lại **${
-            races[selectedRace]?.name || "Unknown"
-          }**`,
+          content: `🧬 Bạn đã chọn lại **${races[selectedRace].emoji} ${races[selectedRace].name}**`,
           ephemeral: true,
         });
       }
@@ -96,9 +86,7 @@ module.exports = {
       if (interaction.customId === "reset_select_element") {
         selectedElement = interaction.values[0];
         await interaction.reply({
-          content: `🌿 Bạn đã chọn lại **${
-            elements.display[selectedElement] || "Unknown"
-          }**`,
+          content: `🌿 Bạn đã chọn lại **${elements.display[selectedElement]}**`,
           ephemeral: true,
         });
       }
@@ -114,12 +102,8 @@ module.exports = {
           .setTitle("✅ Reset thành công!")
           .setColor("Green")
           .setDescription(
-            `🧬 **Tộc:** ${races[selectedRace]?.emoji || "✨"} ${
-              races[selectedRace]?.name || "Unknown"
-            }\n` +
-              `🌿 **Ngũ hành:** ${
-                elements.display[selectedElement] || "Unknown"
-              }\n` +
+            `🧬 **Tộc:** ${races[selectedRace].emoji} ${races[selectedRace].name}\n` +
+              `🌿 **Ngũ hành:** ${elements.display[selectedElement]}\n` +
               `⚔️ **Cảnh giới:** ${newUser.realm}\n` +
               `❤️ Máu: ${newUser.hp} | 🔷 Mana: ${newUser.mana}\n` +
               `🔥 Công: ${newUser.attack} | 🛡️ Thủ: ${newUser.defense} | 📦 Giáp: ${newUser.armor}\n` +
@@ -134,7 +118,9 @@ module.exports = {
 
     collector.on("end", () => {
       if (!selectedRace || !selectedElement) {
-        msg.channel.send("⏳ Reset chưa hoàn tất, hãy dùng lại lệnh `-reset`.");
+        msg.channel.send(
+          "⏳ Reset không hoàn tất, hãy dùng lại lệnh `-reset`."
+        );
       }
     });
   },
