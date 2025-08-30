@@ -1,4 +1,3 @@
-// commands/create.js
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
@@ -10,7 +9,7 @@ const elements = require("../utils/element");
 
 module.exports = {
   name: "create",
-  aliases: ["c"],
+  aliases: ["c", "crate"], // thêm alias tránh gõ nhầm
   run: async (client, msg) => {
     const users = loadUsers();
     if (users[msg.author.id]) {
@@ -23,22 +22,27 @@ module.exports = {
       .setPlaceholder("🧬 Chọn Tộc")
       .addOptions(
         Object.entries(races).map(([key, r]) => ({
-          label: r.name, // Nhân / Ma / Tiên ...
-          value: key, // nhan / ma / tien ...
-          emoji: r.emoji, // 👤 / 😈 / 👼 ...
+          label: (r.name || key).substring(0, 25),
+          value: key.substring(0, 100),
+          emoji: r.emoji || "✨",
         }))
       );
 
-    // menu chọn hệ
+    // menu chọn ngũ hành
     const elementMenu = new StringSelectMenuBuilder()
       .setCustomId("select_element")
       .setPlaceholder("🌿 Chọn Ngũ hành")
       .addOptions(
-        Object.entries(elements.display).map(([key, label]) => ({
-          label: label.replace(/^[^ ]+ /, ""), // chỉ lấy chữ (Kim / Mộc / Thủy...)
-          value: key,
-          emoji: label.split(" ")[0], // lấy emoji
-        }))
+        Object.entries(elements.display).map(([key, raw]) => {
+          const parts = raw.trim().split(/\s+/);
+          const emoji = parts[0] || "✨";
+          const name = parts.slice(1).join(" ") || key;
+          return {
+            label: name.substring(0, 25),
+            value: key.substring(0, 100),
+            emoji,
+          };
+        })
       );
 
     const row1 = new ActionRowBuilder().addComponents(raceMenu);
@@ -82,7 +86,6 @@ module.exports = {
         });
       }
 
-      // khi đã chọn đủ
       if (selectedRace && selectedElement) {
         const newUser = createUser(
           msg.author.id,

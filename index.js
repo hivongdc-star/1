@@ -13,12 +13,13 @@ const client = new Client({
   partials: [Partials.Channel], // cần để nhận DM
 });
 
-client.once("ready", () => {
+// dùng clientReady (v15) → hết warning
+client.once("clientReady", () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
   startDispatcher(client);
 });
 
-// --- Xử lý interaction (menu chọn skill) ---
+// xử lý interaction (skill menu)
 client.on("interactionCreate", async (interaction) => {
   try {
     if (!interaction.isStringSelectMenu()) return;

@@ -1,4 +1,3 @@
-// commands/reset.js
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
@@ -17,32 +16,37 @@ module.exports = {
       return msg.reply("⚠️ Bạn chưa có nhân vật để reset!");
     }
 
-    // Xoá nhân vật cũ
+    // xoá nhân vật cũ
     delete users[msg.author.id];
     saveUsers(users);
 
-    // Menu chọn Tộc
+    // menu chọn lại tộc
     const raceMenu = new StringSelectMenuBuilder()
       .setCustomId("reset_select_race")
       .setPlaceholder("🧬 Chọn lại Tộc")
       .addOptions(
         Object.entries(races).map(([key, r]) => ({
-          label: r.name,
-          value: key,
-          emoji: r.emoji,
+          label: (r.name || key).substring(0, 25),
+          value: key.substring(0, 100),
+          emoji: r.emoji || "✨",
         }))
       );
 
-    // Menu chọn Hệ
+    // menu chọn lại ngũ hành
     const elementMenu = new StringSelectMenuBuilder()
       .setCustomId("reset_select_element")
       .setPlaceholder("🌿 Chọn lại Ngũ hành")
       .addOptions(
-        Object.entries(elements.display).map(([key, label]) => ({
-          label: label.replace(/^[^ ]+ /, ""),
-          value: key,
-          emoji: label.split(" ")[0],
-        }))
+        Object.entries(elements.display).map(([key, raw]) => {
+          const parts = raw.trim().split(/\s+/);
+          const emoji = parts[0] || "✨";
+          const name = parts.slice(1).join(" ") || key;
+          return {
+            label: name.substring(0, 25),
+            value: key.substring(0, 100),
+            emoji,
+          };
+        })
       );
 
     const row1 = new ActionRowBuilder().addComponents(raceMenu);
@@ -52,8 +56,7 @@ module.exports = {
       .setColor("Red")
       .setTitle("♻️ Reset nhân vật")
       .setDescription(
-        `Nhân vật cũ của **${msg.author.username}** đã được xoá.\n` +
-          `👉 Hãy chọn lại **Tộc** và **Ngũ hành** để bắt đầu lại!`
+        `Nhân vật cũ của **${msg.author.username}** đã bị xoá.\n👉 Hãy chọn lại **Tộc** và **Ngũ hành** để bắt đầu lại!`
       );
 
     const reply = await msg.channel.send({
@@ -89,7 +92,6 @@ module.exports = {
         });
       }
 
-      // Khi đã chọn đủ cả 2
       if (selectedRace && selectedElement) {
         const newUser = createUser(
           msg.author.id,
