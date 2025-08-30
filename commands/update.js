@@ -1,4 +1,3 @@
-// commands/update.js
 require("dotenv").config();
 const { spawn } = require("child_process");
 const path = require("path");
@@ -18,9 +17,9 @@ module.exports = {
       const owner = await client.users.fetch(ownerId);
       await owner.send("🔄 Bot đang tiến hành update...");
 
-      // chỉ chạy update.bat (Windows)
+      // chạy file update.bat (Windows VPS)
       const scriptPath = path.join(__dirname, "..", "update.bat");
-      const child = spawn(scriptPath, [], { shell: true });
+      const child = spawn("cmd.exe", ["/c", scriptPath]);
 
       child.stdout.on("data", (data) => {
         log(`[UPDATE STDOUT] ${data}`);
@@ -43,6 +42,7 @@ module.exports = {
       });
     } catch (err) {
       logError(err, "Update Command Outer");
+      msg.reply("❌ Có lỗi khi chạy update, xem log để biết chi tiết.");
     }
   },
 };
