@@ -17,29 +17,28 @@ module.exports = {
       return msg.reply("⚠️ Bạn đã có nhân vật rồi! Dùng `-profile` để xem.");
     }
 
-    // Menu chọn Tộc
+    // menu chọn tộc
     const raceMenu = new StringSelectMenuBuilder()
       .setCustomId("select_race")
       .setPlaceholder("🧬 Chọn Tộc")
       .addOptions(
         Object.entries(races).map(([key, r]) => ({
-          label: r.name,
-          value: key,
-          emoji: r.emoji,
+          label: r.name, // Nhân / Ma / Tiên ...
+          value: key, // nhan / ma / tien ...
+          emoji: r.emoji, // 👤 / 😈 / 👼 ...
         }))
       );
 
-    // Menu chọn Ngũ hành
+    // menu chọn hệ
     const elementMenu = new StringSelectMenuBuilder()
       .setCustomId("select_element")
       .setPlaceholder("🌿 Chọn Ngũ hành")
       .addOptions(
-        Object.entries(elements.display).map(([key, label]) => {
-          const parts = label.split(" ");
-          const emoji = parts[0] || "❓";
-          const text = parts.slice(1).join(" ") || key;
-          return { label: text, value: key, emoji };
-        })
+        Object.entries(elements.display).map(([key, label]) => ({
+          label: label.replace(/^[^ ]+ /, ""), // chỉ lấy chữ (Kim / Mộc / Thủy...)
+          value: key,
+          emoji: label.split(" ")[0], // lấy emoji
+        }))
       );
 
     const row1 = new ActionRowBuilder().addComponents(raceMenu);
@@ -83,6 +82,7 @@ module.exports = {
         });
       }
 
+      // khi đã chọn đủ
       if (selectedRace && selectedElement) {
         const newUser = createUser(
           msg.author.id,

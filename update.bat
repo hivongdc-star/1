@@ -1,19 +1,20 @@
 @echo off
-echo ============================
-echo 🚀 Bắt đầu cập nhật bot...
-echo ============================
+echo ========================
+echo  🚀 Updating TuTien Bot
+echo ========================
+cd /d %~dp0
 
-REM Pull code mới nhất từ GitHub
-git pull origin main
+set LOGFILE=logs\update.log
+if not exist logs mkdir logs
 
-REM Cài lại dependencies nếu có thay đổi
-npm install
+echo [START] %date% %time% > %LOGFILE%
+git reset --hard >> %LOGFILE% 2>&1
+git pull origin main >> %LOGFILE% 2>&1
+call npm install >> %LOGFILE% 2>&1
+call pm2 restart index.js >> %LOGFILE% 2>&1
+echo [END] %date% %time% >> %LOGFILE%
 
-REM Restart bot bằng PM2
-pm2 restart index
-
-echo ============================
-echo ✅ Bot đã được cập nhật xong!
-echo ============================
-
-pause
+echo ========================
+echo ✅ Update completed!
+echo ========================
+timeout /t 10 /nobreak >nul

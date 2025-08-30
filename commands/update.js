@@ -1,43 +1,48 @@
-const { exec } = require("child_process");
+// commands/update.js
+require("dotenv").config();
+const { spawn } = require("child_process");
+const path = require("path");
+const { log, logError } = require("../utils/logger");
 
 module.exports = {
   name: "update",
-  description: "Cập nhật code từ GitHub và restart bot (Admin only)",
+  aliases: ["up"],
   run: async (client, msg) => {
-    const OWNER_ID = process.env.OWNER_ID;
+    const ownerId = process.env.OWNER_ID;
 
-    if (msg.author.id !== OWNER_ID) {
+    if (msg.author.id !== ownerId) {
       return msg.reply("❌ Bạn không có quyền dùng lệnh này.");
     }
 
-    msg.reply("🔄 Đang tiến hành update...");
+    try {
+      const owner = await client.users.fetch(ownerId);
+      await owner.send("🔄 Bot đang tiến hành update...");
 
-    exec("./update.sh", async (err, stdout, stderr) => {
-      const owner = await client.users.fetch(OWNER_ID);
+      // chỉ chạy update.bat (Windows)
+      const scriptPath = path.join(__dirname, "..", "update.bat");
+      const child = spawn(scriptPath, [], { shell: true });
 
-      if (err) {
-        console.error("Update error:", err);
-        if (owner) {
-          owner
-            .send("❌ Lỗi khi update bot:\n```" + err.message + "```")
-            .catch(() => {});
+      child.stdout.on("data", (data) => {
+        log(`[UPDATE STDOUT] ${data}`);
+      });
+
+      child.stderr.on("data", (data) => {
+        logError(`[UPDATE STDERR] ${data}`);
+      });
+
+      child.on("close", (code) => {
+        if (code === 0) {
+          log("Bot update thành công!");
+          owner.send("✅ Bot đã update và restart thành công!");
+        } else {
+          logError(`Update process exited with code ${code}`);
+          owner.send(
+            `❌ Update lỗi với code ${code}. Kiểm tra logs/update.log để biết chi tiết.`
+          );
         }
-        return msg.channel.send("❌ Lỗi khi update bot.");
-      }
-
-      if (stderr) console.error(stderr);
-
-      // báo trong channel
-      msg.channel.send(
-        "✅ Bot đã được cập nhật và restart!\n```" + stdout + "```"
-      );
-
-      // báo riêng cho OWNER
-      if (owner) {
-        owner
-          .send("✅ Bot đã update & restart thành công!\n```" + stdout + "```")
-          .catch(() => {});
-      }
-    });
+      });
+    } catch (err) {
+      logError(err, "Update Command Outer");
+    }
   },
 };
