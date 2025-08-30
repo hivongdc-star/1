@@ -3,7 +3,7 @@ const OWNER_ID = process.env.OWNER_ID;
 
 module.exports = {
   name: "fixdata",
-  description: "Cập nhật users.json với chỉ số mới (chỉ admin)",
+  description: "Tự động chuẩn hóa dữ liệu users.json (chỉ admin)",
   aliases: ["fd"],
 
   run(client, msg) {
@@ -14,6 +14,7 @@ module.exports = {
     const users = loadUsers();
     let fixed = 0;
 
+    // Các field mặc định
     const defaults = {
       name: "Chưa đặt tên",
       exp: 0,
@@ -29,7 +30,7 @@ module.exports = {
       defense: 10,
       armor: 10,
       fury: 0,
-      lt: 0, // ✅ đổi từ linhthach sang lt
+      lt: 0, // ✅ Linh thạch chuẩn
       inventory: {},
       title: null,
       bio: "",
@@ -40,6 +41,14 @@ module.exports = {
       const u = users[id];
       let changed = false;
 
+      // 🔄 migrate từ "linhthach" sang "lt"
+      if (u.linhthach !== undefined) {
+        u.lt = (u.lt || 0) + u.linhthach;
+        delete u.linhthach;
+        changed = true;
+      }
+
+      // thêm field mặc định nếu thiếu
       for (const key in defaults) {
         if (u[key] === undefined || u[key] === null) {
           u[key] = defaults[key];
@@ -51,6 +60,6 @@ module.exports = {
     }
 
     saveUsers(users);
-    msg.reply(`✅ Đã fix chỉ số cho **${fixed}** nhân vật.`);
+    msg.reply(`✅ Đã fix dữ liệu cho **${fixed}** nhân vật.`);
   },
 };
