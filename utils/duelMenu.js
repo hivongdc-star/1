@@ -9,7 +9,6 @@ const { loadUsers } = require("./storage");
 const skills = require("./skills");
 const { createBar } = require("./barHelper");
 
-// Emoji ngũ hành
 const elementEmojis = {
   kim: "⚔️",
   moc: "🌿",
@@ -18,7 +17,7 @@ const elementEmojis = {
   tho: "⛰️",
 };
 
-// 📌 Tạo embed trận đấu
+// 📌 Embed trận đấu
 function createBattleEmbed(state, users) {
   const p1 = users[state.players[0]];
   const p2 = users[state.players[1]];
@@ -37,25 +36,7 @@ function createBattleEmbed(state, users) {
     let buffsText = "";
     if (u.buffs?.length > 0) {
       buffsText =
-        "\n🌀 Buff: " +
-        u.buffs
-          .map(
-            (b) =>
-              `${
-                b.type === "buffDmg"
-                  ? "💥 +DMG"
-                  : b.type === "buffDef"
-                  ? "🛡️ +DEF"
-                  : b.type === "buffAtk"
-                  ? "🔥 +ATK"
-                  : b.type === "buffIgnoreArmor"
-                  ? "⚔️ Xuyên Thủ"
-                  : b.type === "shield"
-                  ? "🛡️ Khiên"
-                  : b.type
-              }(${b.turns})`
-          )
-          .join(", ");
+        "\n🌀 Buff: " + u.buffs.map((b) => `${b.type}(${b.turns})`).join(", ");
     }
 
     let shieldText = u.shield > 0 ? `\n🛡️ Khiên: ${u.shield}` : "";
@@ -85,18 +66,15 @@ function createBattleEmbed(state, users) {
       }
     )
     .setColor(state.finished ? "Gold" : "Purple")
-    .setFooter({
-      text: "✨ Hãy vận dụng linh lực khéo léo để giành thắng lợi!",
-    });
+    .setFooter({ text: "✨ Vận dụng linh lực để giành thắng lợi!" });
 }
 
-// 📌 Menu chọn skill
+// 📌 Menu skill
 function createSkillMenu(user, userId, isTurn) {
   const skillList = skills[user.element] || [];
-
   const menu = new StringSelectMenuBuilder()
     .setCustomId(`duel-skill-${userId}`)
-    .setPlaceholder(isTurn ? "Chọn skill để sử dụng" : "Chưa tới lượt của bạn")
+    .setPlaceholder(isTurn ? "Chọn skill" : "Chưa tới lượt")
     .setDisabled(!isTurn);
 
   if (skillList.length === 0) {
@@ -120,7 +98,7 @@ function createSkillMenu(user, userId, isTurn) {
   return new ActionRowBuilder().addComponents(menu);
 }
 
-// 📌 Gửi embed trận đấu
+// 📌 Gửi embed
 async function sendBattleEmbeds(client, state, channel) {
   const users = loadUsers();
   const p1 = users[state.players[0]];
@@ -141,7 +119,7 @@ async function sendBattleEmbeds(client, state, channel) {
   await channel.send({ embeds: [embed], components: [row1, row2] });
 }
 
-// 📌 Xử lý chọn skill
+// 📌 Xử lý interaction
 async function handleSkillInteraction(interaction, client) {
   const userId = interaction.customId.split("duel-skill-")[1];
   if (interaction.user.id !== userId) {
