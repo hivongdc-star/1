@@ -5,7 +5,7 @@ const { calculateDamage, tickBuffs } = require("./dmg");
 const battles = {};
 const challenges = {};
 
-// Chuẩn hóa user trước combat
+// chuẩn hóa user
 function normalizeUser(u, id) {
   if (!u) return null;
   u.id = id;
@@ -29,7 +29,7 @@ function createBattleState(p1Id, p2Id) {
     turn: p1Id,
     logs: [],
     finished: false,
-    channels: [], // nơi gửi update (kênh chính)
+    channels: [], // ✅ chuẩn: nơi update (DM hoặc kênh công khai)
   };
 }
 
@@ -66,17 +66,19 @@ function useSkill(userId, skillName) {
     return state;
   }
 
-  // check mana & fury
-  if ((skill.cost?.mpPercent || 0) > 0) {
-    const mpNeed = Math.floor(
+  // check MP cost %
+  if (skill.cost?.mpPercent) {
+    const need = Math.floor(
       (attacker.maxMp || 100) * (skill.cost.mpPercent / 100)
     );
-    if (attacker.mp < mpNeed) {
+    if (attacker.mp < need) {
       state.logs.push(`${attacker.name} không đủ MP để dùng ${skill.name}!`);
       return state;
     }
-    attacker.mp -= mpNeed;
+    attacker.mp -= need;
   }
+
+  // check fury
   if ((skill.cost?.fury || 0) > attacker.fury) {
     state.logs.push(`${attacker.name} chưa đủ Nộ để dùng ${skill.name}!`);
     return state;
@@ -89,7 +91,7 @@ function useSkill(userId, skillName) {
       state.logs.push(`${attacker.name} chưa thể dùng lại ${skill.name} (CD)!`);
       return state;
     }
-    attacker.buffCooldowns[skill.name] = 3; // CD 3 turn
+    attacker.buffCooldowns[skill.name] = 3; // cooldown 3 turn
   }
 
   let dmg = 0;
@@ -109,11 +111,10 @@ function useSkill(userId, skillName) {
   );
 
   let log = `💥 ${attacker.name} dùng **${skill.name}**`;
-  if (dmg > 0) log += ` gây **${dmg}** sát thương cho ${defender.name}!`;
-  else if (skill.type === "buff") log += ` (${skill.description})`;
+  if (skill.type === "buff") log += ` (${skill.description})`;
+  else if (dmg > 0) log += ` gây **${dmg}** sát thương cho ${defender.name}!`;
   state.logs.push(log);
 
-  // Kết thúc hoặc đổi lượt
   if (defender.hp <= 0) {
     state.finished = true;
     state.logs.push(`🏆 ${attacker.name} đã chiến thắng!`);
@@ -121,7 +122,7 @@ function useSkill(userId, skillName) {
     state.turn = defenderId;
   }
 
-  // Tick buff + cooldown
+  // tick buff & cd
   tickBuffs(attacker);
   tickBuffs(defender);
   for (const k in attacker.buffCooldowns)
@@ -129,7 +130,6 @@ function useSkill(userId, skillName) {
   for (const k in defender.buffCooldowns)
     if (defender.buffCooldowns[k] > 0) defender.buffCooldowns[k]--;
 
-  // Save lại
   const allUsers = loadUsers();
   allUsers[userId] = attacker;
   allUsers[defenderId] = defender;
@@ -154,4 +154,16 @@ function resetAfterBattle(state) {
   for (const pid of state.players) delete battles[pid];
 }
 
-module.exports = { battles, challenges, startDuel, useSkill, resetAfterBattle };
+function cancelAll() {
+  for (const pid in battles) delete battles[pid];
+  for (const cid in challenges) delete challenges[cid];
+}
+
+module.exports = {
+  battles,
+  challenges,
+  startDuel,
+  useSkill,
+  resetAfterBattle,
+  cancelAll,
+};
