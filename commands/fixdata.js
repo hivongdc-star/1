@@ -21,36 +21,59 @@ module.exports = {
       const u = users[id];
       let changed = false;
 
-      // --- migrate stat cũ -> mới ---
+      // --- migrate field cũ -> mới ---
       if (u.linhthach !== undefined) {
         u.lt = (u.lt || 0) + u.linhthach;
         delete u.linhthach;
         changed = true;
       }
-      if (u.mana !== undefined) { u.mp = u.mana; delete u.mana; changed = true; }
-      if (u.maxMana !== undefined) { u.maxMp = u.maxMana; delete u.maxMana; changed = true; }
-      if (u.attack !== undefined) { u.atk = u.attack; delete u.attack; changed = true; }
-      if (u.defense !== undefined) { u.def = u.defense; delete u.defense; changed = true; }
-      if (u.armor !== undefined) { delete u.armor; if (u.spd === undefined) u.spd = 10; changed = true; }
+      if (u.mana !== undefined) {
+        u.mp = u.mana;
+        delete u.mana;
+        changed = true;
+      }
+      if (u.maxMana !== undefined) {
+        u.maxMp = u.maxMana;
+        delete u.maxMana;
+        changed = true;
+      }
+      if (u.attack !== undefined) {
+        u.atk = u.attack;
+        delete u.attack;
+        changed = true;
+      }
+      if (u.defense !== undefined) {
+        u.def = u.defense;
+        delete u.defense;
+        changed = true;
+      }
+      if (u.armor !== undefined) {
+        delete u.armor;
+        if (u.spd === undefined) u.spd = 10;
+        changed = true;
+      }
 
-      // --- chuẩn hóa field mặc định ---
-      if (!u.inventory) { u.inventory = {}; changed = true; }
-      if (!u.dailyStones) { u.dailyStones = { date: null, earned: 0 }; changed = true; }
-      if (!u.buffs) { u.buffs = []; changed = true; }
-      if (u.shield === undefined) { u.shield = 0; changed = true; }
-      if (u.lt === undefined) { u.lt = 0; changed = true; }
-      if (u.fury === undefined) { u.fury = 0; changed = true; }
+      // --- field mặc định ---
+      if (!u.inventory) u.inventory = {};
+      if (!u.dailyStones) u.dailyStones = { date: null, earned: 0 };
+      if (!u.buffs) u.buffs = [];
+      if (u.shield === undefined) u.shield = 0;
+      if (u.lt === undefined) u.lt = 0;
+      if (u.fury === undefined) u.fury = 0;
       if (!u.bio) u.bio = "";
       if (!u.title) u.title = null;
 
-      // --- tái tính toàn bộ chỉ số ---
+      // --- tính lại chỉ số ---
       const level = u.level || 1;
       const race = races[u.race] || races["nhan"];
       const element = elements[u.element] || elements["kim"];
 
-      let hp = 100, mp = 100, atk = 10, def = 10, spd = 10;
+      let hp = 100,
+        mp = 100,
+        atk = 10,
+        def = 10,
+        spd = 10;
 
-      // cộng dồn cho từng level
       for (let lv = 2; lv <= level; lv++) {
         // theo race
         if (race.gain) {
@@ -68,12 +91,16 @@ module.exports = {
           def += element.def || 0;
           spd += element.spd || 0;
         }
-        // ✅ thêm 100HP cố định mỗi level
+        // +100 HP cố định mỗi cấp
         hp += 100;
       }
 
-      // breakthrough multiplier
-      let realmHp = hp, realmMp = mp, realmAtk = atk, realmDef = def, realmSpd = spd;
+      // breakthrough nhân hệ số
+      let realmHp = hp,
+        realmMp = mp,
+        realmAtk = atk,
+        realmDef = def,
+        realmSpd = spd;
       for (let lv = 2; lv <= level; lv++) {
         if (lv % 10 === 1) {
           let multiplier = 1.5;
@@ -86,6 +113,22 @@ module.exports = {
         }
       }
 
-      // cập nhật lại user
+      // cập nhật
       u.hp = realmHp;
       u.maxHp = realmHp;
+      u.mp = realmMp;
+      u.maxMp = realmMp;
+      u.atk = realmAtk;
+      u.def = realmDef;
+      u.spd = realmSpd;
+      u.realm = getRealm(level);
+
+      fixed++;
+    }
+
+    saveUsers(users);
+    msg.reply(
+      `✅ Đã fix & re-sync chỉ số cho **${fixed}** nhân vật (theo cơ chế mới).`
+    );
+  },
+};
