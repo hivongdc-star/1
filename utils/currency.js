@@ -3,14 +3,31 @@ const { dailyReward, maxDailyChatStones } = require("./config");
 
 const chatTracker = {}; // track LT từ chat
 
-function addStones(userId, amount) {
+// --- Cộng LT ---
+function addLT(userId, amount) {
   const users = loadUsers();
   if (!users[userId]) return;
 
-  users[userId].lt = (users[userId].lt || 0) + amount; // ✅ dùng lt
+  users[userId].lt = (users[userId].lt || 0) + amount;
   saveUsers(users);
 }
 
+// --- Trừ LT ---
+function removeLT(userId, amount) {
+  const users = loadUsers();
+  if (!users[userId]) return;
+
+  users[userId].lt = Math.max(0, (users[userId].lt || 0) - amount);
+  saveUsers(users);
+}
+
+// --- Lấy LT hiện tại ---
+function getLT(userId) {
+  const users = loadUsers();
+  return users[userId]?.lt || 0;
+}
+
+// --- Kiếm LT từ chat ---
 function earnFromChat(userId) {
   const today = new Date().toDateString();
   if (!chatTracker[userId]) chatTracker[userId] = { date: today, earned: 0 };
@@ -20,11 +37,12 @@ function earnFromChat(userId) {
   }
 
   if (chatTracker[userId].earned < maxDailyChatStones) {
-    addStones(userId, 1);
+    addLT(userId, 1);
     chatTracker[userId].earned++;
   }
 }
 
+// --- Nhận LT Daily ---
 function claimDaily(userId) {
   const users = loadUsers();
   if (!users[userId])
@@ -39,7 +57,7 @@ function claimDaily(userId) {
   users[userId].dailyStreak = (users[userId].dailyStreak || 0) + 1;
 
   const reward = dailyReward + (users[userId].dailyStreak - 1) * 5;
-  users[userId].lt = (users[userId].lt || 0) + reward; // ✅ dùng lt
+  users[userId].lt = (users[userId].lt || 0) + reward;
 
   saveUsers(users);
 
@@ -49,4 +67,12 @@ function claimDaily(userId) {
   };
 }
 
-module.exports = { addStones, earnFromChat, claimDaily };
+// Xuất ra đầy đủ, có alias để code cũ không lỗi
+module.exports = {
+  addLT,
+  removeLT,
+  getLT,
+  earnFromChat,
+  claimDaily,
+  addStones: addLT, // alias cho code cũ
+};
