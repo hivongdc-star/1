@@ -50,6 +50,9 @@ function handleCommand(client, msg, args) {
 function startDispatcher(client) {
   loadCommands();
 
+  // 🔔 Gắn lịch xổ số tự động (19:50 nhắc, 20:00 quay)
+  require("./lotteryScheduler")(client);
+
   client.on("messageCreate", (msg) => {
     if (msg.author.bot) return;
 
@@ -59,12 +62,14 @@ function startDispatcher(client) {
     if (now - last >= 15000) {
       const users = loadUsers();
       let expGain = Math.floor(Math.random() * 16) + 5; // random 5–20
+
       if (users[msg.author.id]) {
         if (users[msg.author.id].race === "nhan")
           expGain = Math.floor(expGain * 1.05);
         if (users[msg.author.id].race === "than")
           expGain = Math.floor(expGain * 0.95);
       }
+
       addXp(msg.author.id, expGain);
       earnFromChat(msg.author.id);
       cooldowns.set(msg.author.id, now);
