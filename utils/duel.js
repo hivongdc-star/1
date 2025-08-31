@@ -1,4 +1,3 @@
-// utils/duel.js
 const { loadUsers, saveUsers } = require("./storage");
 const skills = require("./skills");
 const { calculateDamage, tickBuffs } = require("./dmg");
@@ -26,7 +25,8 @@ function normalizeUser(u, id) {
 function createBattleState(p1Id, p2Id) {
   return {
     players: [p1Id, p2Id],
-    turn: p1Id,
+    // ai có spd cao hơn sẽ đi trước
+    turn: null,
     logs: [],
     finished: false,
     channels: [],
@@ -41,6 +41,10 @@ function startDuel(p1Id, p2Id) {
   if (!p1 || !p2) return null;
 
   const state = createBattleState(p1Id, p2Id);
+
+  // SPD quyết định lượt đầu tiên
+  state.turn = p1.spd >= p2.spd ? p1Id : p2Id;
+
   battles[p1Id] = { opponentId: p2Id, state };
   battles[p2Id] = { opponentId: p1Id, state };
   delete challenges[p1Id];
@@ -96,10 +100,15 @@ function useSkill(userId, skillName) {
     Math.min(100, attacker.fury + (skill.furyGain || 0))
   );
 
+  // --- Ghi log ---
   let log = `💥 ${attacker.name} dùng **${skill.name}**`;
-  if (skill.multiplier > 0)
+  if (defender.lastDodge) {
+    log += ` nhưng ${defender.name} đã né tránh thành công! 🌀`;
+  } else if (skill.multiplier > 0) {
     log += ` gây **${dmg}** sát thương cho ${defender.name}!`;
-  else log += ` (${skill.description})`;
+  } else {
+    log += ` (${skill.description})`;
+  }
   state.logs.push(log);
 
   if (defender.hp <= 0) {

@@ -2,40 +2,29 @@ module.exports = {
   nhan: {
     name: "Nhân",
     emoji: "👤",
-    bonus: (user) => {
-      // Nhân: cân bằng, không buff gì
-    },
+    gain: { hp: 20, mp: 20, atk: 20, def: 20, spd: 20 },
+    bonusExp: 1.05,
   },
   ma: {
     name: "Ma",
     emoji: "😈",
-    bonus: (user) => {
-      user.attack += 5;
-    },
+    gain: { hp: 10, mp: 10, atk: 50, def: 15, spd: 15 },
   },
   tien: {
     name: "Tiên",
     emoji: "👼",
-    bonus: (user) => {
-      user.mana += 30;
-      user.hp -= 10;
-    },
+    gain: { hp: 10, mp: 50, atk: 15, def: 15, spd: 10 },
   },
   yeu: {
     name: "Yêu",
     emoji: "🦊",
-    bonus: (user) => {
-      user.hp += 50;
-      user.attack -= 2;
-    },
+    gain: { hp: 50, mp: 10, atk: 10, def: 20, spd: 10 },
   },
   than: {
     name: "Thần",
     emoji: "⚡",
-    bonus: (user) => {
-      user.attack += 3;
-      user.defense += 3;
-      user.hp += 10;
-    },
+    gain: { hp: 20, mp: 20, atk: 20, def: 20, spd: 20 },
+    expPenalty: 0.95,
+    breakthroughMult: 1.6,
   },
 };
