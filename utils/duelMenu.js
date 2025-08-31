@@ -96,7 +96,7 @@ function createSkillMenu(user, userId, isTurn) {
   return new ActionRowBuilder().addComponents(menu);
 }
 
-// gửi embed cho tất cả kênh trong state
+// gửi embed cho tất cả kênh
 async function sendBattleEmbeds(client, state) {
   const users = loadUsers();
   const embed = createBattleEmbed(state, users);

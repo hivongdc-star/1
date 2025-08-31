@@ -29,7 +29,7 @@ function createBattleState(p1Id, p2Id) {
     turn: p1Id,
     logs: [],
     finished: false,
-    channels: [], // ✅ chuẩn: nơi update (DM hoặc kênh công khai)
+    channels: [], // nơi gửi update
   };
 }
 
@@ -66,7 +66,7 @@ function useSkill(userId, skillName) {
     return state;
   }
 
-  // check MP cost %
+  // cost MP %
   if (skill.cost?.mpPercent) {
     const need = Math.floor(
       (attacker.maxMp || 100) * (skill.cost.mpPercent / 100)
@@ -78,20 +78,20 @@ function useSkill(userId, skillName) {
     attacker.mp -= need;
   }
 
-  // check fury
+  // cost Fury
   if ((skill.cost?.fury || 0) > attacker.fury) {
     state.logs.push(`${attacker.name} chưa đủ Nộ để dùng ${skill.name}!`);
     return state;
   }
   attacker.fury -= skill.cost?.fury || 0;
 
-  // xử lý buff cooldown
+  // buff cooldown
   if (skill.type === "buff") {
     if (attacker.buffCooldowns[skill.name] > 0) {
       state.logs.push(`${attacker.name} chưa thể dùng lại ${skill.name} (CD)!`);
       return state;
     }
-    attacker.buffCooldowns[skill.name] = 3; // cooldown 3 turn
+    attacker.buffCooldowns[skill.name] = 3;
   }
 
   let dmg = 0;
@@ -122,7 +122,6 @@ function useSkill(userId, skillName) {
     state.turn = defenderId;
   }
 
-  // tick buff & cd
   tickBuffs(attacker);
   tickBuffs(defender);
   for (const k in attacker.buffCooldowns)

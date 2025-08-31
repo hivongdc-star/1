@@ -8,6 +8,9 @@ echo ============================
 :: Lấy code mới nhất từ git
 git fetch --all
 git reset --hard origin/main
+npm i
+npm i dotenv
+npm i discord.js
 
 
 :: Dừng tiến trình Node cũ (chỉ bot hiện tại)
