@@ -1,12 +1,9 @@
 const { loadUsers, saveUsers } = require("../utils/storage");
-const races = require("../utils/races");
-const elements = require("../utils/element");
-const { getRealm } = require("../utils/xp");
 const OWNER_ID = process.env.OWNER_ID;
 
 module.exports = {
   name: "fixdata",
-  description: "Chuẩn hóa dữ liệu & đồng bộ chỉ số theo races/element",
+  description: "Tự động chuẩn hóa dữ liệu users.json (chỉ admin)",
   aliases: ["fd"],
 
   run(client, msg) {
@@ -17,16 +14,43 @@ module.exports = {
     const users = loadUsers();
     let fixed = 0;
 
+    // Các field mặc định (stat mới)
+    const defaults = {
+      name: "Chưa đặt tên",
+      exp: 0,
+      level: 1,
+      realm: "Luyện Khí - Tầng 1",
+      race: "nhan",
+      element: "kim",
+      hp: 100,
+      maxHp: 100,
+      mp: 100,
+      maxMp: 100,
+      atk: 10,
+      def: 10,
+      spd: 10,
+      fury: 0,
+      lt: 0,
+      inventory: {},
+      title: null,
+      bio: "",
+      dailyStones: { date: null, earned: 0 },
+      buffs: [],
+      shield: 0,
+    };
+
     for (const id in users) {
       const u = users[id];
       let changed = false;
 
-      // --- migrate field cũ -> mới ---
+      // 🔄 migrate từ "linhthach" sang "lt"
       if (u.linhthach !== undefined) {
         u.lt = (u.lt || 0) + u.linhthach;
         delete u.linhthach;
         changed = true;
       }
+
+      // 🔄 migrate stat cũ -> stat mới
       if (u.mana !== undefined) {
         u.mp = u.mana;
         delete u.mana;
@@ -48,87 +72,33 @@ module.exports = {
         changed = true;
       }
       if (u.armor !== undefined) {
+        u.spd = u.armor;
         delete u.armor;
-        if (u.spd === undefined) u.spd = 10;
         changed = true;
       }
 
-      // --- field mặc định ---
-      if (!u.inventory) u.inventory = {};
-      if (!u.dailyStones) u.dailyStones = { date: null, earned: 0 };
-      if (!u.buffs) u.buffs = [];
-      if (u.shield === undefined) u.shield = 0;
-      if (u.lt === undefined) u.lt = 0;
-      if (u.fury === undefined) u.fury = 0;
-      if (!u.bio) u.bio = "";
-      if (!u.title) u.title = null;
-
-      // --- tính lại chỉ số ---
-      const level = u.level || 1;
-      const race = races[u.race] || races["nhan"];
-      const element = elements[u.element] || elements["kim"];
-
-      let hp = 100,
-        mp = 100,
-        atk = 10,
-        def = 10,
-        spd = 10;
-
-      for (let lv = 2; lv <= level; lv++) {
-        // theo race
-        if (race.gain) {
-          hp += race.gain.hp || 0;
-          mp += race.gain.mp || 0;
-          atk += race.gain.atk || 0;
-          def += race.gain.def || 0;
-          spd += race.gain.spd || 0;
-        }
-        // theo element
-        if (element) {
-          hp += element.hp || 0;
-          mp += element.mp || 0;
-          atk += element.atk || 0;
-          def += element.def || 0;
-          spd += element.spd || 0;
-        }
-        // +100 HP cố định mỗi cấp
-        hp += 100;
-      }
-
-      // breakthrough nhân hệ số
-      let realmHp = hp,
-        realmMp = mp,
-        realmAtk = atk,
-        realmDef = def,
-        realmSpd = spd;
-      for (let lv = 2; lv <= level; lv++) {
-        if (lv % 10 === 1) {
-          let multiplier = 1.5;
-          if (u.race === "than") multiplier = 1.6;
-          realmHp = Math.floor(realmHp * multiplier);
-          realmMp = Math.floor(realmMp * multiplier);
-          realmAtk = Math.floor(realmAtk * multiplier);
-          realmDef = Math.floor(realmDef * multiplier);
-          realmSpd = Math.floor(realmSpd * multiplier);
+      // thêm field mặc định nếu thiếu
+      for (const key in defaults) {
+        if (u[key] === undefined || u[key] === null) {
+          u[key] = defaults[key];
+          changed = true;
         }
       }
 
-      // cập nhật
-      u.hp = realmHp;
-      u.maxHp = realmHp;
-      u.mp = realmMp;
-      u.maxMp = realmMp;
-      u.atk = realmAtk;
-      u.def = realmDef;
-      u.spd = realmSpd;
-      u.realm = getRealm(level);
+      // 📌 Update HP chuẩn theo level (100 + 100 * (level-1))
+      if (u.level && u.level > 1) {
+        const expectedHp = 100 + (u.level - 1) * 100;
+        if (u.maxHp < expectedHp) {
+          u.maxHp = expectedHp;
+          if (u.hp > u.maxHp) u.hp = u.maxHp;
+          changed = true;
+        }
+      }
 
-      fixed++;
+      if (changed) fixed++;
     }
 
     saveUsers(users);
-    msg.reply(
-      `✅ Đã fix & re-sync chỉ số cho **${fixed}** nhân vật (theo cơ chế mới).`
-    );
+    msg.reply(`✅ Đã fix dữ liệu cho **${fixed}** nhân vật.`);
   },
 };

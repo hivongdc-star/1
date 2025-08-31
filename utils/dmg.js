@@ -1,71 +1,61 @@
-/**
- * 📌 Damage system với Buff/Shield/Heal + Dodge theo SPD
- */
-
-function applyBuffs(user, target, baseDmg) {
-  let dmg = baseDmg;
-  let defenseBonus = 0;
+function applyBuffs(user, target, baseAtk, baseDef) {
+  let atk = baseAtk;
+  let def = baseDef;
   let ignoreArmor = 0;
 
   if (user.buffs) {
     for (const buff of user.buffs) {
-      if (buff.type === "buffDmg") dmg *= buff.value; // buffDmg: nhân sát thương
-      if (buff.type === "ignoreArmor") {
-        ignoreArmor = Math.max(ignoreArmor, buff.value); // % cao nhất
-      }
+      if (buff.type === "buffAtk") atk = Math.floor(atk * (1 + buff.value));
+      if (buff.type === "buffIgnoreArmor")
+        ignoreArmor = Math.max(ignoreArmor, buff.value);
     }
   }
 
   if (target.buffs) {
     for (const buff of target.buffs) {
-      if (buff.type === "buffDef") defenseBonus += buff.value; // cộng dồn % def
+      if (buff.type === "buffDef") def = Math.floor(def * (1 + buff.value));
     }
   }
 
-  return { dmg, defenseBonus, ignoreArmor };
+  return { atk, def, ignoreArmor };
 }
 
 function calculateDamage(attacker, defender, skill) {
+  // Buff skill không gây sát thương → bỏ qua né tránh
+  if (skill.type === "buff") return 0;
+
   let atk = attacker.atk || 10;
   let def = defender.def || 0;
 
-  let dmg = atk * (skill.multiplier || 1);
-
-  // --- Né tránh dựa trên SPD ---
-  const dodgeChance = Math.min(
-    0.3,
-    ((defender.spd || 0) / ((attacker.spd || 1) + (defender.spd || 0))) * 0.3
-  );
-  if (Math.random() < dodgeChance) {
-    defender.lastDodge = true; // flag cho log
-    return 0;
-  }
-  defender.lastDodge = false;
-
-  // --- Buff & Armor ---
   const {
-    dmg: buffedDmg,
-    defenseBonus,
+    atk: buffedAtk,
+    def: buffedDef,
     ignoreArmor,
-  } = applyBuffs(attacker, defender, dmg);
-  dmg = buffedDmg;
+  } = applyBuffs(attacker, defender, atk, def);
+  atk = buffedAtk;
+  def = buffedDef;
 
-  def = Math.floor(def * (1 + defenseBonus));
-
-  if (skill.ignoreArmor && skill.ignoreArmor < 1) {
-    def = Math.floor(def * (1 - skill.ignoreArmor));
-  } else {
-    def = Math.max(0, def - (skill.ignoreArmor || 0));
-  }
-
-  if (ignoreArmor > 0 && ignoreArmor < 1) {
+  if (ignoreArmor > 0) {
     def = Math.floor(def * (1 - ignoreArmor));
   }
 
+  // Né tránh chỉ áp dụng cho skill tấn công
+  if (["normal", "mana", "fury"].includes(skill.type)) {
+    const spdDiff = attacker.spd - defender.spd;
+    let dodgeChance = Math.min(
+      30,
+      Math.max(0, (spdDiff / (defender.spd + 1)) * 100)
+    );
+    if (Math.random() * 100 < dodgeChance) {
+      return 0; // né thành công
+    }
+  }
+
+  let dmg = atk * (skill.multiplier || 1);
   dmg = Math.floor(dmg * (100 / (100 + def)));
 
   // Shield absorb
-  if (defender.shield && defender.shield > 0) {
+  if (defender.shield > 0) {
     const absorbed = Math.min(defender.shield, dmg);
     defender.shield -= absorbed;
     dmg -= absorbed;
@@ -78,29 +68,20 @@ function tickBuffs(user) {
   if (!user.buffs) return;
   user.buffs = user.buffs.filter((buff) => {
     buff.turns -= 1;
-
     if (buff.type === "shield" && buff.turns <= 0) {
       user.shield = 0;
     }
-
     return buff.turns > 0;
   });
 }
 
 function addBuff(user, type, value, turns) {
   user.buffs = user.buffs || [];
-
-  const existing = user.buffs.find((b) => b.type === type);
-  if (existing) {
-    existing.value = value;
-    existing.turns = turns;
-  } else {
-    user.buffs.push({ type, value, turns });
-  }
+  user.buffs.push({ type, value, turns });
 }
 
 function heal(user, amount) {
-  user.hp = Math.min(user.maxHp || 100, user.hp + amount);
+  user.hp = Math.min(user.maxHp, user.hp + amount);
   return amount;
 }
 

@@ -1,4 +1,3 @@
-// utils/duelmenu.js
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
@@ -47,8 +46,10 @@ function createBattleEmbed(state, users) {
                   ? "💥 +DMG"
                   : b.type === "buffDef"
                   ? "🛡️ +DEF"
-                  : b.type === "ignoreArmor"
-                  ? "⚔️ Xuyên Giáp"
+                  : b.type === "buffAtk"
+                  ? "🔥 +ATK"
+                  : b.type === "buffIgnoreArmor"
+                  ? "⚔️ Xuyên Thủ"
                   : b.type === "shield"
                   ? "🛡️ Khiên"
                   : b.type
@@ -84,7 +85,9 @@ function createBattleEmbed(state, users) {
       }
     )
     .setColor(state.finished ? "Gold" : "Purple")
-    .setFooter({ text: "✨ Hãy dùng skill khéo léo để giành chiến thắng!" });
+    .setFooter({
+      text: "✨ Hãy vận dụng linh lực khéo léo để giành thắng lợi!",
+    });
 }
 
 // 📌 Menu chọn skill
@@ -100,13 +103,17 @@ function createSkillMenu(user, userId, isTurn) {
     menu.addOptions([{ label: "Không có skill", value: "none" }]);
   } else {
     menu.addOptions(
-      skillList.map((s) => ({
-        label: `${s.name}`,
-        description: `${s.description} | MP:${s.cost?.mp || 0}, Nộ:${
-          s.cost?.fury || 0
-        }`,
-        value: s.name,
-      }))
+      skillList.map((s) => {
+        let cd = user.buffCooldowns?.[s.name] || 0;
+        let label = cd > 0 ? `${s.name} (CD:${cd})` : s.name;
+        return {
+          label,
+          description: `${s.description} | MP:${s.cost?.mpPercent || 0}% | Nộ:${
+            s.cost?.fury || 0
+          }`,
+          value: s.name,
+        };
+      })
     );
   }
 
@@ -159,15 +166,11 @@ async function handleSkillInteraction(interaction, client) {
   if (state.finished) {
     resetAfterBattle(state);
     const embed = createBattleEmbed(state, users);
-    for (const dm of state.dmChannels) {
-      await dm.send({ embeds: [embed], components: [] });
-    }
+    await interaction.message.channel.send({ embeds: [embed], components: [] });
     return;
   }
 
-  for (const dm of state.dmChannels) {
-    await sendBattleEmbeds(client, state, dm);
-  }
+  await sendBattleEmbeds(client, state, interaction.message.channel);
 
   await interaction.followUp({
     content: `✅ Bạn đã dùng skill: **${skillName}**`,
