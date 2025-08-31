@@ -12,12 +12,12 @@ function normalizeUser(u, id) {
   u.id = id;
   u.maxHp = u.maxHp || 100;
   u.hp = Math.min(u.hp ?? u.maxHp, u.maxHp);
-  u.maxMana = u.maxMana || 100;
-  u.mana = Math.min(u.mana ?? u.maxMana, u.maxMana);
+  u.maxMp = u.maxMp || 100;
+  u.mp = Math.min(u.mp ?? u.maxMp, u.maxMp);
   u.fury = u.fury ?? 0;
-  u.attack = u.attack ?? 10;
-  u.defense = u.defense ?? 10;
-  u.armor = u.armor ?? 10;
+  u.atk = u.atk ?? 10;
+  u.def = u.def ?? 10;
+  u.spd = u.spd ?? 10;
   u.buffs = u.buffs || [];
   u.shield = u.shield || 0;
   return u;
@@ -29,7 +29,8 @@ function createBattleState(p1Id, p2Id) {
     turn: p1Id,
     logs: [],
     finished: false,
-    channels: [], // nơi gửi update (DM hoặc channel chính)
+    channels: [],
+    dmChannels: [],
   };
 }
 
@@ -66,8 +67,8 @@ function useSkill(userId, skillName) {
     return state;
   }
 
-  if ((skill.cost?.mana || 0) > attacker.mana) {
-    state.logs.push(`${attacker.name} không đủ Mana để dùng ${skill.name}!`);
+  if ((skill.cost?.mp || 0) > attacker.mp) {
+    state.logs.push(`${attacker.name} không đủ MP để dùng ${skill.name}!`);
     return state;
   }
   if ((skill.cost?.fury || 0) > attacker.fury) {
@@ -75,7 +76,7 @@ function useSkill(userId, skillName) {
     return state;
   }
 
-  attacker.mana -= skill.cost?.mana || 0;
+  attacker.mp -= skill.cost?.mp || 0;
   attacker.fury -= skill.cost?.fury || 0;
 
   let dmg = 0;
@@ -125,7 +126,7 @@ function resetAfterBattle(state) {
     const u = normalizeUser(users[pid], pid);
     if (!u) continue;
     u.hp = u.maxHp;
-    u.mana = u.maxMana;
+    u.mp = u.maxMp;
     u.fury = 0;
     u.shield = 0;
     u.buffs = [];

@@ -14,7 +14,7 @@ module.exports = {
     const users = loadUsers();
     let fixed = 0;
 
-    // Các field mặc định
+    // Các field mặc định (theo stat mới)
     const defaults = {
       name: "Chưa đặt tên",
       exp: 0,
@@ -24,17 +24,19 @@ module.exports = {
       element: "kim",
       hp: 100,
       maxHp: 100,
-      mana: 100,
-      maxMana: 100,
-      attack: 10,
-      defense: 10,
-      armor: 10,
+      mp: 100,
+      maxMp: 100,
+      atk: 10,
+      def: 10,
+      spd: 10,
       fury: 0,
-      lt: 0, // ✅ Linh thạch chuẩn
+      lt: 0,
       inventory: {},
       title: null,
       bio: "",
       dailyStones: { date: null, earned: 0 },
+      buffs: [],
+      shield: 0,
     };
 
     for (const id in users) {
@@ -45,6 +47,33 @@ module.exports = {
       if (u.linhthach !== undefined) {
         u.lt = (u.lt || 0) + u.linhthach;
         delete u.linhthach;
+        changed = true;
+      }
+
+      // 🔄 migrate stat cũ -> stat mới
+      if (u.mana !== undefined) {
+        u.mp = u.mana;
+        delete u.mana;
+        changed = true;
+      }
+      if (u.maxMana !== undefined) {
+        u.maxMp = u.maxMana;
+        delete u.maxMana;
+        changed = true;
+      }
+      if (u.attack !== undefined) {
+        u.atk = u.attack;
+        delete u.attack;
+        changed = true;
+      }
+      if (u.defense !== undefined) {
+        u.def = u.defense;
+        delete u.defense;
+        changed = true;
+      }
+      if (u.armor !== undefined) {
+        u.spd = u.armor;
+        delete u.armor;
         changed = true;
       }
 

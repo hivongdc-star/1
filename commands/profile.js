@@ -5,11 +5,11 @@ const elements = require("../utils/element");
 const races = require("../utils/races");
 
 const elementColors = {
-  Kim: "Grey",
-  Mộc: "Green",
-  Thủy: "Blue",
-  Hỏa: "Red",
-  Thổ: "Yellow",
+  kim: "Grey",
+  moc: "Green",
+  thuy: "Blue",
+  hoa: "Red",
+  tho: "Yellow",
 };
 
 module.exports = {
@@ -51,16 +51,12 @@ module.exports = {
           inline: true,
         },
         { name: "❤️ Máu", value: String(user.hp ?? 100), inline: true },
-        { name: "🔥 Công", value: String(user.attack ?? 10), inline: true },
-        { name: "🛡️ Thủ", value: String(user.defense ?? 10), inline: true },
-        { name: "📦 Giáp", value: String(user.armor ?? 10), inline: true },
-        {
-          name: "🔷 Năng lượng",
-          value: String(user.mana ?? 100),
-          inline: true,
-        },
+        { name: "🔷 Mana", value: String(user.mp ?? 100), inline: true },
+        { name: "🔥 Công", value: String(user.atk ?? 10), inline: true },
+        { name: "🛡️ Thủ", value: String(user.def ?? 10), inline: true },
+        { name: "⚡ Tốc", value: String(user.spd ?? 10), inline: true },
         { name: "💢 Nộ", value: String(user.fury ?? 0), inline: true },
-        { name: "💎 Linh thạch", value: String(user.lt ?? 0), inline: true }, // ✅ fix: dùng user.lt
+        { name: "💎 Linh thạch", value: String(user.lt ?? 0), inline: true },
         {
           name: "📖 Bio",
           value: user.bio

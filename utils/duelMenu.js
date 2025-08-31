@@ -1,3 +1,4 @@
+// utils/duelmenu.js
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
@@ -60,9 +61,7 @@ function createBattleEmbed(state, users) {
 
     return (
       `❤️ HP: ${createBar(u.hp, u.maxHp, 15, "❤️")} (${u.hp}/${u.maxHp})\n` +
-      `🔵 Mana: ${createBar(u.mana, u.maxMana, 15, "🔵")} (${u.mana}/${
-        u.maxMana
-      })\n` +
+      `🔵 MP: ${createBar(u.mp, u.maxMp, 15, "🔵")} (${u.mp}/${u.maxMp})\n` +
       `🔥 Nộ: ${createBar(u.fury, 100, 15, "🔥")} (${u.fury}/100)` +
       shieldText +
       buffsText
@@ -103,7 +102,7 @@ function createSkillMenu(user, userId, isTurn) {
     menu.addOptions(
       skillList.map((s) => ({
         label: `${s.name}`,
-        description: `${s.description} | Mana:${s.cost?.mana || 0}, Nộ:${
+        description: `${s.description} | MP:${s.cost?.mp || 0}, Nộ:${
           s.cost?.fury || 0
         }`,
         value: s.name,
@@ -166,7 +165,6 @@ async function handleSkillInteraction(interaction, client) {
     return;
   }
 
-  // update cả 2 DM/kênh
   for (const dm of state.dmChannels) {
     await sendBattleEmbeds(client, state, dm);
   }

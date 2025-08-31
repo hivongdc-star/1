@@ -1,7 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const elements = require("./element");
-const races = require("./races");
 
 const dataPath = path.join(__dirname, "../data/users.json");
 
@@ -22,11 +20,12 @@ function getUser(id) {
   const u = users[id];
   if (!u) return null;
 
-  // ✅ normalize dữ liệu cũ
   if (u.lt === undefined) u.lt = 0;
   if (u.fury === undefined) u.fury = 0;
   if (!u.inventory) u.inventory = {};
   if (!u.dailyStones) u.dailyStones = { date: null, earned: 0 };
+  if (!u.buffs) u.buffs = [];
+  if (!u.shield) u.shield = 0;
 
   return u;
 }
@@ -35,19 +34,10 @@ function createUser(id, race, element) {
   const users = loadUsers();
   if (!users[id]) {
     let hp = 100,
-      mana = 100,
-      attack = 10,
-      defense = 10,
-      armor = 10;
-
-    const eleBonus = elements[element];
-    if (eleBonus) {
-      hp += eleBonus.hp || 0;
-      mana += eleBonus.mana || 0;
-      attack += eleBonus.attack || 0;
-      defense += eleBonus.defense || 0;
-      armor += eleBonus.armor || 0;
-    }
+      mp = 100,
+      atk = 10,
+      def = 10,
+      spd = 10;
 
     let user = {
       id,
@@ -59,22 +49,20 @@ function createUser(id, race, element) {
       element,
       hp,
       maxHp: hp,
-      mana,
-      maxMana: mana,
-      attack,
-      defense,
-      armor,
+      mp,
+      maxMp: mp,
+      atk,
+      def,
+      spd,
       fury: 0,
-      lt: 0, // ✅ Linh thạch rút gọn
+      lt: 0,
       bio: "",
       title: null,
       inventory: {},
       dailyStones: { date: null, earned: 0 },
+      buffs: [],
+      shield: 0,
     };
-
-    if (races[race] && typeof races[race].bonus === "function") {
-      races[race].bonus(user);
-    }
 
     users[id] = user;
     saveUsers(users);
