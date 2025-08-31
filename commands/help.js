@@ -1,4 +1,3 @@
-// commands/help.js
 const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
@@ -12,6 +11,7 @@ module.exports = {
         "Dưới đây là các lệnh bạn có thể sử dụng trong bot Tu Tiên:"
       )
       .addFields(
+        // --- Nhân vật ---
         {
           name: "✨ Tạo nhân vật",
           value: "`-create` | alias: `-c`, `-crate`\nTạo nhân vật mới",
@@ -38,6 +38,8 @@ module.exports = {
           name: "🌟 Danh hiệu",
           value: "`-danhhieu` | alias: `-title`\nĐổi danh hiệu nhân vật",
         },
+
+        // --- Kinh tế ---
         {
           name: "🎁 Daily",
           value: "`-daily` | alias: `-dly`\nNhận thưởng hàng ngày",
@@ -50,6 +52,8 @@ module.exports = {
           name: "🧚 Tiểu Nhu",
           value: "`-tieunhu` | alias: `-tn`\nGọi NPC Tiểu Nhu để nhận EXP",
         },
+
+        // --- PK ---
         {
           name: "⚔️ Thách đấu",
           value: "`-thachdau @user` | alias: `-td`\nThách đấu một người chơi",
@@ -66,6 +70,30 @@ module.exports = {
           name: "🚫 Hủy hành động",
           value: "`-cancel` | alias: `-cxl`\nHủy lời thách đấu hoặc hành động",
         },
+
+        // --- Cờ bạc & Xổ số ---
+        {
+          name: "🎲 Tài Xỉu",
+          value:
+            "`-taixiu <LT>` | alias: `-tx`\nTung 3 xúc xắc, ≥13 điểm = thắng x2 LT",
+        },
+        {
+          name: "🪙 Tung Xu",
+          value:
+            "`-flip <LT> <ngửa/sấp>` | alias: `-coin`\nĐoán mặt đồng xu, thắng x2 LT",
+        },
+        {
+          name: "🎰 Slot Machine",
+          value:
+            "`-slot <LT>` | alias: `-quay`\nQuay 3 ô emoji (Ngũ hành + 💎), có jackpot x50",
+        },
+        {
+          name: "🎟️ Xổ số",
+          value:
+            "`-lottery buy <số vé>` | alias: `-loto`, `-xs`\nMua vé số (10 LT/vé)\n`-lottery pot` xem jackpot\n`-lottery draw` quay số thủ công (auto 20h)",
+        },
+
+        // --- Hỗ trợ ---
         {
           name: "ℹ️ Hướng dẫn",
           value: "`-help` | alias: `-h`\nXem danh sách lệnh",

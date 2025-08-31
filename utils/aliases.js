@@ -1,4 +1,3 @@
-// utils/aliases.js
 module.exports = {
   // Lệnh dành cho người chơi
   create: ["c", "crate"], // tạo nhân vật
@@ -15,6 +14,12 @@ module.exports = {
   deny: ["d"], // từ chối thách đấu
   cancel: ["cxl"], // hủy thách đấu hoặc hành động
   help: ["h"], // hướng dẫn
+
+  // Lệnh cờ bạc
+  taixiu: ["tx"], // tài xỉu
+  flip: ["coin"], // tung xu
+  slot: ["quay"], // slot machine
+  lottery: ["loto", "xs"], // xổ số
 
   // Lệnh quản trị (Admin/Owner)
   xoa: ["delete", "del"], // xóa nhân vật
