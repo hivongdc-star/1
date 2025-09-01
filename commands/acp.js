@@ -14,47 +14,42 @@ module.exports = {
     const challengerId = challenge.challengerId;
     const defenderId = message.author.id;
 
-    // Tạo state trận đấu
+    // tạo state
     const state = startDuel(challengerId, defenderId);
-    delete challenges[defenderId];
-
     if (!state) {
-      return message.reply(
-        "❌ Không thể bắt đầu trận đấu (thiếu dữ liệu nhân vật)!"
-      );
+      return message.reply("❌ Không thể bắt đầu trận đấu (thiếu dữ liệu nhân vật)!");
     }
 
-    const challenger = await client.users.fetch(challengerId);
-    const defender = message.author;
+    // lưu kênh riêng cho từng người
+    state.channels = {};
 
-    // thử DM cả 2 bên, nếu fail thì gửi ở kênh công khai
-    const channels = [];
+    // DM challenger
     try {
+      const challenger = await client.users.fetch(challengerId);
       const dm1 = await challenger.createDM();
-      await dm1.send(`🔥 Trận đấu với **${defender.username}** đã bắt đầu!`);
-      channels.push(dm1);
+      await dm1.send(`🔥 Trận đấu với **${message.author.username}** đã bắt đầu!`);
+      state.channels[challengerId] = dm1;
     } catch {
-      message.channel.send(
-        `⚠️ Không thể DM cho **${challenger.username}**, sẽ gửi ở kênh công khai.`
+      state.channels[challengerId] = message.channel;
+      await message.channel.send(
+        `⚠️ Không thể DM cho <@${challengerId}>, sẽ gửi ở kênh công khai.`
       );
-      channels.push(message.channel);
     }
 
+    // DM defender
     try {
+      const defender = message.author;
       const dm2 = await defender.createDM();
-      await dm2.send(`🔥 Trận đấu với **${challenger.username}** đã bắt đầu!`);
-      channels.push(dm2);
+      await dm2.send(`🔥 Trận đấu với <@${challengerId}> đã bắt đầu!`);
+      state.channels[defenderId] = dm2;
     } catch {
-      message.channel.send(
-        `⚠️ Không thể DM cho **${defender.username}**, sẽ gửi ở kênh công khai.`
+      state.channels[defenderId] = message.channel;
+      await message.channel.send(
+        `⚠️ Không thể DM cho <@${defenderId}>, sẽ gửi ở kênh công khai.`
       );
-      if (!channels.includes(message.channel)) channels.push(message.channel);
     }
 
-    // Lưu danh sách kênh để cập nhật
-    state.channels = channels;
-
-    // Gửi giao diện skill ban đầu
+    // gửi giao diện ban đầu
     await sendBattleEmbeds(client, state);
   },
 };

@@ -2,7 +2,6 @@ const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
   EmbedBuilder,
-  MessageFlags,
 } = require("discord.js");
 const { useSkill, resetAfterBattle, battles } = require("./duel");
 const { loadUsers } = require("./storage");
@@ -68,7 +67,7 @@ function createBattleEmbed(state, users) {
     .setFooter({ text: "✨ Vận dụng linh lực để giành thắng lợi!" });
 }
 
-// menu skill
+// menu skill cho 1 người
 function createSkillMenu(user, userId, isTurn) {
   const skillList = skills[user.element] || [];
   const menu = new StringSelectMenuBuilder()
@@ -85,9 +84,9 @@ function createSkillMenu(user, userId, isTurn) {
         let label = cd > 0 ? `${s.name} (CD:${cd})` : s.name;
         return {
           label,
-          description: `${s.description} | MP:${s.cost?.mpPercent || 0}% | Nộ:${
-            s.cost?.fury || 0
-          }`,
+          description: `${s.description} | ${
+            s.cost?.mpPercent ? `MP:${s.cost.mpPercent}%` : ""
+          } ${s.cost?.fury ? `| Nộ:${s.cost.fury}` : ""}`,
           value: s.name,
         };
       })
@@ -96,47 +95,48 @@ function createSkillMenu(user, userId, isTurn) {
   return new ActionRowBuilder().addComponents(menu);
 }
 
-// gửi embed cho tất cả kênh
+// gửi/edits embed cho từng người chơi
 async function sendBattleEmbeds(client, state) {
   const users = loadUsers();
   const embed = createBattleEmbed(state, users);
 
-  for (const ch of state.channels) {
-    const p1 = users[state.players[0]];
-    const p2 = users[state.players[1]];
-    const row1 = createSkillMenu(
-      p1,
-      state.players[0],
-      state.turn === state.players[0]
-    );
-    const row2 = createSkillMenu(
-      p2,
-      state.players[1],
-      state.turn === state.players[1]
-    );
+  for (const pid of state.players) {
+    const player = users[pid];
+    const isTurn = state.turn === pid;
+    const row = createSkillMenu(player, pid, isTurn);
 
-    await ch.send({ embeds: [embed], components: [row1, row2] });
+    // đã có message → edit
+    if (state.battleMsgs?.[pid]) {
+      await state.battleMsgs[pid].edit({ embeds: [embed], components: [row] });
+    } else {
+      // fallback nếu chưa có message
+      const ch = state.channels?.[pid];
+      if (ch) {
+        const msg = await ch.send({ embeds: [embed], components: [row] });
+        if (!state.battleMsgs) state.battleMsgs = {};
+        state.battleMsgs[pid] = msg;
+      }
+    }
   }
 }
 
-// xử lý interaction
+// xử lý chọn skill
 async function handleSkillInteraction(interaction, client) {
   const clickerId = interaction.user.id;
 
-  const state = Object.values(battles).find((b) =>
-    b.state.players.includes(clickerId)
-  )?.state;
-  if (!state) {
+  const battle = battles[clickerId];
+  if (!battle) {
     return interaction.reply({
       content: "❌ Trận đấu không tồn tại!",
-      flags: MessageFlags.Ephemeral,
+      ephemeral: true,
     });
   }
 
+  const state = battle.state;
   if (state.turn !== clickerId) {
     return interaction.reply({
       content: "❌ Không phải lượt của bạn!",
-      flags: MessageFlags.Ephemeral,
+      ephemeral: true,
     });
   }
 
@@ -148,8 +148,10 @@ async function handleSkillInteraction(interaction, client) {
   if (newState.finished) {
     resetAfterBattle(newState);
     const embed = createBattleEmbed(newState, users);
-    for (const ch of state.channels) {
-      await ch.send({ embeds: [embed], components: [] });
+    for (const pid of state.players) {
+      if (state.battleMsgs?.[pid]) {
+        await state.battleMsgs[pid].edit({ embeds: [embed], components: [] });
+      }
     }
     return;
   }
@@ -158,7 +160,7 @@ async function handleSkillInteraction(interaction, client) {
 
   await interaction.followUp({
     content: `✅ Bạn đã dùng skill: **${skillName}**`,
-    flags: MessageFlags.Ephemeral,
+    ephemeral: true,
   });
 }
 

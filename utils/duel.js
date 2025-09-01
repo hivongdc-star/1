@@ -5,7 +5,6 @@ const { calculateDamage, tickBuffs } = require("./dmg");
 const battles = {};
 const challenges = {};
 
-// chuẩn hóa user
 function normalizeUser(u, id) {
   if (!u) return null;
   u.id = id;
@@ -29,7 +28,7 @@ function createBattleState(p1Id, p2Id) {
     turn: p1Id,
     logs: [],
     finished: false,
-    channels: [], // nơi gửi update
+    channels: [],
   };
 }
 
@@ -66,7 +65,7 @@ function useSkill(userId, skillName) {
     return state;
   }
 
-  // cost MP %
+  // cost MP
   if (skill.cost?.mpPercent) {
     const need = Math.floor(
       (attacker.maxMp || 100) * (skill.cost.mpPercent / 100)
@@ -87,11 +86,13 @@ function useSkill(userId, skillName) {
 
   // buff cooldown
   if (skill.type === "buff") {
-    if (attacker.buffCooldowns[skill.name] > 0) {
-      state.logs.push(`${attacker.name} chưa thể dùng lại ${skill.name} (CD)!`);
+    if ((attacker.buffCooldowns[skill.name] || 0) > 0) {
+      state.logs.push(
+        `⏳ ${attacker.name} chưa thể dùng lại ${skill.name} (CD:${attacker.buffCooldowns[skill.name]})!`
+      );
       return state;
     }
-    attacker.buffCooldowns[skill.name] = 3;
+    attacker.buffCooldowns[skill.name] = skill.cooldown || 3;
   }
 
   let dmg = 0;
@@ -122,12 +123,10 @@ function useSkill(userId, skillName) {
     state.turn = defenderId;
   }
 
-  tickBuffs(attacker);
-  tickBuffs(defender);
+  // chỉ tick buff của attacker
+  tickBuffs(attacker, state);
   for (const k in attacker.buffCooldowns)
     if (attacker.buffCooldowns[k] > 0) attacker.buffCooldowns[k]--;
-  for (const k in defender.buffCooldowns)
-    if (defender.buffCooldowns[k] > 0) defender.buffCooldowns[k]--;
 
   const allUsers = loadUsers();
   allUsers[userId] = attacker;

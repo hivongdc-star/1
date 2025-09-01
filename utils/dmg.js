@@ -21,17 +21,17 @@ function applyBuffs(user, target, baseAtk, baseDef) {
 }
 
 function calculateDamage(attacker, defender, skill) {
-  // Buff skill không gây sát thương → bỏ qua né tránh
   if (skill.type === "buff") return 0;
 
   let atk = attacker.atk || 10;
   let def = defender.def || 0;
 
-  const {
-    atk: buffedAtk,
-    def: buffedDef,
-    ignoreArmor,
-  } = applyBuffs(attacker, defender, atk, def);
+  const { atk: buffedAtk, def: buffedDef, ignoreArmor } = applyBuffs(
+    attacker,
+    defender,
+    atk,
+    def
+  );
   atk = buffedAtk;
   def = buffedDef;
 
@@ -39,7 +39,6 @@ function calculateDamage(attacker, defender, skill) {
     def = Math.floor(def * (1 - ignoreArmor));
   }
 
-  // Né tránh chỉ áp dụng cho skill tấn công
   if (["normal", "mana", "fury"].includes(skill.type)) {
     const spdDiff = attacker.spd - defender.spd;
     let dodgeChance = Math.min(
@@ -47,14 +46,13 @@ function calculateDamage(attacker, defender, skill) {
       Math.max(0, (spdDiff / (defender.spd + 1)) * 100)
     );
     if (Math.random() * 100 < dodgeChance) {
-      return 0; // né thành công
+      return 0;
     }
   }
 
   let dmg = atk * (skill.multiplier || 1);
   dmg = Math.floor(dmg * (100 / (100 + def)));
 
-  // Shield absorb
   if (defender.shield > 0) {
     const absorbed = Math.min(defender.shield, dmg);
     defender.shield -= absorbed;
@@ -64,12 +62,15 @@ function calculateDamage(attacker, defender, skill) {
   return dmg > 0 ? dmg : 1;
 }
 
-function tickBuffs(user) {
+function tickBuffs(user, state) {
   if (!user.buffs) return;
   user.buffs = user.buffs.filter((buff) => {
     buff.turns -= 1;
     if (buff.type === "shield" && buff.turns <= 0) {
       user.shield = 0;
+    }
+    if (buff.turns <= 0 && state) {
+      state.logs.push(`✨ Buff ${buff.type} của ${user.name} đã hết hiệu lực.`);
     }
     return buff.turns > 0;
   });
