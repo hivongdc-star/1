@@ -34,8 +34,12 @@ function safeField(u, elementEmoji, fallbackName) {
   let shieldText = u.shield > 0 ? `\n🛡️ Khiên: ${u.shield}` : "";
 
   const value =
-    `❤️ HP: ${createBar(u.hp || 0, u.maxHp || 1, 15, "❤️")} (${u.hp || 0}/${u.maxHp || 1})\n` +
-    `🔵 MP: ${createBar(u.mp || 0, u.maxMp || 1, 15, "🔵")} (${u.mp || 0}/${u.maxMp || 1})\n` +
+    `❤️ HP: ${createBar(u.hp || 0, u.maxHp || 1, 15, "❤️")} (${u.hp || 0}/${
+      u.maxHp || 1
+    })\n` +
+    `🔵 MP: ${createBar(u.mp || 0, u.maxMp || 1, 15, "🔵")} (${u.mp || 0}/${
+      u.maxMp || 1
+    })\n` +
     `🔥 Nộ: ${createBar(u.fury || 0, 100, 15, "🔥")} (${u.fury || 0}/100)` +
     shieldText +
     buffsText;
@@ -54,12 +58,15 @@ function createBattleEmbed(state, users) {
 
   let desc = "";
   if (state.finished) {
-    desc = "🏆 " + (state.logs?.[state.logs.length - 1] || "Trận đấu đã kết thúc!");
+    desc =
+      "🏆 " + (state.logs?.[state.logs.length - 1] || "Trận đấu đã kết thúc!");
   } else {
-    const lastLog = state.logs?.[state.logs.length - 1];
-    desc = lastLog
-      ? `📜 **${lastLog}**\n\n👉 Lượt của **${users[state.turn]?.name || "???"}**`
-      : `👉 Lượt của **${users[state.turn]?.name || "???"}**`;
+    // ✅ hiển thị toàn bộ log trong lượt hiện tại
+    const turnLogs = state.logs?.length
+      ? state.logs.map((l) => `📜 ${l}`).join("\n")
+      : "⚠️ Chưa có hành động.";
+
+    desc = `${turnLogs}\n\n👉 Lượt của **${users[state.turn]?.name || "???"}**`;
   }
 
   return new EmbedBuilder()
@@ -92,7 +99,9 @@ function createSkillMenu(user, userId, isTurn) {
           label: String(label).slice(0, 100),
           description: `${s.description || ""} | ${
             s.cost?.mpPercent ? `MP:${s.cost.mpPercent}%` : ""
-          } ${s.cost?.fury ? `| Nộ:${s.cost.fury}` : ""}`.trim().slice(0, 100),
+          } ${s.cost?.fury ? `| Nộ:${s.cost.fury}` : ""}`
+            .trim()
+            .slice(0, 100),
           value: s.name,
         };
       })

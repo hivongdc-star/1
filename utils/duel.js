@@ -28,8 +28,8 @@ function createBattleState(p1Id, p2Id) {
     turn: p1Id,
     logs: [],
     finished: false,
-    channels: {}, // sửa thành object để đồng bộ với duelMenu.js
-    battleMsgs: {}, // thêm để lưu message edit
+    channels: {},
+    battleMsgs: {},
   };
 }
 
@@ -71,7 +71,9 @@ function useSkill(userId, skillName) {
 
   // cost MP
   if (skill.cost?.mpPercent) {
-    const need = Math.floor((attacker.maxMp || 100) * (skill.cost.mpPercent / 100));
+    const need = Math.floor(
+      (attacker.maxMp || 100) * (skill.cost.mpPercent / 100)
+    );
     if (attacker.mp < need) {
       state.logs.push(`${attacker.name} không đủ MP để dùng ${skill.name}!`);
       return state;
@@ -89,10 +91,20 @@ function useSkill(userId, skillName) {
   // buff cooldown
   if (skill.type === "buff") {
     if ((attacker.buffCooldowns[skill.name] || 0) > 0) {
-      state.logs.push(`⏳ ${attacker.name} chưa thể dùng lại ${skill.name} (CD:${attacker.buffCooldowns[skill.name]})!`);
+      state.logs.push(
+        `⏳ ${attacker.name} chưa thể dùng lại ${skill.name} (CD:${
+          attacker.buffCooldowns[skill.name]
+        })!`
+      );
       return state;
     }
     attacker.buffCooldowns[skill.name] = skill.cooldown || 3;
+
+    // buff bắt đầu từ lượt kế tiếp
+    attacker.buffs.push({ pending: true, effect: skill.effect, turns: 2 });
+    state.logs.push(
+      `✨ ${attacker.name} chuẩn bị buff **${skill.name}**, sẽ có hiệu lực từ lượt kế tiếp!`
+    );
   }
 
   let dmg = 0;
@@ -101,12 +113,15 @@ function useSkill(userId, skillName) {
     defender.hp -= dmg;
   }
 
-  if (skill.effect) {
-    skill.effect(attacker, defender, dmg);
+  if (skill.effect && skill.type !== "buff") {
+    skill.effect(attacker, defender, dmg, state);
   }
 
   defender.hp = Math.max(0, defender.hp);
-  attacker.fury = Math.max(0, Math.min(100, attacker.fury + (skill.furyGain || 0)));
+  attacker.fury = Math.max(
+    0,
+    Math.min(100, attacker.fury + (skill.furyGain || 0))
+  );
 
   let log = `💥 ${attacker.name} dùng **${skill.name}**`;
   if (skill.type === "buff") log += ` (${skill.description})`;
@@ -120,10 +135,8 @@ function useSkill(userId, skillName) {
     state.turn = defenderId;
   }
 
-  // tick buff + giảm cooldown
-  tickBuffs(attacker, state);
-  for (const k in attacker.buffCooldowns)
-    if (attacker.buffCooldowns[k] > 0) attacker.buffCooldowns[k]--;
+  // tick buff cho attacker (chỉ khi là lượt của mình)
+  tickBuffs(attacker, state, true);
 
   const allUsers = loadUsers();
   allUsers[userId] = attacker;

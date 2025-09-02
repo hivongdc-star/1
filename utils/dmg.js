@@ -28,12 +28,11 @@ function calculateDamage(attacker, defender, skill, state) {
   let atk = attacker.atk || 10;
   let def = defender.def || 0;
 
-  const { atk: buffedAtk, def: buffedDef, ignoreArmor } = applyBuffs(
-    attacker,
-    defender,
-    atk,
-    def
-  );
+  const {
+    atk: buffedAtk,
+    def: buffedDef,
+    ignoreArmor,
+  } = applyBuffs(attacker, defender, atk, def);
   atk = buffedAtk;
   def = buffedDef;
 
@@ -48,7 +47,10 @@ function calculateDamage(attacker, defender, skill, state) {
       Math.max(0, (spdDiff / (defender.spd + 1)) * 100)
     );
     if (Math.random() * 100 < dodgeChance) {
-      if (state) state.logs.push(`💨 ${defender.name} né được đòn của ${attacker.name}!`);
+      if (state)
+        state.logs.push(
+          `💨 ${defender.name} né được đòn của ${attacker.name}!`
+        );
       return 0;
     }
   }
@@ -60,24 +62,46 @@ function calculateDamage(attacker, defender, skill, state) {
     const absorbed = Math.min(defender.shield, dmg);
     defender.shield -= absorbed;
     dmg -= absorbed;
-    if (state) state.logs.push(`🛡️ Khiên của ${defender.name} đã chặn ${absorbed} sát thương!`);
+    if (state)
+      state.logs.push(
+        `🛡️ Khiên của ${defender.name} đã chặn ${absorbed} sát thương!`
+      );
   }
 
   return dmg > 0 ? dmg : 1;
 }
 
-function tickBuffs(user, state) {
-  if (!user.buffs) return;
-  user.buffs = user.buffs.filter((buff) => {
-    buff.turns -= 1;
-    if (buff.type === "shield" && buff.turns <= 0) {
-      user.shield = 0;
+// --- Tick buffs & cooldown (chỉ khi là lượt của user) ---
+function tickBuffs(user, state, isUserTurn) {
+  if (!user.buffs || !isUserTurn) return;
+
+  const newBuffs = [];
+  for (const buff of user.buffs) {
+    if (buff.pending) {
+      // buff bắt đầu có hiệu lực từ lượt kế tiếp
+      if (typeof buff.effect === "function") {
+        buff.effect(user, null, 0, state);
+        state.logs.push(`🔮 Buff đã kích hoạt cho ${user.name}!`);
+      }
+      buff.pending = false;
+    } else {
+      buff.turns -= 1;
+      if (buff.type === "shield" && buff.turns <= 0) {
+        user.shield = 0;
+      }
+      if (buff.turns <= 0) {
+        state.logs.push(`✨ Buff của ${user.name} đã hết hiệu lực.`);
+        continue;
+      }
     }
-    if (buff.turns <= 0 && state) {
-      state.logs.push(`✨ Buff ${buff.type} của ${user.name} đã hết hiệu lực.`);
-    }
-    return buff.turns > 0;
-  });
+    newBuffs.push(buff);
+  }
+  user.buffs = newBuffs;
+
+  // giảm cooldown buff
+  for (const k in user.buffCooldowns) {
+    if (user.buffCooldowns[k] > 0) user.buffCooldowns[k]--;
+  }
 }
 
 function addBuff(user, type, value, turns) {
@@ -88,14 +112,19 @@ function addBuff(user, type, value, turns) {
 function heal(user, amount, state) {
   const healed = Math.min(user.maxHp - user.hp, amount);
   user.hp = Math.min(user.maxHp, user.hp + amount);
-  if (state && healed > 0) state.logs.push(`💚 ${user.name} hồi phục ${healed} HP!`);
+  if (state && healed > 0)
+    state.logs.push(`💚 ${user.name} hồi phục ${healed} HP!`);
   return healed;
 }
 
 function addShield(user, amount, turns = 2, state) {
   user.shield = (user.shield || 0) + amount;
-  addBuff(user, "shield", amount, turns);
-  if (state) state.logs.push(`🛡️ ${user.name} nhận được khiên ${amount} (tồn tại ${turns} lượt)!`);
+  user.buffs = user.buffs || [];
+  user.buffs.push({ type: "shield", value: amount, turns });
+  if (state)
+    state.logs.push(
+      `🛡️ ${user.name} nhận được khiên ${amount} (tồn tại ${turns} lượt)!`
+    );
 }
 
 module.exports = {
