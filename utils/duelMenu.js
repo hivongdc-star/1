@@ -16,6 +16,37 @@ const elementEmojis = {
   tho: "⛰️",
 };
 
+// đảm bảo field hợp lệ cho embed
+function safeField(u, elementEmoji, fallbackName) {
+  if (!u) {
+    return {
+      name: `${elementEmoji} ${fallbackName}`,
+      value: "❌ Không có dữ liệu",
+      inline: true,
+    };
+  }
+
+  let buffsText = "";
+  if (u.buffs?.length > 0) {
+    buffsText =
+      "\n🌀 Buff: " + u.buffs.map((b) => `${b.type}(${b.turns})`).join(", ");
+  }
+  let shieldText = u.shield > 0 ? `\n🛡️ Khiên: ${u.shield}` : "";
+
+  const value =
+    `❤️ HP: ${createBar(u.hp || 0, u.maxHp || 1, 15, "❤️")} (${u.hp || 0}/${u.maxHp || 1})\n` +
+    `🔵 MP: ${createBar(u.mp || 0, u.maxMp || 1, 15, "🔵")} (${u.mp || 0}/${u.maxMp || 1})\n` +
+    `🔥 Nộ: ${createBar(u.fury || 0, 100, 15, "🔥")} (${u.fury || 0}/100)` +
+    shieldText +
+    buffsText;
+
+  return {
+    name: `${elementEmoji} ${String(u.name || fallbackName)}`,
+    value: String(value).slice(0, 1024), // tránh vượt giới hạn
+    inline: true,
+  };
+}
+
 // embed trận đấu
 function createBattleEmbed(state, users) {
   const p1 = users[state.players[0]];
@@ -31,38 +62,12 @@ function createBattleEmbed(state, users) {
       : `👉 Lượt của **${users[state.turn]?.name || "???"}**`;
   }
 
-  function playerField(u) {
-    if (!u) return "❌ Không có dữ liệu";
-    let buffsText = "";
-    if (u.buffs?.length > 0) {
-      buffsText =
-        "\n🌀 Buff: " + u.buffs.map((b) => `${b.type}(${b.turns})`).join(", ");
-    }
-    let shieldText = u.shield > 0 ? `\n🛡️ Khiên: ${u.shield}` : "";
-
-    return (
-      `❤️ HP: ${createBar(u.hp, u.maxHp, 15, "❤️")} (${u.hp}/${u.maxHp})\n` +
-      `🔵 MP: ${createBar(u.mp, u.maxMp, 15, "🔵")} (${u.mp}/${u.maxMp})\n` +
-      `🔥 Nộ: ${createBar(u.fury, 100, 15, "🔥")} (${u.fury}/100)` +
-      shieldText +
-      buffsText
-    ).toString();
-  }
-
   return new EmbedBuilder()
     .setTitle("⚔️ Trận đấu Tu Tiên")
     .setDescription(desc || "⚠️ Chưa có log")
     .addFields([
-      {
-        name: `${elementEmojis[p1?.element] || ""} ${String(p1?.name || "Người chơi 1")}`,
-        value: playerField(p1),
-        inline: true,
-      },
-      {
-        name: `${elementEmojis[p2?.element] || ""} ${String(p2?.name || "Người chơi 2")}`,
-        value: playerField(p2),
-        inline: true,
-      },
+      safeField(p1, elementEmojis[p1?.element] || "", "Người chơi 1"),
+      safeField(p2, elementEmojis[p2?.element] || "", "Người chơi 2"),
     ])
     .setColor(state.finished ? "Gold" : "Purple")
     .setFooter({ text: "✨ Vận dụng linh lực để giành thắng lợi!" });
@@ -84,10 +89,10 @@ function createSkillMenu(user, userId, isTurn) {
         let cd = user.buffCooldowns?.[s.name] || 0;
         let label = cd > 0 ? `${s.name} (CD:${cd})` : s.name;
         return {
-          label,
-          description: `${s.description} | ${
+          label: String(label).slice(0, 100),
+          description: `${s.description || ""} | ${
             s.cost?.mpPercent ? `MP:${s.cost.mpPercent}%` : ""
-          } ${s.cost?.fury ? `| Nộ:${s.cost.fury}` : ""}`.trim(),
+          } ${s.cost?.fury ? `| Nộ:${s.cost.fury}` : ""}`.trim().slice(0, 100),
           value: s.name,
         };
       })
