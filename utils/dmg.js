@@ -40,13 +40,10 @@ function calculateDamage(attacker, defender, skill, state) {
     def = Math.floor(def * (1 - ignoreArmor));
   }
 
-  // Né tránh (chỉ áp dụng cho skill thường, mana, fury)
+  // Né tránh (người có SPD cao hơn thì dễ né hơn)
   if (["normal", "mana", "fury"].includes(skill.type)) {
-    const spdDiff = (attacker.spd || 0) - (defender.spd || 0);
-    let dodgeChance = Math.min(
-      30,
-      Math.max(0, (spdDiff / ((defender.spd || 1) + 1)) * 100)
-    );
+    const ratio = defender.spd / (attacker.spd + 1);
+    let dodgeChance = Math.min(50, Math.max(0, ratio * 50)); // cap 50%
     if (Math.random() * 100 < dodgeChance) {
       if (state)
         state.logs.push(
@@ -86,7 +83,6 @@ function tickBuffs(user, state, isUserTurn) {
         );
       }
       buff.pending = false;
-      // ❌ Không trừ lượt ngay khi vừa kích hoạt
     } else {
       buff.turns -= 1;
       if (buff.type === "shield" && buff.turns <= 0) {
