@@ -23,15 +23,16 @@ function createBattleEmbed(state, users) {
 
   let desc = "";
   if (state.finished) {
-    desc = "🏆 " + state.logs[state.logs.length - 1];
+    desc = "🏆 " + (state.logs?.[state.logs.length - 1] || "Trận đấu đã kết thúc!");
   } else {
-    const lastLog = state.logs[state.logs.length - 1];
+    const lastLog = state.logs?.[state.logs.length - 1];
     desc = lastLog
-      ? `📜 **${lastLog}**\n\n👉 Lượt của **${users[state.turn].name}**`
-      : `👉 Lượt của **${users[state.turn].name}**`;
+      ? `📜 **${lastLog}**\n\n👉 Lượt của **${users[state.turn]?.name || "???"}**`
+      : `👉 Lượt của **${users[state.turn]?.name || "???"}**`;
   }
 
   function playerField(u) {
+    if (!u) return "❌ Không có dữ liệu";
     let buffsText = "";
     if (u.buffs?.length > 0) {
       buffsText =
@@ -45,24 +46,24 @@ function createBattleEmbed(state, users) {
       `🔥 Nộ: ${createBar(u.fury, 100, 15, "🔥")} (${u.fury}/100)` +
       shieldText +
       buffsText
-    );
+    ).toString();
   }
 
   return new EmbedBuilder()
     .setTitle("⚔️ Trận đấu Tu Tiên")
-    .setDescription(desc)
-    .addFields(
+    .setDescription(desc || "⚠️ Chưa có log")
+    .addFields([
       {
-        name: `${elementEmojis[p1.element] || ""} ${p1.name}`,
+        name: `${elementEmojis[p1?.element] || ""} ${String(p1?.name || "Người chơi 1")}`,
         value: playerField(p1),
         inline: true,
       },
       {
-        name: `${elementEmojis[p2.element] || ""} ${p2.name}`,
+        name: `${elementEmojis[p2?.element] || ""} ${String(p2?.name || "Người chơi 2")}`,
         value: playerField(p2),
         inline: true,
-      }
-    )
+      },
+    ])
     .setColor(state.finished ? "Gold" : "Purple")
     .setFooter({ text: "✨ Vận dụng linh lực để giành thắng lợi!" });
 }
@@ -86,7 +87,7 @@ function createSkillMenu(user, userId, isTurn) {
           label,
           description: `${s.description} | ${
             s.cost?.mpPercent ? `MP:${s.cost.mpPercent}%` : ""
-          } ${s.cost?.fury ? `| Nộ:${s.cost.fury}` : ""}`,
+          } ${s.cost?.fury ? `| Nộ:${s.cost.fury}` : ""}`.trim(),
           value: s.name,
         };
       })

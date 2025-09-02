@@ -19,12 +19,13 @@ const skills = {
       furyGain: 0,
       description:
         "Kim quang hộ thể, linh lực tức tụ, phá giáp chi uy, bất khả ngăn cản.",
-      effect: (attacker) => {
+      effect: (attacker, _, __, state) => {
         attacker.mp = Math.min(
           attacker.maxMp,
           attacker.mp + Math.floor(attacker.maxMp * 0.5)
         );
         addBuff(attacker, "buffIgnoreArmor", 0.2, 2);
+        if (state) state.logs.push(`✨ ${attacker.name} tăng 20% xuyên giáp trong 2 lượt!`);
       },
     },
     {
@@ -65,12 +66,12 @@ const skills = {
       furyGain: 0,
       description:
         "Sinh cơ sinh diệp, linh khí thịnh thịnh, thương thế tiêu tán, sinh mệnh bất tuyệt.",
-      effect: (attacker) => {
+      effect: (attacker, _, __, state) => {
         attacker.mp = Math.min(
           attacker.maxMp,
           attacker.mp + Math.floor(attacker.maxMp * 0.5)
         );
-        heal(attacker, Math.floor(attacker.maxHp * 0.2));
+        heal(attacker, Math.floor(attacker.maxHp * 0.2), state);
       },
     },
     {
@@ -110,12 +111,12 @@ const skills = {
       furyGain: 0,
       description:
         "Tâm tĩnh như thủy, băng giáp tụ thân, hàn khí hộ thể, vạn pháp nan xâm.",
-      effect: (attacker) => {
+      effect: (attacker, _, __, state) => {
         attacker.mp = Math.min(
           attacker.maxMp,
           attacker.mp + Math.floor(attacker.maxMp * 0.5)
         );
-        addShield(attacker, Math.floor(attacker.maxHp * 0.25), 2);
+        addShield(attacker, Math.floor(attacker.maxHp * 0.25), 2, state);
       },
     },
     {
@@ -156,12 +157,13 @@ const skills = {
       furyGain: 0,
       description:
         "Hỏa linh phụ thể, huyết khí sôi trào, uy thế như viêm long, thiên uy bạo khởi.",
-      effect: (attacker) => {
+      effect: (attacker, _, __, state) => {
         attacker.mp = Math.min(
           attacker.maxMp,
           attacker.mp + Math.floor(attacker.maxMp * 0.5)
         );
         addBuff(attacker, "buffAtk", 0.2, 2);
+        if (state) state.logs.push(`🔥 ${attacker.name} tăng 20% công trong 2 lượt!`);
       },
     },
     {
@@ -202,12 +204,13 @@ const skills = {
       furyGain: 0,
       description:
         "Thân như thạch cốt, khí trụ sơn hà, thiên công nan phá, vạn pháp nan xâm.",
-      effect: (attacker) => {
+      effect: (attacker, _, __, state) => {
         attacker.mp = Math.min(
           attacker.maxMp,
           attacker.mp + Math.floor(attacker.maxMp * 0.5)
         );
         addBuff(attacker, "buffDef", 0.2, 2);
+        if (state) state.logs.push(`🪨 ${attacker.name} tăng 20% thủ trong 2 lượt!`);
       },
     },
     {

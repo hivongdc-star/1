@@ -5,22 +5,24 @@ function applyBuffs(user, target, baseAtk, baseDef) {
 
   if (user.buffs) {
     for (const buff of user.buffs) {
-      if (buff.type === "buffAtk") atk = Math.floor(atk * (1 + buff.value));
+      const val = Number(buff.value) || 0;
+      if (buff.type === "buffAtk") atk = Math.floor(atk * (1 + val));
       if (buff.type === "buffIgnoreArmor")
-        ignoreArmor = Math.max(ignoreArmor, buff.value);
+        ignoreArmor = Math.max(ignoreArmor, val);
     }
   }
 
   if (target.buffs) {
     for (const buff of target.buffs) {
-      if (buff.type === "buffDef") def = Math.floor(def * (1 + buff.value));
+      const val = Number(buff.value) || 0;
+      if (buff.type === "buffDef") def = Math.floor(def * (1 + val));
     }
   }
 
   return { atk, def, ignoreArmor };
 }
 
-function calculateDamage(attacker, defender, skill) {
+function calculateDamage(attacker, defender, skill, state) {
   if (skill.type === "buff") return 0;
 
   let atk = attacker.atk || 10;
@@ -46,6 +48,7 @@ function calculateDamage(attacker, defender, skill) {
       Math.max(0, (spdDiff / (defender.spd + 1)) * 100)
     );
     if (Math.random() * 100 < dodgeChance) {
+      if (state) state.logs.push(`💨 ${defender.name} né được đòn của ${attacker.name}!`);
       return 0;
     }
   }
@@ -57,6 +60,7 @@ function calculateDamage(attacker, defender, skill) {
     const absorbed = Math.min(defender.shield, dmg);
     defender.shield -= absorbed;
     dmg -= absorbed;
+    if (state) state.logs.push(`🛡️ Khiên của ${defender.name} đã chặn ${absorbed} sát thương!`);
   }
 
   return dmg > 0 ? dmg : 1;
@@ -81,14 +85,17 @@ function addBuff(user, type, value, turns) {
   user.buffs.push({ type, value, turns });
 }
 
-function heal(user, amount) {
+function heal(user, amount, state) {
+  const healed = Math.min(user.maxHp - user.hp, amount);
   user.hp = Math.min(user.maxHp, user.hp + amount);
-  return amount;
+  if (state && healed > 0) state.logs.push(`💚 ${user.name} hồi phục ${healed} HP!`);
+  return healed;
 }
 
-function addShield(user, amount, turns = 2) {
+function addShield(user, amount, turns = 2, state) {
   user.shield = (user.shield || 0) + amount;
   addBuff(user, "shield", amount, turns);
+  if (state) state.logs.push(`🛡️ ${user.name} nhận được khiên ${amount} (tồn tại ${turns} lượt)!`);
 }
 
 module.exports = {
