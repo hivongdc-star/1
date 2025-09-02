@@ -1,4 +1,3 @@
-// utils/gamble.js
 const { addLT, removeLT, getLT } = require("./currency");
 const { addToJackpot } = require("./lottery");
 
@@ -87,4 +86,85 @@ function playSlot(user, bet) {
   return { success: true, msg: result };
 }
 
-module.exports = { playTaiXiu, playFlip, playSlot };
+// 🎴 Bài Cào (đánh với bot, có 3 cào)
+function playBaiCao(user, bet) {
+  if (getLT(user) < bet)
+    return { success: false, msg: "❌ Bạn không đủ LT để cược!" };
+
+  removeLT(user, bet);
+
+  const suits = ["♠️", "♥️", "♦️", "♣️"];
+  const ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+  const deck = [];
+  for (let s of suits) {
+    for (let r of ranks) {
+      deck.push({ rank: r, suit: s });
+    }
+  }
+
+  function drawHand() {
+    const hand = [];
+    for (let i = 0; i < 3; i++) {
+      const index = Math.floor(Math.random() * deck.length);
+      hand.push(deck.splice(index, 1)[0]);
+    }
+    return hand;
+  }
+
+  function calcPoint(hand) {
+    const values = hand.map((c) => {
+      if (["J", "Q", "K"].includes(c.rank)) return 10;
+      if (c.rank === "A") return 1;
+      return parseInt(c.rank);
+    });
+    return values.reduce((a, b) => a + b, 0) % 10;
+  }
+
+  function isBaCao(hand) {
+    return hand.every((c) => ["J","Q","K"].includes(c.rank));
+  }
+
+  const playerHand = drawHand();
+  const botHand = drawHand();
+
+  const playerPoint = calcPoint(playerHand);
+  const botPoint = calcPoint(botHand);
+
+  const playerBaCao = isBaCao(playerHand);
+  const botBaCao = isBaCao(botHand);
+
+  let result = `👤 Bài của bạn: ${playerHand.map(c => c.rank + c.suit).join(" ")}\n`;
+  result += `🤖 Bài của bot: ${botHand.map(c => c.rank + c.suit).join(" ")}\n`;
+
+  if (playerBaCao && botBaCao) {
+    addLT(user, bet);
+    result += "⚖️ Cả hai đều 3 cào → Hòa! Hoàn cược.";
+  } else if (playerBaCao) {
+    let win = bet * 5;
+    let tax = Math.floor(win * 0.05);
+    win -= tax;
+    addLT(user, win);
+    addToJackpot(tax);
+    result += `✨ 3 Cào! Bạn thắng ${win} LT (trích ${tax} LT vào Jackpot)`;
+  } else if (botBaCao) {
+    result += "💀 Bot có 3 Cào! Bạn thua toàn tập!";
+  } else {
+    if (playerPoint > botPoint) {
+      let win = bet * 2;
+      let tax = Math.floor(win * 0.05);
+      win -= tax;
+      addLT(user, win);
+      addToJackpot(tax);
+      result += `✨ Bạn ${playerPoint} điểm, bot ${botPoint} điểm → Bạn thắng ${win} LT (trích ${tax} LT vào Jackpot)`;
+    } else if (playerPoint < botPoint) {
+      result += `💀 Bạn ${playerPoint} điểm, bot ${botPoint} điểm → Bạn thua!`;
+    } else {
+      addLT(user, bet);
+      result += `⚖️ Hòa điểm (${playerPoint}) → Hoàn cược.`;
+    }
+  }
+
+  return { success: true, msg: result };
+}
+
+module.exports = { playTaiXiu, playFlip, playSlot, playBaiCao };
