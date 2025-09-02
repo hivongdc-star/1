@@ -24,7 +24,7 @@ module.exports = {
       .addOptions(
         Object.entries(races).map(([key, r]) => ({
           label: r.name.substring(0, 25), // label ≤ 25
-          value: key, // key chuẩn: nhan, ma, tien, yeu, than
+          value: key, // nhan, ma, tien, yeu, than
           emoji: r.emoji,
         }))
       );
@@ -38,7 +38,7 @@ module.exports = {
           const [emoji, name] = raw.split(" ");
           return {
             label: name.substring(0, 25),
-            value: key, // key chuẩn: kim, moc, thuy, hoa, tho
+            value: key, // kim, moc, thuy, hoa, tho
             emoji: emoji,
           };
         })
@@ -59,6 +59,7 @@ module.exports = {
 
     let selectedRace = null;
     let selectedElement = null;
+    let created = false;
     const collector = reply.createMessageComponentCollector({ time: 60000 });
 
     collector.on("collect", async (interaction) => {
@@ -92,6 +93,7 @@ module.exports = {
           selectedRace,
           selectedElement
         );
+        created = true;
 
         const confirm = new EmbedBuilder()
           .setTitle("✅ Nhân vật đã tạo thành công!")
@@ -99,10 +101,11 @@ module.exports = {
           .setDescription(
             `🧬 **Tộc:** ${races[selectedRace].emoji} ${races[selectedRace].name}\n` +
               `🌿 **Ngũ hành:** ${elements.display[selectedElement]}\n` +
-              `⚔️ **Cảnh giới:** ${newUser.realm}\n` +
-              `❤️ Máu: ${newUser.hp} | 🔷 Mana: ${newUser.mana}\n` +
-              `🔥 Công: ${newUser.attack} | 🛡️ Thủ: ${newUser.defense} | 📦 Giáp: ${newUser.armor}\n` +
-              `💢 Nộ: ${newUser.fury} | 💎 Linh Thạch: ${newUser.linhthach}`
+              `⚔️ **Cảnh giới:** ${newUser.realm}\n\n` +
+              `❤️ Máu: ${newUser.hp}/${newUser.maxHp}\n` +
+              `🔷 Mana: ${newUser.mp}/${newUser.maxMp}\n` +
+              `🔥 Công: ${newUser.atk} | 🛡️ Thủ: ${newUser.def} | ⚡ Tốc: ${newUser.spd}\n` +
+              `💢 Nộ: ${newUser.fury} | 💎 Linh Thạch: ${newUser.lt}`
           );
 
         await msg.channel.send({ embeds: [confirm] });
@@ -111,7 +114,7 @@ module.exports = {
     });
 
     collector.on("end", () => {
-      if (!selectedRace || !selectedElement) {
+      if (!created) {
         msg.channel.send(
           "⏳ Bạn chưa hoàn tất chọn Tộc và Ngũ hành, hãy thử lại!"
         );
