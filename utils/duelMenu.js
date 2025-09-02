@@ -29,7 +29,10 @@ function safeField(u, elementEmoji, fallbackName) {
   let buffsText = "";
   if (u.buffs?.length > 0) {
     buffsText =
-      "\n🌀 Buff: " + u.buffs.map((b) => `${b.type}(${b.turns})`).join(", ");
+      "\n🌀 Buff: " +
+      u.buffs
+        .map((b) => `${b.name || b.type || "Buff"}(${b.turns})`)
+        .join(", ");
   }
   let shieldText = u.shield > 0 ? `\n🛡️ Khiên: ${u.shield}` : "";
 
@@ -46,7 +49,7 @@ function safeField(u, elementEmoji, fallbackName) {
 
   return {
     name: `${elementEmoji} ${String(u.name || fallbackName)}`,
-    value: String(value).slice(0, 1024), // tránh vượt giới hạn
+    value: String(value).slice(0, 1024),
     inline: true,
   };
 }
@@ -61,7 +64,6 @@ function createBattleEmbed(state, users) {
     desc =
       "🏆 " + (state.logs?.[state.logs.length - 1] || "Trận đấu đã kết thúc!");
   } else {
-    // ✅ hiển thị toàn bộ log trong lượt hiện tại
     const turnLogs = state.logs?.length
       ? state.logs.map((l) => `📜 ${l}`).join("\n")
       : "⚠️ Chưa có hành động.";
@@ -120,11 +122,9 @@ async function sendBattleEmbeds(client, state) {
     const isTurn = state.turn === pid;
     const row = createSkillMenu(player, pid, isTurn);
 
-    // đã có message → edit
     if (state.battleMsgs?.[pid]) {
       await state.battleMsgs[pid].edit({ embeds: [embed], components: [row] });
     } else {
-      // fallback nếu chưa có message
       const ch = state.channels?.[pid];
       if (ch) {
         const msg = await ch.send({ embeds: [embed], components: [row] });

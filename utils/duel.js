@@ -88,7 +88,7 @@ function useSkill(userId, skillName) {
   }
   attacker.fury -= skill.cost?.fury || 0;
 
-  // buff cooldown
+  // buff skill
   if (skill.type === "buff") {
     if ((attacker.buffCooldowns[skill.name] || 0) > 0) {
       state.logs.push(
@@ -100,16 +100,24 @@ function useSkill(userId, skillName) {
     }
     attacker.buffCooldowns[skill.name] = skill.cooldown || 3;
 
-    // buff bắt đầu từ lượt kế tiếp
-    attacker.buffs.push({ pending: true, effect: skill.effect, turns: 2 });
+    attacker.buffs.push({
+      name: skill.name,
+      type: skill.buffType || "buff",
+      value: skill.value || null,
+      turns: 2, // duy trì 2 lượt bản thân
+      pending: true,
+      effect: skill.effect,
+    });
+
     state.logs.push(
-      `✨ ${attacker.name} chuẩn bị buff **${skill.name}**, sẽ có hiệu lực từ lượt kế tiếp!`
+      `✨ ${attacker.name} chuẩn bị buff **${skill.name}**, sẽ kích hoạt từ lượt kế tiếp!`
     );
   }
 
+  // damage skill
   let dmg = 0;
   if (skill.multiplier > 0 && skill.type !== "buff") {
-    dmg = calculateDamage(attacker, defender, skill);
+    dmg = calculateDamage(attacker, defender, skill, state);
     defender.hp -= dmg;
   }
 
@@ -135,7 +143,7 @@ function useSkill(userId, skillName) {
     state.turn = defenderId;
   }
 
-  // tick buff cho attacker (chỉ khi là lượt của mình)
+  // tick buff
   tickBuffs(attacker, state, true);
 
   const allUsers = loadUsers();

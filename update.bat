@@ -6,12 +6,7 @@ echo 🔄 Updating Bot...
 echo ============================
 
 :: Lấy code mới nhất từ git
-git fetch --all
-git reset --hard origin/main
-npm i
-npm i dotenv
-npm i discord.js
-
+git pull
 
 :: Dừng tiến trình Node cũ (chỉ bot hiện tại)
 for /f "tokens=2" %%a in ('tasklist ^| findstr "node.exe"') do (

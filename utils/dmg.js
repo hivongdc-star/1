@@ -40,11 +40,12 @@ function calculateDamage(attacker, defender, skill, state) {
     def = Math.floor(def * (1 - ignoreArmor));
   }
 
+  // Né tránh (chỉ áp dụng cho skill thường, mana, fury)
   if (["normal", "mana", "fury"].includes(skill.type)) {
-    const spdDiff = attacker.spd - defender.spd;
+    const spdDiff = (attacker.spd || 0) - (defender.spd || 0);
     let dodgeChance = Math.min(
       30,
-      Math.max(0, (spdDiff / (defender.spd + 1)) * 100)
+      Math.max(0, (spdDiff / ((defender.spd || 1) + 1)) * 100)
     );
     if (Math.random() * 100 < dodgeChance) {
       if (state)
@@ -71,26 +72,32 @@ function calculateDamage(attacker, defender, skill, state) {
   return dmg > 0 ? dmg : 1;
 }
 
-// --- Tick buffs & cooldown (chỉ khi là lượt của user) ---
 function tickBuffs(user, state, isUserTurn) {
   if (!user.buffs || !isUserTurn) return;
 
   const newBuffs = [];
   for (const buff of user.buffs) {
     if (buff.pending) {
-      // buff bắt đầu có hiệu lực từ lượt kế tiếp
+      // Buff kích hoạt từ lượt kế tiếp
       if (typeof buff.effect === "function") {
         buff.effect(user, null, 0, state);
-        state.logs.push(`🔮 Buff đã kích hoạt cho ${user.name}!`);
+        state.logs.push(
+          `🔮 Buff **${buff.name || buff.type}** của ${user.name} đã kích hoạt!`
+        );
       }
       buff.pending = false;
+      // ❌ Không trừ lượt ngay khi vừa kích hoạt
     } else {
       buff.turns -= 1;
       if (buff.type === "shield" && buff.turns <= 0) {
         user.shield = 0;
       }
       if (buff.turns <= 0) {
-        state.logs.push(`✨ Buff của ${user.name} đã hết hiệu lực.`);
+        state.logs.push(
+          `✨ Buff **${buff.name || buff.type}** của ${
+            user.name
+          } đã hết hiệu lực.`
+        );
         continue;
       }
     }
@@ -98,7 +105,7 @@ function tickBuffs(user, state, isUserTurn) {
   }
   user.buffs = newBuffs;
 
-  // giảm cooldown buff
+  // Giảm cooldown skill buff theo lượt bản thân
   for (const k in user.buffCooldowns) {
     if (user.buffCooldowns[k] > 0) user.buffCooldowns[k]--;
   }
@@ -128,6 +135,7 @@ function addShield(user, amount, turns = 2, state) {
 }
 
 module.exports = {
+  applyBuffs,
   calculateDamage,
   tickBuffs,
   addBuff,
