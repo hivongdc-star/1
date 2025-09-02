@@ -1,4 +1,4 @@
-const { challenges, startDuel } = require("../utils/duel");
+const { challenges, startDuel, battles } = require("../utils/duel");
 const { sendBattleEmbeds } = require("../utils/duelMenu");
 
 module.exports = {
@@ -19,6 +19,17 @@ module.exports = {
     if (!state) {
       return message.reply("❌ Không thể bắt đầu trận đấu (thiếu dữ liệu nhân vật)!");
     }
+
+    // log mở màn
+    state.logs = state.logs || [];
+    state.logs.push(`✨ Trận đấu giữa <@${challengerId}> và <@${defenderId}> bắt đầu!`);
+
+    // lưu state vào battles
+    battles[challengerId] = { state };
+    battles[defenderId] = { state };
+
+    // xóa challenge sau khi bắt đầu
+    delete challenges[defenderId];
 
     // lưu kênh riêng cho từng người
     state.channels = {};
@@ -49,7 +60,7 @@ module.exports = {
       );
     }
 
-    // gửi giao diện ban đầu
+    // gửi giao diện ban đầu (embed + menu skill)
     await sendBattleEmbeds(client, state);
   },
 };
