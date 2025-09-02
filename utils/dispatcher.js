@@ -76,9 +76,10 @@ function startDispatcher(client) {
 
       // ⚡ Thông báo lên cấp
       if (gained > 0) {
-        const u = users[msg.author.id];
+        const updatedUsers = loadUsers(); // load lại dữ liệu mới nhất
+        const u = updatedUsers[msg.author.id];
         msg.channel.send(
-          `⚡ **${msg.author.username}** đã đột phá **${gained} cấp**!\n` +
+          `⚡ **${displayName}** đã đột phá **${gained} cấp**!\n` +
             `📖 Hiện tại cảnh giới: **${u ? getRealm(u.level) : "???"}**`
         );
       }
