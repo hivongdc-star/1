@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const aliases = require("./aliases");
 const { loadUsers, saveUsers } = require("./storage");
-const { addXp } = require("./xp");
+const { addXp, getRealm } = require("./xp");
 const { earnFromChat } = require("./currency");
 
 let commands = new Map();
@@ -70,9 +70,18 @@ function startDispatcher(client) {
           expGain = Math.floor(expGain * 0.95);
       }
 
-      addXp(msg.author.id, expGain);
+      const gained = addXp(msg.author.id, expGain);
       earnFromChat(msg.author.id);
       cooldowns.set(msg.author.id, now);
+
+      // ⚡ Thông báo lên cấp
+      if (gained > 0) {
+        const u = users[msg.author.id];
+        msg.channel.send(
+          `⚡ **${msg.author.username}** đã đột phá **${gained} cấp**!\n` +
+            `📖 Hiện tại cảnh giới: **${u ? getRealm(u.level) : "???"}**`
+        );
+      }
     }
 
     if (msg.content.startsWith("-")) {

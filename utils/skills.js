@@ -25,7 +25,10 @@ const skills = {
           attacker.mp + Math.floor(attacker.maxMp * 0.5)
         );
         addBuff(attacker, "buffIgnoreArmor", 0.2, 2);
-        if (state) state.logs.push(`✨ ${attacker.name} tăng 20% xuyên giáp trong 2 lượt!`);
+        if (state)
+          state.logs.push(
+            `✨ ${attacker.name} tăng 20% xuyên giáp trong 2 lượt!`
+          );
       },
     },
     {
@@ -71,7 +74,7 @@ const skills = {
           attacker.maxMp,
           attacker.mp + Math.floor(attacker.maxMp * 0.5)
         );
-        heal(attacker, Math.floor(attacker.maxHp * 0.2), state);
+        heal(attacker, Math.floor(attacker.maxHp * 0.1), state);
       },
     },
     {
@@ -163,7 +166,8 @@ const skills = {
           attacker.mp + Math.floor(attacker.maxMp * 0.5)
         );
         addBuff(attacker, "buffAtk", 0.2, 2);
-        if (state) state.logs.push(`🔥 ${attacker.name} tăng 20% công trong 2 lượt!`);
+        if (state)
+          state.logs.push(`🔥 ${attacker.name} tăng 20% công trong 2 lượt!`);
       },
     },
     {
@@ -210,7 +214,8 @@ const skills = {
           attacker.mp + Math.floor(attacker.maxMp * 0.5)
         );
         addBuff(attacker, "buffDef", 0.2, 2);
-        if (state) state.logs.push(`🪨 ${attacker.name} tăng 20% thủ trong 2 lượt!`);
+        if (state)
+          state.logs.push(`🪨 ${attacker.name} tăng 20% thủ trong 2 lượt!`);
       },
     },
     {
