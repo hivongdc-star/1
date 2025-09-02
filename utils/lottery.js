@@ -1,4 +1,3 @@
-// utils/lottery.js
 const fs = require("fs");
 const path = "./data/lottery.json";
 const { addLT, removeLT, getLT } = require("./currency");
@@ -37,9 +36,14 @@ function addToJackpot(amount) {
   saveLottery();
 }
 
-// Xem hũ
+// Xem hũ + thông tin thêm
 function getPot() {
-  return lottery.jackpot;
+  let ticketCount = Object.values(lottery.tickets).reduce((a, b) => a + b, 0);
+  return {
+    jackpot: lottery.jackpot,
+    lastWinner: lottery.lastWinner,
+    ticketCount,
+  };
 }
 
 // Quay thưởng
@@ -65,6 +69,8 @@ function drawWinner() {
   return {
     success: true,
     msg: `🎉 Người trúng số hôm nay là <@${winner}>! Nhận ${prize} LT`,
+    winner,
+    prize,
   };
 }
 

@@ -1,7 +1,9 @@
+const { EmbedBuilder } = require("discord.js");
 const { buyTicket, getPot, drawWinner } = require("../utils/lottery");
 
 module.exports = {
   name: "lottery",
+  description: "Quản lý xổ số và jackpot",
   run: (client, msg, args) => {
     const sub = args[0];
 
@@ -9,8 +11,28 @@ module.exports = {
       const amount = parseInt(args[1]) || 1;
       const result = buyTicket(msg.author.id, amount);
       return msg.reply(result.msg);
+
     } else if (sub === "pot") {
-      return msg.reply(`💰 Jackpot hiện tại: ${getPot()} LT`);
+      const pot = getPot();
+      const embed = new EmbedBuilder()
+        .setColor("Gold")
+        .setTitle("💰 Jackpot Hiện Tại")
+        .addFields(
+          { name: "💎 Tổng Jackpot", value: `${pot.jackpot} LT`, inline: true },
+          { name: "🎟️ Tổng số vé", value: `${pot.ticketCount}`, inline: true }
+        )
+        .setFooter({ text: "Mua vé bằng lệnh: -lottery buy <số vé>" })
+        .setTimestamp();
+
+      if (pot.lastWinner) {
+        embed.addFields({
+          name: "🏆 Người thắng gần nhất",
+          value: `<@${pot.lastWinner}>`,
+        });
+      }
+
+      return msg.reply({ embeds: [embed] });
+
     } else if (sub === "draw") {
       // 🔒 chỉ OWNER_ID trong .env mới có quyền
       const ownerId = process.env.OWNER_ID;
@@ -20,6 +42,7 @@ module.exports = {
 
       const result = drawWinner();
       return msg.reply(result.msg);
+
     } else {
       return msg.reply(
         "📌 Dùng: \n" +
