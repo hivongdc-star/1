@@ -6,8 +6,7 @@ const OWNER_ID = process.env.OWNER_ID;
 
 module.exports = {
   name: "fixdata",
-  description:
-    "Chuẩn hóa dữ liệu nhân vật và tính lại chỉ số theo level hiện tại (admin only)",
+  description: "Chuẩn hóa & tính lại chỉ số nhân vật theo level (admin only)",
   aliases: ["fd"],
 
   run(client, msg) {
@@ -26,7 +25,7 @@ module.exports = {
       const race = u.race || "nhan";
       const element = u.element || "kim";
 
-      // Reset base stats về level 1
+      // 🟢 Base stats level 1
       let hp = 100,
         maxHp = 100;
       let mp = 100,
@@ -35,9 +34,9 @@ module.exports = {
         def = 10,
         spd = 10;
 
-      // Loop lại từ lv2 -> level hiện tại
+      // 🔄 Loop từ level 2 → level hiện tại
       for (let lv = 2; lv <= level; lv++) {
-        // tăng theo Tộc
+        // Cộng theo Tộc
         const raceGain = races[race]?.gain || {};
         for (let stat in raceGain) {
           if (stat === "hp") maxHp += raceGain[stat];
@@ -47,7 +46,7 @@ module.exports = {
           else if (stat === "spd") spd += raceGain[stat];
         }
 
-        // tăng theo Ngũ hành
+        // Cộng theo Ngũ hành
         const eleGain = elements[element] || {};
         for (let stat in eleGain) {
           if (stat === "hp") maxHp += eleGain[stat];
@@ -57,11 +56,11 @@ module.exports = {
           else if (stat === "spd") spd += eleGain[stat];
         }
 
-        // cộng thêm máu/mana cơ bản mỗi cấp
+        // Tăng trưởng cơ bản
         maxHp += 100;
         maxMp += 20;
 
-        // breakthrough mỗi cảnh giới
+        // Breakthrough
         if (lv % 10 === 1) {
           let multiplier = race === "than" ? 1.6 : 1.5;
           atk = Math.floor(atk * multiplier);
@@ -72,39 +71,30 @@ module.exports = {
         }
       }
 
-      // hp hiện tại không vượt quá maxHp
-      hp = Math.min(u.hp || maxHp, maxHp);
-
-      // Ghi đè lại dữ liệu user
+      // 🟢 Cập nhật lại user
       users[id] = {
-        id,
-        name: u.name || "Chưa đặt tên",
-        exp: u.exp || 0,
-        level,
-        realm: getRealm(level),
+        ...u,
         race,
         element,
-        hp,
+        level,
+        realm: getRealm(level),
+        hp: maxHp,
         maxHp,
-        mp,
+        mp: maxMp,
         maxMp,
         atk,
         def,
         spd,
-        fury: u.fury || 0,
-        lt: u.lt || 0,
-        bio: u.bio || "",
-        title: u.title || null,
-        inventory: u.inventory || {},
-        dailyStones: u.dailyStones || { date: null, earned: 0 },
+        fury: 0,
         buffs: [],
         shield: 0,
+        buffCooldowns: {},
       };
 
       fixed++;
     }
 
     saveUsers(users);
-    msg.reply(`✅ Đã chuẩn hóa và fix chỉ số cho **${fixed}** nhân vật.`);
+    msg.reply(`✅ Đã chuẩn hóa & tính lại chỉ số cho **${fixed}** nhân vật.`);
   },
 };
