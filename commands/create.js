@@ -1,4 +1,3 @@
-// commands/create.js
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
@@ -17,19 +16,17 @@ module.exports = {
       return msg.reply("⚠️ Bạn đã có nhân vật rồi! Dùng `-profile` để xem.");
     }
 
-    // Menu chọn Tộc
     const raceMenu = new StringSelectMenuBuilder()
       .setCustomId("select_race")
       .setPlaceholder("🧬 Chọn Tộc")
       .addOptions(
         Object.entries(races).map(([key, r]) => ({
-          label: r.name.substring(0, 25), // label ≤ 25
-          value: key, // nhan, ma, tien, yeu, than
+          label: r.name.substring(0, 25),
+          value: key,
           emoji: r.emoji,
         }))
       );
 
-    // Menu chọn Ngũ hành
     const elementMenu = new StringSelectMenuBuilder()
       .setCustomId("select_element")
       .setPlaceholder("🌿 Chọn Ngũ hành")
@@ -38,7 +35,7 @@ module.exports = {
           const [emoji, name] = raw.split(" ");
           return {
             label: name.substring(0, 25),
-            value: key, // kim, moc, thuy, hoa, tho
+            value: key,
             emoji: emoji,
           };
         })
@@ -86,13 +83,9 @@ module.exports = {
         });
       }
 
-      // Khi đã chọn đủ
       if (selectedRace && selectedElement) {
-        const newUser = createUser(
-          msg.author.id,
-          selectedRace,
-          selectedElement
-        );
+        const newUser = createUser(msg.author.id, selectedRace, selectedElement);
+        newUser.background = "default"; // gán mặc định
         created = true;
 
         const confirm = new EmbedBuilder()
@@ -115,9 +108,7 @@ module.exports = {
 
     collector.on("end", () => {
       if (!created) {
-        msg.channel.send(
-          "⏳ Bạn chưa hoàn tất chọn Tộc và Ngũ hành, hãy thử lại!"
-        );
+        msg.channel.send("⏳ Bạn chưa hoàn tất chọn Tộc và Ngũ hành, hãy thử lại!");
       }
     });
   },

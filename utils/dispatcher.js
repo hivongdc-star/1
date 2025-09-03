@@ -50,7 +50,7 @@ function handleCommand(client, msg, args) {
 function startDispatcher(client) {
   loadCommands();
 
-  // 🔔 Gắn lịch xổ số tự động (19:50 nhắc, 20:00 quay)
+  // 🔔 Lên lịch quay số (19:50 nhắc, 20:00 quay)
   require("./lotteryScheduler")(client);
 
   client.on("messageCreate", (msg) => {
@@ -74,10 +74,13 @@ function startDispatcher(client) {
       earnFromChat(msg.author.id);
       cooldowns.set(msg.author.id, now);
 
-      // ⚡ Thông báo lên cấp
+      // ⚡ Thông báo đột phá
       if (gained > 0) {
-        const updatedUsers = loadUsers(); // load lại dữ liệu mới nhất
+        const updatedUsers = loadUsers(); // lấy dữ liệu mới nhất
         const u = updatedUsers[msg.author.id];
+
+        const displayName = u?.name || msg.author.username;
+
         msg.channel.send(
           `⚡ **${displayName}** đã đột phá **${gained} cấp**!\n` +
             `📖 Hiện tại cảnh giới: **${u ? getRealm(u.level) : "???"}**`
@@ -85,6 +88,7 @@ function startDispatcher(client) {
       }
     }
 
+    // --- Command ---
     if (msg.content.startsWith("-")) {
       const args = msg.content.trim().split(/\s+/);
       handleCommand(client, msg, args);

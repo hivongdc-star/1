@@ -62,6 +62,7 @@ function createUser(id, race, element) {
       dailyStones: { date: null, earned: 0 },
       buffs: [],
       shield: 0,
+      background: "default",
     };
 
     users[id] = user;
