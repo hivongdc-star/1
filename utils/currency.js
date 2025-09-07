@@ -67,12 +67,39 @@ function claimDaily(userId) {
   };
 }
 
-// Xuất ra đầy đủ, có alias để code cũ không lỗi
+//
+// --- Phần mới: hỗ trợ Game nối từ ---
+//
+
+// +1 LT cho mỗi từ hợp lệ
+function rewardWord(userId, amount = 1) {
+  addLT(userId, amount);
+}
+
+// Trao thưởng khi game kết thúc
+// players = { userId: số từ đã nhập }
+function rewardGameResults(players) {
+  const results = [];
+  for (const [userId, words] of Object.entries(players)) {
+    const reward = words; // mỗi từ = 1 LT (có thể thêm bonus top ở đây)
+    addLT(userId, reward);
+    results.push({ userId, reward, words });
+  }
+
+  // Sắp xếp kết quả theo số từ giảm dần
+  results.sort((a, b) => b.words - a.words);
+
+  return results;
+}
+
+// Xuất ra đầy đủ
 module.exports = {
   addLT,
   removeLT,
   getLT,
   earnFromChat,
   claimDaily,
+  rewardWord,
+  rewardGameResults,
   addStones: addLT, // alias cho code cũ
 };
