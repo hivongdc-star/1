@@ -3,7 +3,10 @@ const path = require("path");
 const aliases = require("./aliases");
 const { loadUsers, saveUsers } = require("./storage");
 const { addXp, getRealm } = require("./xp");
-const { earnFromChat } = require("./currency");
+const { earnFromChat, rewardGameResults } = require("./currency");
+
+// --- Nối từ (Noitu) ---
+const { getGame, addTurn, stopGame } = require("../noitu/noituState");
 
 let commands = new Map();
 const cooldowns = new Map();
@@ -56,6 +59,39 @@ function startDispatcher(client) {
   client.on("messageCreate", (msg) => {
     if (msg.author.bot) return;
 
+    // --- Nối từ ---
+    const state = getGame(msg.channel.id);
+    if (state && state.active && !msg.content.startsWith("-")) {
+      const result = addTurn(msg.channel.id, msg.author.id, msg.content.trim());
+
+      if (!result.success) {
+        msg.react("❌"); // sai → thả icon đỏ
+      } else {
+        msg.react("✅"); // đúng → thả icon xanh
+
+        // Nếu đạt maxWords thì tự động kết thúc
+        if (state.wordCount >= state.maxWords) {
+          const finished = stopGame(msg.channel.id);
+          const results = rewardGameResults(finished.players);
+
+          let board = results.length
+            ? results
+                .map(
+                  (r, i) =>
+                    `${i + 1}. <@${r.userId}> - ${r.words} từ → +${r.reward} LT`
+                )
+                .join("\n")
+            : "Không có ai tham gia 😢";
+
+          msg.channel.send(
+            `🎉 Game nối từ đã hoàn thành ${finished.maxWords}/${finished.maxWords} từ!\n\n${board}`
+          );
+        }
+      }
+
+      return; // không xử lý exp/command cho message nối từ
+    }
+
     // --- Auto EXP mỗi 15s ---
     const now = Date.now();
     const last = cooldowns.get(msg.author.id) || 0;
@@ -76,9 +112,8 @@ function startDispatcher(client) {
 
       // ⚡ Thông báo đột phá
       if (gained > 0) {
-        const updatedUsers = loadUsers(); // lấy dữ liệu mới nhất
+        const updatedUsers = loadUsers();
         const u = updatedUsers[msg.author.id];
-
         const displayName = u?.name || msg.author.username;
 
         msg.channel.send(
