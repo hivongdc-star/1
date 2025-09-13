@@ -2,97 +2,134 @@ const { createCanvas, loadImage } = require("@napi-rs/canvas");
 const { getRealm, getExpNeeded } = require("./xp");
 const { getBackground } = require("./backgrounds");
 const { fonts } = require("./fontUtils");
-const elements = require("./element");
 const races = require("./races");
+const elements = require("./element");
 const { loadUsers } = require("./storage");
+const { getIcon } = require("./iconUtils");
 
-async function drawProfile(userId) {
+// cache ảnh để tránh load lại nhiều lần
+const __imgCache = new Map();
+async function getImage(p) {
+  if (!__imgCache.has(p)) {
+    __imgCache.set(p, loadImage(p));
+  }
+  return __imgCache.get(p);
+}
+
+async function drawProfile(userId, avatarUrl = null) {
   const users = loadUsers();
   const user = users[userId];
   if (!user) return null;
 
-  // Canvas kích thước chuẩn
-  const width = 600,
-    height = 350;
+  const width = 600, height = 420;
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
   // --- Background ---
-  const bg = getBackground(user.background);
-  try {
-    const bgImg = await loadImage(`./assets/backgrounds/${bg.file}`);
-    ctx.drawImage(bgImg, 0, 0, width, height);
-  } catch {
-    ctx.fillStyle = "#222";
-    ctx.fillRect(0, 0, width, height);
-  }
+  const bg = getBackground(user.bg || "default");
+  const bgImg = await getImage(`./assets/backgrounds/${bg.file}`);
+  ctx.drawImage(bgImg, 0, 0, width, height);
 
-  // Nền mờ cho text
-  ctx.fillStyle = "rgba(0,0,0,0.5)";
-  ctx.fillRect(20, 20, width - 40, height - 40);
+  // Nền mờ
+  ctx.fillStyle = "rgba(0,0,0,0.55)";
+  ctx.fillRect(0, 0, width, height);
 
-  // --- Avatar ---
+  // --- Avatar (bo tròn) ---
+  const avatar = await getImage(avatarUrl || user.avatar || "./assets/default_avatar.png");
+  const avSize = 120;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(60, 60, avSize / 2, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+  ctx.drawImage(avatar, 0, 0, avSize, avSize);
+  ctx.restore();
+
+  // --- Tên nhân vật ---
+  ctx.font = "28px Cinzel";
+  ctx.fillStyle = "#4fc3f7";
+  ctx.fillText(user.name || "Vô Danh", 150, 50);
+
+  // --- Cảnh giới ---
+  const realm = getRealm(user.level || 1);
+  ctx.font = "20px NotoSans";
+  ctx.fillStyle = "#ddd";
+  ctx.fillText(realm.name || "Luyện Khí", 150, 80);
+
+  // --- Icon Tộc & Ngũ hành (trên exp bar) ---
   try {
-    const avatar = await loadImage(
-      user.avatar || "./assets/default_avatar.png"
-    );
-    const size = 100;
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(70, 70, size / 2, 0, Math.PI * 2, true);
-    ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(avatar, 20, 20, size, size);
-    ctx.restore();
+    const raceKey = (user.race || "nhan").toLowerCase();
+    const elemKey = (user.element || "kim").toLowerCase();
+    const raceIcon = await getIcon(raceKey);
+    const elemIcon = await getIcon(elemKey);
+    ctx.drawImage(raceIcon, 150, 100, 40, 40);
+    ctx.drawImage(elemIcon, 200, 100, 40, 40);
   } catch {}
 
-  // --- Tên + Cảnh giới ---
-  ctx.font = fonts.title;
-  ctx.fillStyle = "#fff";
-  ctx.fillText(user.name, 140, 60);
-
-  const realm = getRealm(user.level);
-  ctx.font = fonts.subtitle;
-  ctx.fillStyle = "#ddd";
-  ctx.fillText(`${realm} (Lv.${user.level})`, 140, 90);
-
   // --- Thanh EXP ---
-  const expNow = user.exp;
-  const expNeed = getExpNeeded(user.level);
-  const barX = 140,
-    barY = 110,
-    barW = 400,
-    barH = 18;
+  const expNow = user.exp || 0;
+  const expNeed = getExpNeeded(user.level || 1);
+  const barX = 150, barY = 150, barW = 400, barH = 20;
 
   ctx.fillStyle = "#444";
   ctx.fillRect(barX, barY, barW, barH);
-  ctx.fillStyle = "#4fc3f7";
+  ctx.fillStyle = "#81c784";
   ctx.fillRect(barX, barY, Math.floor((barW * expNow) / expNeed), barH);
 
-  ctx.font = fonts.text;
+  ctx.font = "14px DejaVu";
   ctx.fillStyle = "#fff";
-  ctx.fillText(`EXP: ${expNow}/${expNeed}`, barX, barY - 5);
+  ctx.textAlign = "center";
+  ctx.fillText(`EXP: ${expNow}/${expNeed}`, barX + barW / 2, barY + 15);
+  ctx.textAlign = "left";
 
-  // --- Stats ---
-  const stats = [
-    ["⚔ Công", user.atk],
-    ["🛡 Thủ", user.def],
-    ["❤️ Máu", user.maxHp],
-    ["🔮 Mana", user.maxMp],
-    ["💢 Nộ", user.fury],
-    ["💎 LT", user.lt],
+  // --- Linh thạch ---
+  try {
+    const ltIcon = await getIcon("lt");
+    ctx.drawImage(ltIcon, 150, 190, 24, 24);
+  } catch {}
+  ctx.font = "18px DejaVu";
+  ctx.fillStyle = "#fff";
+  ctx.fillText(`${user.lt || 0}`, 180, 210);
+
+  // --- Chỉ số (2 cột, có icon) ---
+  const statsLeft = [
+    ["hp", user.hp || 0],
+    ["mp", user.mp || 0],
+    ["atk", user.atk || 0],
+  ];
+  const statsRight = [
+    ["def", user.def || 0],
+    ["spd", user.spd || 0],
   ];
 
-  let sy = 160;
-  stats.forEach(([label, val]) => {
-    ctx.fillText(`${label}: ${val}`, 140, sy);
-    sy += 25;
-  });
+  let sy = 250;
+  for (const [key, val] of statsLeft) {
+    try {
+      const ic = await getIcon(key);
+      ctx.drawImage(ic, 150, sy - 18, 20, 20);
+    } catch {}
+    ctx.font = "16px DejaVu";
+    ctx.fillStyle = "#fff";
+    ctx.fillText(`${val}`, 180, sy);
+    sy += 30;
+  }
 
-  // --- Bio ---
-  ctx.fillStyle = "#eee";
-  ctx.font = fonts.text;
-  ctx.fillText(`"${user.bio || "Chưa có mô tả."}"`, 140, sy + 20);
+  sy = 250;
+  for (const [key, val] of statsRight) {
+    try {
+      const ic = await getIcon(key);
+      ctx.drawImage(ic, 300, sy - 18, 20, 20);
+    } catch {}
+    ctx.font = "16px DejaVu";
+    ctx.fillStyle = "#fff";
+    ctx.fillText(`${val}`, 330, sy);
+    sy += 30;
+  }
+
+  // --- Bio (in nghiêng) ---
+  ctx.font = "italic 14px DejaVu";
+  ctx.fillStyle = "#ccc";
+  ctx.fillText(`"${user.bio || "Chưa có mô tả."}"`, 150, 350);
 
   return canvas.toBuffer("image/png");
 }

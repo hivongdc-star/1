@@ -1,6 +1,6 @@
 {
   "name": "cultivation-bot",
-  "version": "1.5.5",
+  "version": "1.5.6",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -9,6 +9,8 @@
     "axios": "^1.11.0",
     "discord.js": "^14.22.1",
     "node-schedule": "^2.1.1",
-    "simsimi-api": "^1.0.3"
+    "simsimi-api": "^1.0.3",
+    "@napi-rs/canvas": "^0.1.55",
+    "dotenv": "^16.4.5"
   }
 }
