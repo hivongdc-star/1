@@ -1,22 +1,2 @@
-@echo off
-cd /d C:\Users\Administrator\1
-
-echo ============================
-echo 🔄 Updating Bot...
-echo ============================
-
-:: Lấy code mới nhất từ git
 git pull
-
-:: Dừng tiến trình Node cũ (chỉ bot hiện tại)
-for /f "tokens=2" %%a in ('tasklist ^| findstr "node.exe"') do (
-    taskkill /F /PID %%a >nul 2>&1
-)
-
-:: Khởi động lại bot trong nền, ghi log ra file
-start /b cmd /c "node index.js >> logs\bot.log 2>&1"
-
-echo ============================
-echo ✅ Update & Restart Completed
-echo ============================
-exit
+pm2 reset all

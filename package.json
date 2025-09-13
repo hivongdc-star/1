@@ -1,6 +1,6 @@
 {
   "name": "cultivation-bot",
-  "version": "1.5.6",
+  "version": "1.5.6.1",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"

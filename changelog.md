@@ -1,3 +1,8 @@
+## 1.5.6.1
+- Fix hiển thị cảnh giới trong profile 
+- Avatar, tên nhân vật, icon tộc/ngũ hành, thanh EXP, linh thạch, chỉ số được tối ưu hiển thị.
+
+
 ## 1.5.6
 - Tối ưu bố cục `profile`: avatar bo tròn, tên có màu, cảnh giới rõ ràng.
 - Thanh EXP có số trực tiếp bên trong.
