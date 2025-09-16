@@ -1,2 +1,3 @@
 git pull
-pm2 reset all
+pm2 stop  all
+pm2 restart all
