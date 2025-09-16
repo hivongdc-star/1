@@ -72,7 +72,7 @@ function createBattleEmbed(state, users) {
   }
 
   return new EmbedBuilder()
-    .setTitle("⚔️ Trận đấu Tu Tiên")
+    .setTitle("⚔️ Sinh tử chiến")
     .setDescription(desc || "⚠️ Chưa có log")
     .addFields([
       safeField(p1, elementEmojis[p1?.element] || "", "Người chơi 1"),
