@@ -1,6 +1,6 @@
-// commands/tang.js
 const { loadUsers, saveUsers } = require("../utils/storage");
 const { addRelaAmount } = require("../utils/relaUtils");
+const { listItems } = require("../shop/shopUtils");
 const {
   ActionRowBuilder,
   StringSelectMenuBuilder,
@@ -17,23 +17,36 @@ module.exports = {
     if (!mentioned || mentioned.bot || mentioned.id === giverId) {
       return msg.reply("❌ Bạn phải mention đúng người muốn tặng.");
     }
-
     const receiverId = mentioned.id;
-    const users = loadUsers();
-    if (!users[giverId]) return msg.reply("❌ Bạn chưa có hồ sơ nhân vật.");
-    if (!users[receiverId]) return msg.reply("❌ Người nhận chưa có hồ sơ nhân vật.");
 
-    const inv = Array.isArray(users[giverId].inventory) ? users[giverId].inventory : [];
-    const available = inv.filter((it) => (it?.qty ?? 0) > 0);
+    const users = loadUsers();
+    const giver = users[giverId];
+    const receiver = users[receiverId];
+    if (!giver) return msg.reply("❌ Bạn chưa có hồ sơ nhân vật.");
+    if (!receiver) return msg.reply("❌ Người nhận chưa có hồ sơ nhân vật.");
+
+    const inv = giver.inventory || {};
+    const catalog = listItems();
+
+    // lọc item có qty > 0 và tồn tại trong catalog
+    const available = Object.entries(inv)
+      .filter(([id, qty]) => qty > 0 && catalog[id])
+      .map(([id, qty]) => ({
+        id,
+        qty,
+        ...catalog[id],
+      }));
+
     if (!available.length) {
       return msg.reply("📭 Túi của bạn đang trống, không có gì để tặng.");
     }
 
-    // tối đa 25 option cho menu
-    const options = available.slice(0, 25).map((it, idx) => ({
-      label: `${it.name ?? `Item ${idx + 1}`}`,
-      description: `Số lượng: x${it.qty}${it.rela ? ` • +${it.rela} rela` : (it.value ? ` • trị giá ${it.value}` : "")}`,
-      value: String(idx),
+    // tối đa 25 option cho select menu
+    const options = available.slice(0, 25).map((it) => ({
+      label: it.name,
+      description: `Số lượng: x${it.qty} • ${it.description || ""}`,
+      emoji: it.emoji || "🎁",
+      value: it.id,
     }));
 
     const row = new ActionRowBuilder().addComponents(
@@ -44,7 +57,7 @@ module.exports = {
     );
 
     const ui = await msg.channel.send({
-      content: `🎁 Chọn vật phẩm để tặng cho <@${receiverId}>:`,
+      content: `🎁 Chọn vật phẩm để tặng cho **${receiver.name || "Người nhận"}**:`,
       components: [row],
     });
 
@@ -61,39 +74,38 @@ module.exports = {
         time: 30000,
       });
     } catch {
-      await ui.edit({ content: "⏰ Hết thời gian chọn vật phẩm.", components: [] });
+      await ui.edit({
+        content: "⏰ Hết thời gian chọn vật phẩm.",
+        components: [],
+      });
       return;
     }
 
-    const selIdx = parseInt(selection.values[0], 10);
-    if (isNaN(selIdx) || selIdx < 0 || selIdx >= available.length) {
-      await selection.update({ content: "❌ Lựa chọn không hợp lệ.", components: [] });
+    const itemId = selection.values[0];
+    const item = catalog[itemId];
+    if (!item || !inv[itemId] || inv[itemId] <= 0) {
+      await selection.update({
+        content: "⚠️ Vật phẩm không khả dụng.",
+        components: [],
+      });
       return;
     }
 
-    const chosenItem = available[selIdx];
-    const realIndex = inv.findIndex((x) => x === chosenItem);
-    if (realIndex === -1 || inv[realIndex].qty <= 0) {
-      await selection.update({ content: "⚠️ Vật phẩm không còn khả dụng.", components: [] });
-      return;
-    }
-
-    // trừ vật phẩm
-    inv[realIndex].qty -= 1;
-    if (inv[realIndex].qty <= 0) inv.splice(realIndex, 1);
-    users[giverId].inventory = inv;
+    // trừ số lượng
+    inv[itemId]--;
+    if (inv[itemId] <= 0) delete inv[itemId];
+    giver.inventory = inv;
 
     // cộng rela
-    const relaGain = typeof chosenItem.rela === "number"
-      ? chosenItem.rela
-      : (typeof chosenItem.value === "number" ? chosenItem.value : 10);
-
-    addRelaAmount(giverId, receiverId, Math.max(0, Math.floor(relaGain)));
+    const relaGain = item.effect?.rela || 10;
+    addRelaAmount(giverId, receiverId, relaGain);
 
     saveUsers(users);
 
     await selection.update({
-      content: `🎉 <@${giverId}> đã tặng **${chosenItem.name ?? "vật phẩm"}** cho <@${receiverId}>!\n💞 Rela của hai bạn **+${Math.max(0, Math.floor(relaGain))}**.`,
+      content: `🎉 **${giver.name || msg.author.username}** đã tặng **${
+        item.emoji || "🎁"
+     } ${item.name}** cho **${receiver.name || "Người nhận"}**!\n💞 Rela tăng **+${relaGain}**.`,
       components: [],
     });
   },
