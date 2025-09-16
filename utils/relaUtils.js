@@ -1,13 +1,13 @@
 // utils/relaUtils.js
-// RELA = độ thân mật giữa 2 user, lưu trong users[userId].rela[partnerId]
+// RELA = độ thân mật giữa 2 user
 // Rule: mention +50 (tối đa 10/ngày), reply +20 (tối đa 10/ngày), chat liền kề +2
+// Gift = cộng rela theo giá trị, không bị giới hạn
 
 const { loadUsers, saveUsers } = require("./storage");
 
 const TIMEZONE = "Asia/Tokyo";
-const lastMessageByChannel = new Map(); // nhớ người nhắn cuối theo channel
+const lastMessageByChannel = new Map(); // nhớ user cuối trong channel
 
-// format ngày YYYY-MM-DD
 function todayStr() {
   const fmt = new Intl.DateTimeFormat("en-CA", {
     timeZone: TIMEZONE,
@@ -18,27 +18,12 @@ function todayStr() {
   return fmt.format(new Date());
 }
 
-// đảm bảo user và rela tồn tại
-function ensurePair(users, a, b) {
-  if (!users[a]) users[a] = {};
-  if (!users[a].rela) users[a].rela = {};
-  if (!users[b]) users[b] = {};
-  if (!users[b].rela) users[b].rela = {};
-
-  const init = { value: 0, daily: { date: todayStr(), mention: 0, reply: 0 } };
-
-  if (!users[a].rela[b]) users[a].rela[b] = { ...init };
-  if (!users[b].rela[a]) users[b].rela[a] = { ...init };
-
-  normalize(users[a].rela[b]);
-  normalize(users[b].rela[a]);
-}
-
-// nếu là number thì migrate sang object
 function normalize(cell) {
   if (typeof cell === "number") {
-    cell = { value: cell, daily: { date: todayStr(), mention: 0, reply: 0 } };
-    return cell;
+    return { value: cell, daily: { date: todayStr(), mention: 0, reply: 0 } };
+  }
+  if (!cell || typeof cell !== "object") {
+    return { value: 0, daily: { date: todayStr(), mention: 0, reply: 0 } };
   }
   if (!cell.value) cell.value = 0;
   if (!cell.daily) cell.daily = { date: todayStr(), mention: 0, reply: 0 };
@@ -48,19 +33,26 @@ function normalize(cell) {
   return cell;
 }
 
-// cộng rela theo type
+function ensurePair(users, a, b) {
+  if (!users[a]) users[a] = {};
+  if (!users[a].rela) users[a].rela = {};
+  if (!users[b]) users[b] = {};
+  if (!users[b].rela) users[b].rela = {};
+  users[a].rela[b] = normalize(users[a].rela[b]);
+  users[b].rela[a] = normalize(users[b].rela[a]);
+}
+
+// cộng rela theo type (mention/reply/chat)
 function addRelaByType(a, b, type) {
   if (a === b) return;
   const users = loadUsers();
   if (!users[a] || !users[b]) return;
 
   ensurePair(users, a, b);
-
   const cellA = users[a].rela[b];
   const cellB = users[b].rela[a];
 
   let amount = 0;
-
   if (type === "mention") {
     if (cellA.daily.mention < 10) {
       amount = 50;
@@ -80,10 +72,21 @@ function addRelaByType(a, b, type) {
   if (amount > 0) {
     cellA.value += amount;
     cellB.value += amount;
-    saveUsers(users);
-  } else {
-    saveUsers(users); // để cập nhật reset daily
   }
+
+  saveUsers(users);
+}
+
+// cộng rela trực tiếp theo số điểm (gift, event đặc biệt…)
+function addRelaAmount(a, b, amount) {
+  if (a === b || !amount) return;
+  const users = loadUsers();
+  if (!users[a] || !users[b]) return;
+
+  ensurePair(users, a, b);
+  users[a].rela[b].value += amount;
+  users[b].rela[a].value += amount;
+  saveUsers(users);
 }
 
 // đọc rela
@@ -113,10 +116,9 @@ function getTopRelaPairs(limit = 10) {
   const users = loadUsers();
   const seen = new Set();
   const pairs = [];
-
   for (const a in users) {
     for (const b in users[a]?.rela || {}) {
-      if (a >= b) continue; // tránh trùng
+      if (a >= b) continue;
       const val = getRela(a, b);
       const key = `${a}|${b}`;
       if (!seen.has(key)) {
@@ -130,24 +132,16 @@ function getTopRelaPairs(limit = 10) {
 
 // hook từ dispatcher
 function handleMessageEvent({ channelId, authorId, mentionedIds = [], repliedUserId = null }) {
-  // mention
   mentionedIds.forEach((id) => addRelaByType(authorId, id, "mention"));
-
-  // reply
-  if (repliedUserId) {
-    addRelaByType(authorId, repliedUserId, "reply");
-  }
-
-  // chat liền kề
+  if (repliedUserId) addRelaByType(authorId, repliedUserId, "reply");
   const last = lastMessageByChannel.get(channelId);
-  if (last && last !== authorId) {
-    addRelaByType(authorId, last, "chat");
-  }
+  if (last && last !== authorId) addRelaByType(authorId, last, "chat");
   lastMessageByChannel.set(channelId, authorId);
 }
 
 module.exports = {
   addRelaByType,
+  addRelaAmount,
   getRela,
   getEligiblePartners,
   getTopRelaPairs,

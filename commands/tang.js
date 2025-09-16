@@ -1,82 +1,100 @@
 // commands/tang.js
 const { loadUsers, saveUsers } = require("../utils/storage");
-const { addRelaByType } = require("../utils/relaUtils");
+const { addRelaAmount } = require("../utils/relaUtils");
+const {
+  ActionRowBuilder,
+  StringSelectMenuBuilder,
+  ComponentType,
+} = require("discord.js");
 
 module.exports = {
   name: "tang",
   aliases: ["tặng", "gift"],
   run: async (client, msg, args) => {
-    const authorId = msg.author.id;
+    const giverId = msg.author.id;
     const mentioned = msg.mentions.users.first();
 
-    if (!mentioned || mentioned.bot || mentioned.id === authorId) {
+    if (!mentioned || mentioned.bot || mentioned.id === giverId) {
       return msg.reply("❌ Bạn phải mention đúng người muốn tặng.");
     }
 
-    const targetId = mentioned.id;
+    const receiverId = mentioned.id;
     const users = loadUsers();
+    if (!users[giverId]) return msg.reply("❌ Bạn chưa có hồ sơ nhân vật.");
+    if (!users[receiverId]) return msg.reply("❌ Người nhận chưa có hồ sơ nhân vật.");
 
-    if (!users[authorId]) return msg.reply("❌ Bạn chưa có hồ sơ nhân vật.");
-    if (!users[targetId]) return msg.reply("❌ Người này chưa có hồ sơ nhân vật.");
-
-    const inv = users[authorId].inventory || [];
-    if (inv.length === 0) {
+    const inv = Array.isArray(users[giverId].inventory) ? users[giverId].inventory : [];
+    const available = inv.filter((it) => (it?.qty ?? 0) > 0);
+    if (!available.length) {
       return msg.reply("📭 Túi của bạn đang trống, không có gì để tặng.");
     }
 
-    // hiển thị danh sách item
-    const lines = inv.map(
-      (item, i) => `**${i + 1}.** ${item.name} (x${item.qty})`
+    // tối đa 25 option cho menu
+    const options = available.slice(0, 25).map((it, idx) => ({
+      label: `${it.name ?? `Item ${idx + 1}`}`,
+      description: `Số lượng: x${it.qty}${it.rela ? ` • +${it.rela} rela` : (it.value ? ` • trị giá ${it.value}` : "")}`,
+      value: String(idx),
+    }));
+
+    const row = new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId(`gift_select_${giverId}_${receiverId}`)
+        .setPlaceholder("Chọn vật phẩm để tặng")
+        .addOptions(options)
     );
 
-    const prompt = await msg.channel.send(
-      `🎁 Bạn muốn tặng gì cho <@${targetId}>?\n${lines.join("\n")}\n\n👉 Gõ số thứ tự để chọn.`
-    );
-
-    // chờ người tặng chọn
-    const filter = (m) => m.author.id === authorId;
-    const collected = await msg.channel.awaitMessages({
-      filter,
-      max: 1,
-      time: 30000,
+    const ui = await msg.channel.send({
+      content: `🎁 Chọn vật phẩm để tặng cho <@${receiverId}>:`,
+      components: [row],
     });
 
-    if (!collected || collected.size === 0) {
-      return msg.reply("⏰ Hết thời gian chọn vật phẩm.");
+    // collector
+    const filter = (i) =>
+      i.customId === `gift_select_${giverId}_${receiverId}` &&
+      i.user.id === giverId;
+
+    let selection;
+    try {
+      selection = await ui.awaitMessageComponent({
+        filter,
+        componentType: ComponentType.StringSelect,
+        time: 30000,
+      });
+    } catch {
+      await ui.edit({ content: "⏰ Hết thời gian chọn vật phẩm.", components: [] });
+      return;
     }
 
-    const choice = parseInt(collected.first().content.trim());
-    if (isNaN(choice) || choice < 1 || choice > inv.length) {
-      return msg.reply("❌ Lựa chọn không hợp lệ.");
+    const selIdx = parseInt(selection.values[0], 10);
+    if (isNaN(selIdx) || selIdx < 0 || selIdx >= available.length) {
+      await selection.update({ content: "❌ Lựa chọn không hợp lệ.", components: [] });
+      return;
     }
 
-    const item = inv[choice - 1];
+    const chosenItem = available[selIdx];
+    const realIndex = inv.findIndex((x) => x === chosenItem);
+    if (realIndex === -1 || inv[realIndex].qty <= 0) {
+      await selection.update({ content: "⚠️ Vật phẩm không còn khả dụng.", components: [] });
+      return;
+    }
 
-    // trừ item khỏi kho
-    if (item.qty <= 0) {
-      return msg.reply("❌ Bạn không còn vật phẩm này.");
-    }
-    item.qty--;
-    if (item.qty === 0) {
-      inv.splice(choice - 1, 1);
-    }
-    users[authorId].inventory = inv;
+    // trừ vật phẩm
+    inv[realIndex].qty -= 1;
+    if (inv[realIndex].qty <= 0) inv.splice(realIndex, 1);
+    users[giverId].inventory = inv;
 
-    // cộng rela cho cả 2
-    // tạm dùng giá trị item.value nếu có, không thì mặc định +10
-    const relaGain = item.value ? item.value : 10;
-    addRelaByType(authorId, targetId, "gift"); // có thể thêm type "gift" riêng nếu muốn
-    // nếu muốn cộng theo giá trị, ta sửa hàm addRelaByType hoặc gọi trực tiếp
-    // ở đây demo: gift = +relaGain
-    const val = require("../utils/relaUtils");
-    for (let i = 0; i < Math.ceil(relaGain / 10); i++) {
-      val.addRelaByType(authorId, targetId, "mention"); // tạm reuse mention = 50
-    }
+    // cộng rela
+    const relaGain = typeof chosenItem.rela === "number"
+      ? chosenItem.rela
+      : (typeof chosenItem.value === "number" ? chosenItem.value : 10);
+
+    addRelaAmount(giverId, receiverId, Math.max(0, Math.floor(relaGain)));
 
     saveUsers(users);
 
-    msg.channel.send(
-      `🎉 <@${authorId}> đã tặng **${item.name}** cho <@${targetId}>!\n💞 Rela của hai bạn đã tăng.`
-    );
+    await selection.update({
+      content: `🎉 <@${giverId}> đã tặng **${chosenItem.name ?? "vật phẩm"}** cho <@${receiverId}>!\n💞 Rela của hai bạn **+${Math.max(0, Math.floor(relaGain))}**.`,
+      components: [],
+    });
   },
 };

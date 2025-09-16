@@ -1,29 +1,40 @@
-const { getRela } = require("../shop/shopUtils");
+// commands/rela.js
 const { loadUsers } = require("../utils/storage");
+const { getRela } = require("../utils/relaUtils");
 
 module.exports = {
   name: "rela",
-  aliases: ["relationship"],
+  aliases: ["quanhe", "friendship"],
   run: async (client, msg, args) => {
-    const target = msg.mentions.users.first();
-    if (!target) return msg.reply("❌ Bạn phải mention một người để xem độ thân mật.");
-
+    const userId = msg.author.id;
     const users = loadUsers();
-    const u1 = users[msg.author.id];
-    const u2 = users[target.id];
-    if (!u1 || !u2) return msg.reply("❌ Một trong hai người chưa có nhân vật.");
 
-    const rela = getRela(msg.author.id, target.id);
-    let status = "Không có quan hệ";
-
-    if (u1.relationships?.partnerId === target.id) {
-      status = "Đang kết hôn 💍";
-    } else if (rela > 0) {
-      status = "Đang hẹn hò 💖";
+    if (!users[userId]) {
+      return msg.reply("❌ Bạn chưa có hồ sơ nhân vật.");
     }
 
-    msg.reply(
-      `💞 Độ thân mật giữa **${u1.name}** và **${u2.name}**: **${rela}**\n📌 Trạng thái: ${status}`
+    const relaMap = users[userId].rela || {};
+    const entries = Object.keys(relaMap).map((pid) => {
+      const partner = users[pid];
+      const name = partner?.name || "Ẩn danh";
+      const value = getRela(userId, pid);
+      return { name, value };
+    });
+
+    if (!entries.length) {
+      return msg.reply("📭 Bạn chưa có quan hệ (rela) với ai.");
+    }
+
+    // sắp xếp giảm dần theo rela
+    entries.sort((a, b) => b.value - a.value);
+
+    const top = entries.slice(0, 10); // top 10
+    const lines = top.map(
+      (e, i) => `**#${i + 1}** ${e.name} — ${e.value} điểm`
+    );
+
+    msg.channel.send(
+      `📖 **Quan hệ (RELA) của bạn:**\n${lines.join("\n")}`
     );
   },
 };
