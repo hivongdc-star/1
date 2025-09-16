@@ -1,4 +1,3 @@
-// commands/rela.js
 const { loadUsers } = require("../utils/storage");
 const { getRela } = require("../utils/relaUtils");
 
@@ -10,7 +9,7 @@ module.exports = {
     const users = loadUsers();
 
     if (!users[userId]) {
-      return msg.reply("❌ Bạn chưa có hồ sơ nhân vật.");
+      return msg.reply("❌ Bạn chưa có nhân vật.");
     }
 
     const relaMap = users[userId].rela || {};
@@ -25,16 +24,15 @@ module.exports = {
       return msg.reply("📭 Bạn chưa có quan hệ (rela) với ai.");
     }
 
-    // sắp xếp giảm dần theo rela
+    // sắp xếp giảm dần theo điểm rela
     entries.sort((a, b) => b.value - a.value);
 
-    const top = entries.slice(0, 10); // top 10
+    // chỉ lấy top 10 cho gọn
+    const top = entries.slice(0, 10);
     const lines = top.map(
       (e, i) => `**#${i + 1}** ${e.name} — ${e.value} điểm`
     );
 
-    msg.channel.send(
-      `📖 **Quan hệ (RELA) của bạn:**\n${lines.join("\n")}`
-    );
+    msg.reply("📖 **Quan hệ (RELA) của bạn:**\n" + lines.join("\n"));
   },
 };

@@ -15,7 +15,7 @@ module.exports = {
     const mentioned = msg.mentions.users.first();
 
     if (!mentioned || mentioned.bot || mentioned.id === giverId) {
-      return msg.reply("❌ Bạn phải mention đúng người muốn tặng.");
+      return msg.reply("❌ Bạn phải mention đúng người muốn tặng: `-tang @người`");
     }
     const receiverId = mentioned.id;
 
@@ -96,8 +96,11 @@ module.exports = {
     if (inv[itemId] <= 0) delete inv[itemId];
     giver.inventory = inv;
 
-    // cộng rela
-    const relaGain = item.effect?.rela || 10;
+    // cộng rela đúng theo effect.rela
+    let relaGain = 10;
+    if (item.effect && typeof item.effect.rela === "number") {
+      relaGain = item.effect.rela;
+    }
     addRelaAmount(giverId, receiverId, relaGain);
 
     saveUsers(users);
@@ -105,7 +108,7 @@ module.exports = {
     await selection.update({
       content: `🎉 **${giver.name || msg.author.username}** đã tặng **${
         item.emoji || "🎁"
-     } ${item.name}** cho **${receiver.name || "Người nhận"}**!\n💞 Rela tăng **+${relaGain}**.`,
+      } ${item.name}** cho **${receiver.name || "Người nhận"}**!\n💞 Rela tăng **+${relaGain}**.`,
       components: [],
     });
   },
