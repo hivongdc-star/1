@@ -1,3 +1,17 @@
+## [1.5.7.1] - 2025-09-16
+### Added
+- `-toprela`: hiển thị top 10 cặp có rela cao nhất.
+- `-marry`: chọn partner đủ 1000 rela, gửi lời mời và xác nhận kết hôn.
+- `-tang`: cập nhật, cho phép chọn vật phẩm trong túi và tặng trực tiếp.
+
+### Changed
+- Hệ thống rela: thêm rule cộng qua mention, reply, chat liền kề.
+- Đồng bộ schema rela từ number → object `{ value, daily }`.
+- Hook dispatcher để rela tự động cộng khi chat.
+
+### Fixed
+- Đồng bộ dữ liệu rela cũ với schema mới.
+
 # Phiên bản 1.5.7
 
 ## Tính năng mới

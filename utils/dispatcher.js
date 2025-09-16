@@ -8,6 +8,9 @@ const { earnFromChat, rewardGameResults } = require("./currency");
 // --- Nối từ (Noitu) ---
 const { getGame, addTurn, stopGame } = require("../noitu/noituState");
 
+// --- Rela ---
+const { handleMessageEvent } = require("./relaUtils");
+
 let commands = new Map();
 const cooldowns = new Map();
 
@@ -56,8 +59,25 @@ function startDispatcher(client) {
   // 🔔 Lên lịch quay số (19:50 nhắc, 20:00 quay)
   require("./lotteryScheduler")(client);
 
-  client.on("messageCreate", (msg) => {
+  client.on("messageCreate", async (msg) => {
     if (msg.author.bot) return;
+
+    // --- RELA ---
+    const mentionedIds = msg.mentions.users
+      .filter((u) => !u.bot && u.id !== msg.author.id)
+      .map((u) => u.id);
+
+    let repliedUserId = null;
+    if (msg.type === 19 && msg.mentions.repliedUser && !msg.mentions.repliedUser.bot) {
+      repliedUserId = msg.mentions.repliedUser.id;
+    }
+
+    handleMessageEvent({
+      channelId: msg.channel.id,
+      authorId: msg.author.id,
+      mentionedIds,
+      repliedUserId,
+    });
 
     // --- Nối từ ---
     const state = getGame(msg.channel.id);
@@ -65,11 +85,10 @@ function startDispatcher(client) {
       const result = addTurn(msg.channel.id, msg.author.id, msg.content.trim());
 
       if (!result.success) {
-        msg.react("❌"); // sai → thả icon đỏ
+        msg.react("❌");
       } else {
-        msg.react("✅"); // đúng → thả icon xanh
+        msg.react("✅");
 
-        // Nếu đạt maxWords thì tự động kết thúc
         if (state.wordCount >= state.maxWords) {
           const finished = stopGame(msg.channel.id);
           const results = rewardGameResults(finished.players);
@@ -89,7 +108,7 @@ function startDispatcher(client) {
         }
       }
 
-      return; // không xử lý exp/command cho message nối từ
+      return;
     }
 
     // --- Auto EXP mỗi 15s ---
@@ -97,7 +116,7 @@ function startDispatcher(client) {
     const last = cooldowns.get(msg.author.id) || 0;
     if (now - last >= 15000) {
       const users = loadUsers();
-      let expGain = Math.floor(Math.random() * 16) + 5; // random 5–20
+      let expGain = Math.floor(Math.random() * 16) + 5;
 
       if (users[msg.author.id]) {
         if (users[msg.author.id].race === "nhan")
@@ -110,7 +129,6 @@ function startDispatcher(client) {
       earnFromChat(msg.author.id);
       cooldowns.set(msg.author.id, now);
 
-      // ⚡ Thông báo đột phá
       if (gained > 0) {
         const updatedUsers = loadUsers();
         const u = updatedUsers[msg.author.id];

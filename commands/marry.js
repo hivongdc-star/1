@@ -1,162 +1,92 @@
-const { ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
+// commands/marry.js
+const { getEligiblePartners, getRela } = require("../utils/relaUtils");
 const { loadUsers, saveUsers } = require("../utils/storage");
-const { getRela, listItems } = require("../shop/shopUtils");
 
 module.exports = {
   name: "marry",
-  aliases: ["relationship", "quanhe"],
-  run: async (client, msg) => {
+  run: async (client, msg, args) => {
+    const userId = msg.author.id;
     const users = loadUsers();
-    const user = users[msg.author.id];
-    if (!user) return msg.reply("❌ Bạn chưa có nhân vật.");
 
-    // tìm partner đủ rela
-    const partnerIds = Object.entries(user.relationships?.partners || {})
-      .filter(([id, rel]) => rel.rela >= 1000)
-      .map(([id]) => id);
-
-    if (partnerIds.length === 0) {
-      return msg.reply("❌ Bạn chưa có partner nào đạt đủ 1000 điểm rela để kết hôn.");
+    if (!users[userId]) {
+      return msg.reply("❌ Bạn chưa có hồ sơ nhân vật.");
     }
 
-    // tạo menu chọn partner
-    const partnerOptions = partnerIds.map((id) => ({
-      label: users[id]?.name || `ID:${id}`,
-      value: id,
-      description: `Rela: ${getRela(msg.author.id, id)}`,
-    }));
+    // check nếu đã kết hôn
+    if (users[userId].marriedWith) {
+      return msg.reply("💍 Bạn đã kết hôn rồi!");
+    }
 
-    const partnerMenu = new StringSelectMenuBuilder()
-      .setCustomId(`marry_partner_${msg.author.id}`)
-      .setPlaceholder("Chọn partner để cầu hôn...")
-      .addOptions(partnerOptions);
+    // lấy danh sách partner đủ rela
+    const eligibles = getEligiblePartners(userId, 1000);
 
-    const row = new ActionRowBuilder().addComponents(partnerMenu);
-    const sent = await msg.reply({ content: "💞 Hãy chọn partner bạn muốn cầu hôn:", components: [row] });
+    if (!eligibles.length) {
+      return msg.reply("❌ Hiện chưa có ai đủ **1000 rela** để kết hôn.");
+    }
 
-    const collector = sent.createMessageComponentCollector({
-      componentType: ComponentType.StringSelect,
-      time: 30000,
-    });
+    // hiển thị danh sách lựa chọn
+    let msgList = eligibles
+      .slice(0, 10)
+      .map(
+        (r, i) =>
+          `**${i + 1}.** <@${r.partnerId}> — ${r.value} rela`
+      )
+      .join("\n");
 
-    collector.on("collect", async (i) => {
-      if (i.user.id !== msg.author.id)
-        return i.reply({ content: "❌ Đây không phải menu của bạn.", ephemeral: true });
+    const listMessage = await msg.channel.send(
+      `💞 Những người bạn có thể kết hôn:\n${msgList}\n\n👉 Gõ số thứ tự để chọn partner.`
+    );
 
-      const partnerId = i.values[0];
-      const partner = users[partnerId];
-      if (!partner) return i.reply({ content: "❌ Partner không tồn tại.", ephemeral: true });
+    // chờ user phản hồi
+    const filter = (m) => m.author.id === userId;
+    const collected = await msg.channel
+      .awaitMessages({ filter, max: 1, time: 30000 })
+      .catch(() => null);
 
-      // kiểm tra inventory nhẫn
-      const inv = user.inventory || {};
-      const ringIds = Object.keys(inv).filter((id) => id.startsWith("ring_") && inv[id] > 0);
-      if (ringIds.length === 0) {
-        return i.update({ content: "❌ Bạn không có nhẫn nào trong túi.", components: [] });
-      }
+    if (!collected || collected.size === 0) {
+      return msg.reply("⏰ Hết thời gian chọn partner.");
+    }
 
-      // menu chọn nhẫn
-      const items = listItems();
-      const ringOptions = ringIds.map((id) => ({
-        label: items[id]?.name || id,
-        value: id,
-        description: items[id]?.description || "",
-        emoji: items[id]?.emoji || "💍",
-      }));
+    const choice = parseInt(collected.first().content.trim());
+    if (isNaN(choice) || choice < 1 || choice > eligibles.length) {
+      return msg.reply("❌ Lựa chọn không hợp lệ.");
+    }
 
-      const ringMenu = new StringSelectMenuBuilder()
-        .setCustomId(`marry_ring_${msg.author.id}_${partnerId}`)
-        .setPlaceholder("Chọn nhẫn cưới để cầu hôn...")
-        .addOptions(ringOptions);
+    const partnerId = eligibles[choice - 1].partnerId;
 
-      const row2 = new ActionRowBuilder().addComponents(ringMenu);
-      await i.update({ content: `💍 Chọn nhẫn để cầu hôn **${partner.name}**:`, components: [row2] });
-    });
+    // check rela lần cuối
+    const relaNow = getRela(userId, partnerId);
+    if (relaNow < 1000) {
+      return msg.reply("❌ Rela hiện tại chưa đủ 1000.");
+    }
 
-    // bước 2: chọn nhẫn
-    client.on("interactionCreate", async (i) => {
-      if (!i.isStringSelectMenu()) return;
-      if (!i.customId.startsWith("marry_ring_")) return;
+    // gửi đề nghị tới partner
+    const proposal = await msg.channel.send(
+      `💍 <@${partnerId}>, bạn có đồng ý kết hôn với <@${userId}> không?\n👉 Trả lời **có** hoặc **không** trong 30s.`
+    );
 
-      const [_, __, authorId, partnerId] = i.customId.split("_");
-      if (i.user.id !== authorId) return;
+    const filter2 = (m) => m.author.id === partnerId;
+    const collected2 = await msg.channel
+      .awaitMessages({ filter2, max: 1, time: 30000 })
+      .catch(() => null);
 
-      const ringId = i.values[0];
-      const users2 = loadUsers();
-      const u = users2[authorId];
-      const p = users2[partnerId];
-      if (!u || !p) return i.reply({ content: "❌ Lỗi dữ liệu.", ephemeral: true });
+    if (!collected2 || collected2.size === 0) {
+      return msg.channel.send("⏰ Không có phản hồi, hủy kết hôn.");
+    }
 
-      const item = listItems()[ringId];
-      if (!item) return i.reply({ content: "❌ Nhẫn cưới không hợp lệ.", ephemeral: true });
+    const ans = collected2.first().content.toLowerCase();
+    if (ans !== "có" && ans !== "yes" && ans !== "y") {
+      return msg.channel.send("❌ Đối phương đã từ chối.");
+    }
 
-      // hỏi partner đồng ý
-      const rowConfirm = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`accept_marry_${authorId}_${partnerId}_${ringId}`).setLabel("Đồng ý 💖").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId(`deny_marry_${authorId}_${partnerId}`).setLabel("Từ chối 💔").setStyle(ButtonStyle.Danger)
-      );
+    // cập nhật dữ liệu
+    users[userId].marriedWith = partnerId;
+    users[partnerId].marriedWith = userId;
 
-      await i.update({
-        content: `💍 **${u.name}** muốn kết hôn với **${p.name}** bằng **${item.emoji} ${item.name}**.\n${p.name}, bạn có đồng ý không?`,
-        components: [rowConfirm],
-      });
-    });
+    saveUsers(users);
 
-    // bước 3: partner đồng ý / từ chối
-    client.on("interactionCreate", async (i) => {
-      if (!i.isButton()) return;
-
-      if (i.customId.startsWith("accept_marry_")) {
-        const [_, __, authorId, partnerId, ringId] = i.customId.split("_");
-        if (i.user.id !== partnerId) {
-          return i.reply({ content: "❌ Đây không phải lời cầu hôn gửi cho bạn.", ephemeral: true });
-        }
-
-        const users3 = loadUsers();
-        const u = users3[authorId];
-        const p = users3[partnerId];
-        if (!u || !p) return i.reply({ content: "❌ Lỗi dữ liệu.", ephemeral: true });
-
-        if ((u.inventory[ringId] || 0) <= 0) {
-          return i.reply({ content: "❌ Người cầu hôn không còn nhẫn.", ephemeral: true });
-        }
-
-        const item = listItems()[ringId];
-
-        // cập nhật quan hệ
-        u.relationships.partnerId = partnerId;
-        u.relationships.status = "married";
-        u.relationships.since = Date.now();
-        u.relationships.ringBonus = item.bonus || {};
-
-        p.relationships.partnerId = authorId;
-        p.relationships.status = "married";
-        p.relationships.since = Date.now();
-        p.relationships.ringBonus = item.bonus || {};
-
-        // trừ nhẫn
-        u.inventory[ringId] -= 1;
-        if (u.inventory[ringId] <= 0) delete u.inventory[ringId];
-
-        // mở khóa danh hiệu
-        if (item.bonus?.title_unlock && !u.titles.includes(item.bonus.title_unlock)) {
-          u.titles.push(item.bonus.title_unlock);
-        }
-
-        users3[authorId] = u;
-        users3[partnerId] = p;
-        saveUsers(users3);
-
-        await i.update({ content: `🎉 Chúc mừng! 💍 **${u.name}** và **${p.name}** đã kết hôn bằng **${item.name}**!`, components: [] });
-      }
-
-      if (i.customId.startsWith("deny_marry_")) {
-        const [_, __, authorId, partnerId] = i.customId.split("_");
-        if (i.user.id !== partnerId) {
-          return i.reply({ content: "❌ Đây không phải lời cầu hôn gửi cho bạn.", ephemeral: true });
-        }
-
-        await i.update({ content: `💔 **${users[partnerId].name}** đã từ chối lời cầu hôn của **${users[authorId].name}**.`, components: [] });
-      }
-    });
+    msg.channel.send(
+      `🎉 Chúc mừng <@${userId}> và <@${partnerId}> đã chính thức kết hôn! 💞`
+    );
   },
 };
