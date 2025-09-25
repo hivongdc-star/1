@@ -10,6 +10,7 @@ const { getGame, addTurn, stopGame } = require("../noitu/noituState");
 
 // --- Rela ---
 const { handleMessageEvent } = require("./relaUtils");
+const { saveImageFromUrl, saveImageFromBuffer } = require("./imageStore");
 
 let commands = new Map();
 const cooldowns = new Map();
@@ -139,6 +140,32 @@ function startDispatcher(client) {
             `📖 Hiện tại cảnh giới: **${u ? getRealm(u.level) : "???"}**`
         );
       }
+    }
+
+
+    // --- Image save ---
+    try {
+      if ((msg.attachments?.size || 0) > 0) {
+        for (const att of msg.attachments.values()) {
+          const ctype = att.contentType || "";
+          if (ctype.startsWith("image/")) {
+            const result = await saveImageFromUrl(att.url, {
+              mime: ctype,
+              originalName: att.name || "image"
+            });
+            console.log("Saved image:", result.relPath, result.bytes, "bytes");
+          }
+        }
+      }
+      // data URL in message content
+      const m = msg.content?.match(/data:image\/[a-zA-Z0-9.+-]+;base64,([A-Za-z0-9+/=]+)/);
+      if (m) {
+        const buf = Buffer.from(m[1], "base64");
+        const res2 = saveImageFromBuffer(buf, { mime: "image/auto", originalName: "pasted" });
+        console.log("Saved inline image:", res2.relPath);
+      }
+    } catch (e) {
+      console.error("Image save error:", e?.message || e);
     }
 
     // --- Command ---
