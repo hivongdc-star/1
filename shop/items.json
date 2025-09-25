@@ -1,12 +1,11 @@
 {
-
   "flower_rose": {
     "name": "Hoa Hồng",
     "emoji": "🌹",
     "price": 100,
     "type": "gift",
     "description": "Tặng hoa để tăng thiện cảm",
-    "effect": { "rela": 10 }
+    "effect": { "rela": 50 }
   },
   "choco": {
     "name": "Socola Ngọt",
@@ -14,16 +13,16 @@
     "price": 200,
     "type": "gift",
     "description": "Tặng socola để tăng thiện cảm",
-    "effect": { "rela": 20 }
+    "effect": { "rela": 100 }
   },
   "heart_1000": {
-  "name": "Trái Tim Định Mệnh",
-  "emoji": "💖",
-  "price": 1000000,
-  "type": "gift",
-  "description": "Vật phẩm đặc biệt, khi tặng sẽ tăng ngay 1000 điểm RELA với người nhận.",
-  "effect": { "rela": 1000 }
-},
+    "name": "Trái Tim Định Mệnh",
+    "emoji": "💖",
+    "price": 1000000,
+    "type": "gift",
+    "description": "Vật phẩm đặc biệt, khi tặng sẽ tăng ngay 1000 điểm RELA với người nhận.",
+    "effect": { "rela": 1000 }
+  },
 
   "ring_pham_tam":   { "name": "Nhẫn Phàm Tâm",   "emoji": "💍", "price": 1000,        "type": "relationship", "requireRela": 1000,     "bonus": {} },
   "ring_thanh_dong": { "name": "Nhẫn Thanh Đồng", "emoji": "💍", "price": 10000,       "type": "relationship", "requireRela": 5000,     "bonus": { "exp_percent": 3 } },
