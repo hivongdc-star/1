@@ -1,25 +1,17 @@
+// commands/toprela.js
 const { loadUsers } = require("../utils/storage");
-const { getTopRelaPairs } = require("../utils/relaUtils");
+const { getTopPairs } = require("../utils/relaUtils");
 
 module.exports = {
-  name: "toprela",
-  aliases: ["toplove", "rela-top"],
-  run: async (client, msg, args) => {
+  name:"toprela",
+  run: async (client, msg)=>{
     const users = loadUsers();
-    const top = getTopRelaPairs(10); // lấy top 10 cặp
-
-    if (!top.length) {
-      return msg.reply("📭 Chưa có dữ liệu rela để xếp hạng.");
-    }
-
-    const lines = top.map((p, i) => {
-      const userA = users[p.a];
-      const userB = users[p.b];
-      const nameA = userA?.name || "Ẩn danh";
-      const nameB = userB?.name || "Ẩn danh";
-      return `**#${i + 1}** ${nameA} ❤ ${nameB} — **${p.value}** điểm`;
+    const top = getTopPairs(10);
+    if (!top.length) return msg.reply("📭 Chưa có dữ liệu.");
+    const lines = top.map((p,i)=>{
+      const A = users[p.a]?.name||"Ẩn danh", B = users[p.b]?.name||"Ẩn danh";
+      return `**#${i+1}** ${A} ❤ ${B} — **${p.value}**`;
     });
-
-    msg.reply("💞 **TOP RELA** 💞\n" + lines.join("\n"));
-  },
+    msg.reply("💞 **TOP QUAN HỆ** 💞\n"+lines.join("\n"));
+  }
 };

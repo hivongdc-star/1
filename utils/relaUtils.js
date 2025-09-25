@@ -1,149 +1,144 @@
 // utils/relaUtils.js
-// RELA = độ thân mật giữa 2 user
-// Rule: mention +50 (tối đa 10/ngày), reply +20 (tối đa 10/ngày), chat liền kề +2
-// Gift = cộng rela theo giá trị, không bị giới hạn
-
+// Nguồn sự thật duy nhất cho RELA/ĐẠO DUYÊN
 const { loadUsers, saveUsers } = require("./storage");
 
 const TIMEZONE = "Asia/Tokyo";
-const lastMessageByChannel = new Map(); // nhớ user cuối trong channel
+const CHAT_COOLDOWN_MS = 10_000;
+const DAILY_LIMIT = { mention: 10, reply: 10 };
+const GAIN = { mention: 50, reply: 20, chat: 2 };
 
 function todayStr() {
-  const fmt = new Intl.DateTimeFormat("en-CA", {
-    timeZone: TIMEZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  const fmt = new Intl.DateTimeFormat("en-CA", { timeZone: TIMEZONE, year:"numeric", month:"2-digit", day:"2-digit" });
   return fmt.format(new Date());
 }
 
-function normalize(cell) {
-  if (typeof cell === "number") {
-    return { value: cell, daily: { date: todayStr(), mention: 0, reply: 0 } };
-  }
-  if (!cell || typeof cell !== "object") {
-    return { value: 0, daily: { date: todayStr(), mention: 0, reply: 0 } };
-  }
-  if (!cell.value) cell.value = 0;
-  if (!cell.daily) cell.daily = { date: todayStr(), mention: 0, reply: 0 };
-  if (cell.daily.date !== todayStr()) {
-    cell.daily = { date: todayStr(), mention: 0, reply: 0 };
-  }
-  return cell;
+function ensureUser(u) {
+  if (!u) u = {};
+  u.relationships = u.relationships || { partners: {} };
+  return u;
 }
 
 function ensurePair(users, a, b) {
-  if (!users[a]) users[a] = {};
-  if (!users[a].rela) users[a].rela = {};
-  if (!users[b]) users[b] = {};
-  if (!users[b].rela) users[b].rela = {};
-  users[a].rela[b] = normalize(users[a].rela[b]);
-  users[b].rela[a] = normalize(users[b].rela[a]);
+  users[a] = ensureUser(users[a]);
+  users[b] = ensureUser(users[b]);
+  const A = users[a].relationships; const B = users[b].relationships;
+  A.partners[b] = A.partners[b] || { rela:0, daoDuyen:0, status:"none", daily:{ date: todayStr(), mention:0, reply:0 }, chatCdAt:0 };
+  B.partners[a] = B.partners[a] || { rela:0, daoDuyen:0, status:"none", daily:{ date: todayStr(), mention:0, reply:0 }, chatCdAt:0 };
+  const ab = A.partners[b], ba = B.partners[a];
+  // reset daily theo NGÀY cho từng chiều
+  const t = todayStr();
+  if (!ab.daily || ab.daily.date !== t) ab.daily = { date:t, mention:0, reply:0 };
+  if (!ba.daily || ba.daily.date !== t) ba.daily = { date:t, mention:0, reply:0 };
+  return { ab, ba };
 }
 
-// cộng rela theo type (mention/reply/chat)
-function addRelaByType(a, b, type) {
-  if (a === b) return;
+function addRela(a, b, amount) {
+  if (a === b) return { ok:false, message:"self" };
+  if (!Number.isFinite(amount) || amount <= 0) return { ok:false, message:"amount<=0" };
   const users = loadUsers();
-  if (!users[a] || !users[b]) return;
+  const { ab, ba } = ensurePair(users, a, b);
+  ab.rela = (ab.rela||0) + amount;
+  ba.rela = (ba.rela||0) + amount;
+  saveUsers(users);
+  return { ok:true, value:ab.rela };
+}
 
-  ensurePair(users, a, b);
-  const cellA = users[a].rela[b];
-  const cellB = users[b].rela[a];
+function addDaoDuyen(a, b, amount) {
+  if (a === b) return { ok:false };
+  if (!Number.isFinite(amount) || amount <= 0) return { ok:false };
+  const users = loadUsers();
+  const { ab, ba } = ensurePair(users, a, b);
+  ab.daoDuyen = (ab.daoDuyen||0) + amount;
+  ba.daoDuyen = (ba.daoDuyen||0) + amount;
+  saveUsers(users);
+  return { ok:true, value:ab.daoDuyen };
+}
 
-  let amount = 0;
-  if (type === "mention") {
-    if (cellA.daily.mention < 10) {
-      amount = 50;
-      cellA.daily.mention++;
-      cellB.daily.mention++;
-    }
-  } else if (type === "reply") {
-    if (cellA.daily.reply < 10) {
-      amount = 20;
-      cellA.daily.reply++;
-      cellB.daily.reply++;
-    }
-  } else if (type === "chat") {
-    amount = 2;
-  }
+function getRela(a,b){ const u=loadUsers(); return u[a]?.relationships?.partners?.[b]?.rela||0; }
+function getDaoDuyen(a,b){ const u=loadUsers(); return u[a]?.relationships?.partners?.[b]?.daoDuyen||0; }
+function getSpouse(a){ const u=loadUsers(); const ps=u[a]?.relationships?.partners||{}; for(const pid in ps){ if(ps[pid].status==="married") return pid; } return null; }
+function isMarried(a,b){ const u=loadUsers(); return u[a]?.relationships?.partners?.[b]?.status==="married"; }
 
-  if (amount > 0) {
-    cellA.value += amount;
-    cellB.value += amount;
-  }
+function eligiblePartners(a, threshold=1000) {
+  const u = loadUsers(); const ps = u[a]?.relationships?.partners||{};
+  return Object.entries(ps).map(([pid,cell]) => ({ partnerId: pid, value: cell.rela||0 }))
+    .filter(x => x.value >= threshold && pidNotSelf(a,x.partnerId))
+    .sort((m,n)=>n.value-m.value);
+}
+const pidNotSelf=(a,b)=>a!==b;
 
+function recordRing(a,b,ringId){
+  const users=loadUsers(); const {ab,ba}=ensurePair(users,a,b);
+  ab.ringId = ringId; ba.ringId = ringId;
   saveUsers(users);
 }
 
-// cộng rela trực tiếp theo số điểm (gift, event đặc biệt…)
-function addRelaAmount(a, b, amount) {
-  if (a === b || !amount) return;
-  const users = loadUsers();
-  if (!users[a] || !users[b]) return;
+function convertRelaToDaoDuyen(a,b){
+  const users=loadUsers(); const {ab,ba}=ensurePair(users,a,b);
+  const gain = (ab.rela||0);
+  ab.rela = 0; ba.rela = 0;
+  ab.daoDuyen = (ab.daoDuyen||0) + gain;
+  ba.daoDuyen = (ba.daoDuyen||0) + gain;
+  saveUsers(users);
+  return gain;
+}
 
-  ensurePair(users, a, b);
-  users[a].rela[b].value += amount;
-  users[b].rela[a].value += amount;
+function marryPair(a,b,ringId){
+  const users=loadUsers(); const {ab,ba}=ensurePair(users,a,b);
+  const now=Date.now();
+  ab.status="married"; ba.status="married";
+  ab.marriedAt = ba.marriedAt = now;
+  ab.ringId = ba.ringId = ringId;
+  // chuyển RELA thành Đạo Duyên khởi đầu
+  const gain = (ab.rela||0);
+  ab.rela=0; ba.rela=0;
+  ab.daoDuyen=(ab.daoDuyen||0)+gain;
+  ba.daoDuyen=(ba.daoDuyen||0)+gain;
+  saveUsers(users);
+  return { marriedAt: now, gain };
+}
+
+function divorce(a,b){
+  const users=loadUsers(); const {ab,ba}=ensurePair(users,a,b);
+  ab.status="none"; ba.status="none";
+  // Không reset daoDuyen theo yêu cầu mặc định. Thay đổi nếu bạn muốn.
   saveUsers(users);
 }
 
-// đọc rela
-function getRela(a, b) {
-  const users = loadUsers();
-  const cell = users[a]?.rela?.[b];
-  if (!cell) return 0;
-  if (typeof cell === "number") return cell;
-  return cell.value || 0;
-}
-
-// lấy partner đủ rela để marry
-function getEligiblePartners(userId, threshold = 1000) {
-  const users = loadUsers();
-  const rela = users[userId]?.rela || {};
-  return Object.entries(rela)
-    .map(([pid, cell]) => ({
-      partnerId: pid,
-      value: typeof cell === "number" ? cell : (cell.value || 0),
-    }))
-    .filter((r) => r.value >= threshold)
-    .sort((a, b) => b.value - a.value);
-}
-
-// top rela theo cặp
-function getTopRelaPairs(limit = 10) {
-  const users = loadUsers();
-  const seen = new Set();
-  const pairs = [];
-  for (const a in users) {
-    for (const b in users[a]?.rela || {}) {
-      if (a >= b) continue;
-      const val = getRela(a, b);
-      const key = `${a}|${b}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        pairs.push({ a, b, value: val });
-      }
-    }
+function addByType(a,b,type){ // mention/reply/chat
+  if (a===b) return;
+  const users=loadUsers(); const {ab,ba}=ensurePair(users,a,b);
+  let delta=0;
+  if (type==="mention") {
+    if (ab.daily.mention < DAILY_LIMIT.mention) { ab.daily.mention++; delta = GAIN.mention; }
+  } else if (type==="reply") {
+    if (ab.daily.reply < DAILY_LIMIT.reply) { ab.daily.reply++; delta = GAIN.reply; }
+  } else if (type==="chat") {
+    const now=Date.now(); if ((ab.chatCdAt||0) + CHAT_COOLDOWN_MS <= now) { ab.chatCdAt = now; delta = GAIN.chat; }
   }
-  return pairs.sort((x, y) => y.value - x.value).slice(0, limit);
+  if (delta>0) { ab.rela=(ab.rela||0)+delta; ba.rela=(ba.rela||0)+delta; }
+  saveUsers(users);
 }
 
-// hook từ dispatcher
-function handleMessageEvent({ channelId, authorId, mentionedIds = [], repliedUserId = null }) {
-  mentionedIds.forEach((id) => addRelaByType(authorId, id, "mention"));
-  if (repliedUserId) addRelaByType(authorId, repliedUserId, "reply");
-  const last = lastMessageByChannel.get(channelId);
-  if (last && last !== authorId) addRelaByType(authorId, last, "chat");
-  lastMessageByChannel.set(channelId, authorId);
+function handleMessageEvent({ channelId, authorId, mentionedIds=[], repliedUserId=null }, lastByChannelMap){
+  mentionedIds.forEach(id=>addByType(authorId,id,"mention"));
+  if (repliedUserId) addByType(authorId,repliedUserId,"reply");
+  const last = lastByChannelMap.get(channelId);
+  if (last && last!==authorId) addByType(authorId,last,"chat");
+  lastByChannelMap.set(channelId, authorId);
+}
+
+function getTopPairs(limit=10){
+  const u=loadUsers(); const pairs=[];
+  for(const a in u){
+    const ps=u[a]?.relationships?.partners||{};
+    for(const b in ps){ if (a<b){ const cell=ps[b]; pairs.push({ a, b, value:(cell.status==="married" ? cell.daoDuyen||0 : cell.rela||0) }); } }
+  }
+  return pairs.sort((x,y)=>y.value-x.value).slice(0,limit);
 }
 
 module.exports = {
-  addRelaByType,
-  addRelaAmount,
-  getRela,
-  getEligiblePartners,
-  getTopRelaPairs,
-  handleMessageEvent,
+  addRela, addDaoDuyen, getRela, getDaoDuyen, eligiblePartners, recordRing,
+  convertRelaToDaoDuyen, marryPair, divorce, isMarried, getSpouse,
+  handleMessageEvent, getTopPairs
 };

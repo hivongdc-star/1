@@ -32,3 +32,36 @@
 - Linh thạch có icon 💎 riêng.
 - Chỉ số chia thành 2 cột với icon trực quan.
 - Lệnh `ver` được viết lại: luôn hiển thị số phiên bản và ghi chú mới nhất.
+
+###[1.6.0] - 2025-09-26
+Added
+
+Đạo duyên: khi kết hôn, RELA chuyển thành Đạo duyên; mở khóa danh hiệu theo mốc.
+
+Danh hiệu: utils mới quản lý danh hiệu, tích hợp với danhhieu.js.
+
+Lệnh -use: sử dụng vật phẩm trong túi (quà RELA, đổi tộc hệ, buff chỉ số...).
+
+ItemEffects: hệ thống hiệu ứng vật phẩm thống nhất cho quà tặng và sử dụng.
+
+Changed
+
+Marry:
+
+Chuyển sang select menu, chọn partner đủ 1000 RELA và nhẫn.
+
+Đối phương xác nhận qua menu.
+
+Nếu đã kết hôn, hiển thị embed: Đạo lữ, Đạo duyên, ngày cưới, nhẫn hiện tại, nút ly hôn.
+
+Tang: sửa lỗi không tăng RELA, tối ưu lưu, tặng quà cập nhật inventory chuẩn.
+
+Shop: mua nhẫn không cần RELA, đóng menu sau mua, kiểm tra giá hợp lệ.
+
+RelaUtils: hợp nhất toàn bộ dữ liệu RELA/Đạo duyên; thêm cooldown chat 10s, reset daily theo chiều, API marry/divorce mới.
+
+Fixed
+
+Đồng bộ dữ liệu RELA cũ sang relationships.partners.
+
+Giảm mất dữ liệu khi cộng RELA do nhiều lần load/save.
