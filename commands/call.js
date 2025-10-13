@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 const { EmbedBuilder } = require("discord.js");
 
 // 💫 API key của Gemini (ghi trực tiếp tại đây)
-const GEMINI_API_KEY = "AIza..."; // ⬅️ Thay bằng key thật của bạn
+const GEMINI_API_KEY = "AIzaSyCacDkHISpdCEhSaErVztXr82YdMeA4EZQ"; // ⬅️ Thay bằng key thật của bạn
 
 module.exports = {
   name: "call",
@@ -19,9 +19,9 @@ module.exports = {
     try {
       const thinking = await msg.channel.send("🌸 **Tiễn Tình** đang lắng nghe...");
 
-      // Gửi yêu cầu tới Gemini
+      // 💌 Gửi yêu cầu tới Gemini API
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${AIzaSyCacDkHISpdCEhSaErVztXr82YdMeA4EZQ}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -36,7 +36,7 @@ module.exports = {
         data?.candidates?.[0]?.content?.parts?.[0]?.text ||
         "❌ Tiễn Tình im lặng một lúc lâu... (không có phản hồi hợp lệ)";
 
-      // Embed trả lời của Tiễn Tình
+      // 💞 Embed trả lời của Tiễn Tình
       const embed = new EmbedBuilder()
         .setColor(0xffaacc)
         .setAuthor({
@@ -54,7 +54,7 @@ module.exports = {
 
       await thinking.edit({ content: "", embeds: [embed] });
     } catch (err) {
-      console.error("Tiễn Tình error:", err);
+      console.error("💔 Tiễn Tình error:", err);
       msg.reply("⚠️ Tiễn Tình gặp chút trục trặc, hãy thử lại sau nhé...");
     }
   },
