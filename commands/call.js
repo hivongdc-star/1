@@ -1,8 +1,9 @@
-const fetch = require("node-fetch");
+const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
 const { EmbedBuilder } = require("discord.js");
 
-// 💫 API key của Gemini (ghi trực tiếp tại đây)
-const GEMINI_API_KEY = "AIzaSyCacDkHISpdCEhSaErVztXr82YdMeA4EZQ"; // ⬅️ Thay bằng key thật của bạn
+// 💫 API key Gemini
+const GEMINI_API_KEY = "AIzaSyCacDkHISpdCEhSaErVztXr82YdMeA4EZQ"; // Thay bằng key thật của bạn
+const GEMINI_MODEL = "gemini-2.0-flash";
 
 module.exports = {
   name: "call",
@@ -19,24 +20,31 @@ module.exports = {
     try {
       const thinking = await msg.channel.send("🌸 **Tiễn Tình** đang lắng nghe...");
 
-      // 💌 Gửi yêu cầu tới Gemini API
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "X-goog-api-key": GEMINI_API_KEY,
+          },
           body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: question }] }],
+            contents: [
+              {
+                parts: [{ text: question }],
+              },
+            ],
           }),
         }
       );
 
       const data = await res.json();
+      console.log("Gemini raw:", JSON.stringify(data, null, 2));
+
       const answer =
         data?.candidates?.[0]?.content?.parts?.[0]?.text ||
         "❌ Tiễn Tình im lặng một lúc lâu... (không có phản hồi hợp lệ)";
 
-      // 💞 Embed trả lời của Tiễn Tình
       const embed = new EmbedBuilder()
         .setColor(0xffaacc)
         .setAuthor({
@@ -48,7 +56,7 @@ module.exports = {
           { name: "🌷 Tiễn Tình nói:", value: answer.slice(0, 1024) }
         )
         .setFooter({
-          text: "Trò chuyện cùng Tiễn Tình",
+          text: "Trò chuyện cùng Tiễn Tình • Gemini 2.0 Flash",
           iconURL: client.user.displayAvatarURL(),
         });
 
