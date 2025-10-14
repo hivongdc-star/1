@@ -1,13 +1,13 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { 
-  joinVoiceChannel, 
-  createAudioPlayer, 
-  createAudioResource, 
-  AudioPlayerStatus, 
-  NoSubscriberBehavior, 
-  getVoiceConnection 
+const {
+  joinVoiceChannel,
+  createAudioPlayer,
+  createAudioResource,
+  AudioPlayerStatus,
+  NoSubscriberBehavior,
+  getVoiceConnection,
 } = require("@discordjs/voice");
-const ytdl = require("@distube/ytdl-core");
+const play = require("play-dl");
 
 const players = new Map();
 
@@ -28,31 +28,32 @@ module.exports = {
         adapterCreator: channel.guild.voiceAdapterCreator,
       });
 
-      const stream = await ytdl(url, {
-        filter: "audioonly",
-        quality: "highestaudio",
-        highWaterMark: 1 << 25,
-        dlChunkSize: 0,
-        requestOptions: { maxReconnects: 5 },
+      const stream = await play.stream(url);
+      const resource = createAudioResource(stream.stream, {
+        inputType: stream.type,
       });
 
-      const resource = createAudioResource(stream);
-      const player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
+      const player = createAudioPlayer({
+        behaviors: { noSubscriber: NoSubscriberBehavior.Pause },
+      });
+
       player.play(resource);
       connection.subscribe(player);
       players.set(message.guild.id, player);
 
-      const info = await ytdl.getInfo(url);
-      const title = info.videoDetails.title;
-      const duration = Math.floor(info.videoDetails.lengthSeconds / 60) + " phút " + (info.videoDetails.lengthSeconds % 60) + " giây";
+      const info = await play.video_info(url);
+      const video = info.video_details;
 
       const embed = new EmbedBuilder()
         .setColor("Random")
-        .setTitle(`🎶 Đang phát: ${title}`)
+        .setTitle(`🎶 Đang phát: ${video.title}`)
         .setURL(url)
-        .setThumbnail(info.videoDetails.thumbnails[0]?.url || null)
-        .setDescription(`⏱️ Thời lượng: ${duration}`)
-        .setFooter({ text: `Người yêu cầu: ${message.author.username}`, iconURL: message.author.displayAvatarURL() });
+        .setThumbnail(video.thumbnails[0]?.url || null)
+        .setDescription(`⏱️ Thời lượng: ${video.durationRaw}`)
+        .setFooter({
+          text: `Người yêu cầu: ${message.author.username}`,
+          iconURL: message.author.displayAvatarURL(),
+        });
 
       const buttons = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId("pause").setLabel("⏸️ Tạm dừng").setStyle(ButtonStyle.Secondary),
@@ -63,6 +64,7 @@ module.exports = {
       );
 
       const msg = await message.reply({ embeds: [embed], components: [buttons] });
+
       const collector = msg.createMessageComponentCollector({ time: 10 * 60 * 1000 });
 
       collector.on("collect", async (i) => {
@@ -70,7 +72,8 @@ module.exports = {
           return i.reply({ content: "🚫 Bạn không thể điều khiển nhạc của người khác!", ephemeral: true });
 
         const player = players.get(message.guild.id);
-        if (!player) return i.reply({ content: "⚠️ Không tìm thấy trình phát!", ephemeral: true });
+        if (!player)
+          return i.reply({ content: "⚠️ Không tìm thấy trình phát!", ephemeral: true });
 
         switch (i.customId) {
           case "pause":
@@ -86,8 +89,8 @@ module.exports = {
             await i.reply({ content: "⏹️ Đã dừng phát!", ephemeral: true });
             break;
           case "replay":
-            const replayStream = await ytdl(url, { filter: "audioonly", quality: "highestaudio" });
-            player.play(createAudioResource(replayStream));
+            const replayStream = await play.stream(url);
+            player.play(createAudioResource(replayStream.stream, { inputType: replayStream.type }));
             await i.reply({ content: "🔁 Phát lại bài hát!", ephemeral: true });
             break;
           case "leave":
