@@ -7,7 +7,7 @@ const {
   NoSubscriberBehavior, 
   getVoiceConnection 
 } = require("@discordjs/voice");
-const ytdl = require("ytdl-core");
+const ytdl = require("@distube/ytdl-core");
 
 const players = new Map();
 
@@ -28,7 +28,14 @@ module.exports = {
         adapterCreator: channel.guild.voiceAdapterCreator,
       });
 
-      const stream = ytdl(url, { filter: "audioonly", quality: "highestaudio" });
+      const stream = await ytdl(url, {
+        filter: "audioonly",
+        quality: "highestaudio",
+        highWaterMark: 1 << 25,
+        dlChunkSize: 0,
+        requestOptions: { maxReconnects: 5 },
+      });
+
       const resource = createAudioResource(stream);
       const player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
       player.play(resource);
@@ -36,12 +43,16 @@ module.exports = {
       players.set(message.guild.id, player);
 
       const info = await ytdl.getInfo(url);
+      const title = info.videoDetails.title;
+      const duration = Math.floor(info.videoDetails.lengthSeconds / 60) + " phút " + (info.videoDetails.lengthSeconds % 60) + " giây";
+
       const embed = new EmbedBuilder()
         .setColor("Random")
-        .setTitle(`🎶 Đang phát: ${info.videoDetails.title}`)
+        .setTitle(`🎶 Đang phát: ${title}`)
         .setURL(url)
-        .setThumbnail(info.videoDetails.thumbnails[0].url)
-        .setDescription(`⏱️ Thời lượng: ${Math.floor(info.videoDetails.lengthSeconds / 60)} phút ${info.videoDetails.lengthSeconds % 60} giây`);
+        .setThumbnail(info.videoDetails.thumbnails[0]?.url || null)
+        .setDescription(`⏱️ Thời lượng: ${duration}`)
+        .setFooter({ text: `Người yêu cầu: ${message.author.username}`, iconURL: message.author.displayAvatarURL() });
 
       const buttons = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId("pause").setLabel("⏸️ Tạm dừng").setStyle(ButtonStyle.Secondary),
@@ -75,7 +86,7 @@ module.exports = {
             await i.reply({ content: "⏹️ Đã dừng phát!", ephemeral: true });
             break;
           case "replay":
-            const replayStream = ytdl(url, { filter: "audioonly", quality: "highestaudio" });
+            const replayStream = await ytdl(url, { filter: "audioonly", quality: "highestaudio" });
             player.play(createAudioResource(replayStream));
             await i.reply({ content: "🔁 Phát lại bài hát!", ephemeral: true });
             break;
@@ -94,7 +105,7 @@ module.exports = {
         players.delete(message.guild.id);
       });
     } catch (err) {
-      console.error(err);
+      console.error("Music Error:", err);
       message.reply("❌ Có lỗi xảy ra khi phát nhạc!");
     }
   },
