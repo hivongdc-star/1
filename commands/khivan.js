@@ -103,7 +103,8 @@ function linesToTriCode(lines, startIdx) {
 
 function renderHex(lines) {
   const lineStr = (b) => (b ? "———" : "— —");
-  return [5,4,3,2,1,0].map(i => lineStr(lines[i])).join("\n");
+  return [5,4,3,2,1,0].map(i => lineStr(lines[i])).join("
+");
 }
 
 function triLabel(code) {
@@ -207,11 +208,13 @@ async function _khivanHandle(message, args, client) {
     const displayColorName = hexRec?.colorHint || color.name;
     const displayDirection  = hexRec?.directionHint || direction;
 
-    embed.setDescription(
-      `${emoji} **${tier}** _(theo Kinh Dịch)_ — ${note}\n` +
-      `**${bar(adjScore)}**  \\`${adjScore}/100\\`\\n\\n` +
+    embed.setDescription([
+      `${emoji} **${tier}** _(theo Kinh Dịch)_ — ${note}`,
+      `**${bar(adjScore)}**  \`${adjScore}/100\``,
+      ``,
       `> Kết quả cố định trong ngày **${dateKey.slice(0,4)}-${dateKey.slice(4,6)}-${dateKey.slice(6)} (JST)** đối với **${target.username}**.`
-    );
+    ].join("
+"));
 
     if (hexRec) {
       const titleLine = `**${hexRec.symbol} ${hexRec.vn}**` + (hexRec.han ? ` — ${hexRec.han}` : "") + (hexRec.no ? ` (Quẻ ${hexRec.no})` : "");
@@ -220,15 +223,25 @@ async function _khivanHandle(message, args, client) {
         hexRec?.luck?.wealth ? `• Tài: ${hexRec.luck.wealth}` : null,
         hexRec?.luck?.love   ? `• Tình: ${hexRec.luck.love}`   : null,
         hexRec?.luck?.health ? `• SK: ${hexRec.luck.health}`   : null,
-      ].filter(Boolean).join("\\n") || "—";
+      ].filter(Boolean).join("\
+") || "—";
 
       embed.addFields(
-        { name: "Bản quẻ", value:
-          `\\\`\\\`\\\`\\n${hexAscii}\\n\\\`\\\`\\\`\\n**Thượng:** ${upLabel}\\n**Hạ:** ${lowLabel}\\n${titleLine}` },
+        { name: "Bản quẻ", value: [
+          "```",
+          `${hexAscii}`,
+          "```",
+          `**Thượng:** ${upLabel}`,
+          `**Hạ:** ${lowLabel}`,
+          `${titleLine}`
+        ].join("
+") },
         { name: "Lời quẻ", value: (hexRec.judgment || "—").slice(0, 256), inline: false },
         { name: "Tượng", value: (hexRec.image || "—").slice(0, 256), inline: false },
-        { name: "Nên", value: (hexRec.do || []).slice(0, 3).map(i => `• ${i}`).join("\\n") || "—", inline: true },
-        { name: "Tránh", value: (hexRec.dont || []).slice(0, 3).map(i => `• ${i}`).join("\\n") || "—", inline: true },
+        { name: "Nên", value: (hexRec.do || []).slice(0, 3).map(i => `• ${i}`).join("\
+") || "—", inline: true },
+        { name: "Tránh", value: (hexRec.dont || []).slice(0, 3).map(i => `• ${i}`).join("\
+") || "—", inline: true },
         { name: "Gợi ý 4 mặt", value: luckLines, inline: false },
       );
     }
