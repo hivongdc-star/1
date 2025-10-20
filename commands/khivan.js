@@ -173,99 +173,119 @@ function bar(score) {
   return "▰".repeat(filled) + "▱".repeat(10 - filled);
 }
 
+
+// Core handler that works for both execute(message,args) and run(client,message,args)
+async function _khivanHandle(message, args, client) {
+  try {
+    const target = message.mentions?.users?.first?.() || message.author;
+    const dateKey = getJSTDateKey();
+    const seedStr = `${target.id}-${dateKey}`;
+    const rng = createPRNG(hash32(seedStr));
+
+    const element = pick(rng, NGU_HANH);
+    const color = pick(rng, MAU);
+    const direction = pick(rng, HUONG);
+    const luckyNumber = Math.max(10, Math.min(99, Math.floor(rng() * 90) + 10));
+    const tip = pick(rng, LOI_NHAN);
+
+    const six = makeSixLines(rng);
+    const lowerCode = linesToTriCode(six, 0);
+    const upperCode = linesToTriCode(six, 3);
+    const hexAscii = renderHex(six);
+
+    const upLabel = triLabel(upperCode);
+    const lowLabel = triLabel(lowerCode);
+    const compat = makeCompatHexagrams(upperCode, lowerCode);
+
+    const hexRec = findHexRecord(upperCode, lowerCode);
+    const { score: adjScore, tier, emoji, note, color: tierColor } = evaluateTierFromHex(hexRec, rng);
+
+    const embed = new EmbedBuilder()
+      .setTitle(`🔮 Bói Khí Vận Hôm Nay`)
+      .setColor(tierColor || color.hex);
+
+    const displayColorName = hexRec?.colorHint || color.name;
+    const displayDirection  = hexRec?.directionHint || direction;
+
+    embed.setDescription(
+      `${emoji} **${tier}** _(theo Kinh Dịch)_ — ${note}\n` +
+      `**${bar(adjScore)}**  \\`${adjScore}/100\\`\\n\\n` +
+      `> Kết quả cố định trong ngày **${dateKey.slice(0,4)}-${dateKey.slice(4,6)}-${dateKey.slice(6)} (JST)** đối với **${target.username}**.`
+    );
+
+    if (hexRec) {
+      const titleLine = `**${hexRec.symbol} ${hexRec.vn}**` + (hexRec.han ? ` — ${hexRec.han}` : "") + (hexRec.no ? ` (Quẻ ${hexRec.no})` : "");
+      const luckLines = [
+        hexRec?.luck?.career ? `• CV: ${hexRec.luck.career}` : null,
+        hexRec?.luck?.wealth ? `• Tài: ${hexRec.luck.wealth}` : null,
+        hexRec?.luck?.love   ? `• Tình: ${hexRec.luck.love}`   : null,
+        hexRec?.luck?.health ? `• SK: ${hexRec.luck.health}`   : null,
+      ].filter(Boolean).join("\\n") || "—";
+
+      embed.addFields(
+        { name: "Bản quẻ", value:
+          `\\\`\\\`\\\`\\n${hexAscii}\\n\\\`\\\`\\\`\\n**Thượng:** ${upLabel}\\n**Hạ:** ${lowLabel}\\n${titleLine}` },
+        { name: "Lời quẻ", value: (hexRec.judgment || "—").slice(0, 256), inline: false },
+        { name: "Tượng", value: (hexRec.image || "—").slice(0, 256), inline: false },
+        { name: "Nên", value: (hexRec.do || []).slice(0, 3).map(i => `• ${i}`).join("\\n") || "—", inline: true },
+        { name: "Tránh", value: (hexRec.dont || []).slice(0, 3).map(i => `• ${i}`).join("\\n") || "—", inline: true },
+        { name: "Gợi ý 4 mặt", value: luckLines, inline: false },
+      );
+    }
+
+    embed.addFields(
+      { name: "Hành khí", value: element, inline: true },
+      { name: "Màu cát tường", value: displayColorName, inline: true },
+      { name: "Con số may mắn", value: `${luckyNumber}`, inline: true },
+      { name: "Phương hướng thuận", value: displayDirection, inline: true },
+      { name: "Lời nhắn", value: tip, inline: false }
+    );
+
+    const upperCompatLabel = `${triLabel(compat.upperCompat.upper.code)} trên ${triLabel(compat.upperCompat.lower.code)}`;
+    const lowerCompatLabel = `${triLabel(compat.lowerCompat.upper.code)} trên ${triLabel(compat.lowerCompat.lower.code)}`;
+    const doubleCompatLabel = `${triLabel(compat.doubleCompat.upper.code)} trên ${triLabel(compat.doubleCompat.lower.code)}`;
+
+    embed.addFields(
+      { name: "Quẻ hợp (theo Thượng)", value: upperCompatLabel, inline: true },
+      { name: "Quẻ hợp (theo Hạ)", value: lowerCompatLabel, inline: true },
+      { name: "Song hợp", value: doubleCompatLabel, inline: true },
+    );
+
+    embed.setFooter({ text: "Đổi ngày (JST) sẽ đổi khí vận. Dùng: -khivan [@user]" });
+    await message.channel.send({ embeds: [embed] });
+  } catch (err) {
+    console.error("[khivan] error:", err);
+    await message.channel.send("😵 Đã có lỗi nhỏ khi bói khí vận. Thử lại sau nhé!");
+  }
+}
+
+
 module.exports = {
   name: "khivan",
   aliases: ["kv", "kivan", "khi", "khi-van", "fortune", "luck"],
   description: "Bói khí vận hôm nay (JST) dựa theo Kinh Dịch — 7 bậc: Đại Cát → ... → Đại Hung.",
   usage: "-khivan [@ai đó (tuỳ chọn)]",
   cooldown: 10,
-  async execute(message /*, args */) {
-    try {
-      const target = message.mentions.users.first() || message.author;
-      const dateKey = getJSTDateKey();
-      const seedStr = `${target.id}-${dateKey}`;
-      const rng = createPRNG(hash32(seedStr));
-
-      // Field phụ (random nhẹ theo ngày)
-      const element = pick(rng, NGU_HANH);
-      const color = pick(rng, MAU);
-      const direction = pick(rng, HUONG);
-      const luckyNumber = clamp(Math.floor(rng() * 90) + 10, 10, 99);
-      const tip = pick(rng, LOI_NHAN);
-
-      // Quẻ
-      const six = makeSixLines(rng);
-      const lowerCode = linesToTriCode(six, 0);
-      const upperCode = linesToTriCode(six, 3);
-      const hexAscii = renderHex(six);
-
-      const upLabel = triLabel(upperCode);
-      const lowLabel = triLabel(lowerCode);
-      const compat = makeCompatHexagrams(upperCode, lowerCode);
-
-      // Dữ liệu Kinh Dịch
-      const hexRec = findHexRecord(upperCode, lowerCode);
-      const { score: adjScore, tier, emoji, note, color: tierColor } = evaluateTierFromHex(hexRec, rng);
-
-      const embed = new EmbedBuilder()
-        .setTitle(`🔮 Bói Khí Vận Hôm Nay`)
-        .setColor(tierColor || color.hex);
-
-      const displayColorName = hexRec?.colorHint || color.name;
-      const displayDirection  = hexRec?.directionHint || direction;
-
-      embed.setDescription(
-        `${emoji} **${tier}** _(theo Kinh Dịch)_ — ${note}\n` +
-        `**${bar(adjScore)}**  \`${adjScore}/100\`\n\n` +
-        `> Kết quả cố định trong ngày **${dateKey.slice(0,4)}-${dateKey.slice(4,6)}-${dateKey.slice(6)} (JST)** đối với **${target.username}**.`
-      );
-
-      if (hexRec) {
-        const titleLine = `**${hexRec.symbol} ${hexRec.vn}**` + (hexRec.han ? ` — ${hexRec.han}` : "") + (hexRec.no ? ` (Quẻ ${hexRec.no})` : "");
-        const luckLines = [
-          hexRec?.luck?.career ? `• CV: ${hexRec.luck.career}` : null,
-          hexRec?.luck?.wealth ? `• Tài: ${hexRec.luck.wealth}` : null,
-          hexRec?.luck?.love   ? `• Tình: ${hexRec.luck.love}`   : null,
-          hexRec?.luck?.health ? `• SK: ${hexRec.luck.health}`   : null,
-        ].filter(Boolean).join("\n") || "—";
-
-        embed.addFields(
-          { name: "Bản quẻ", value:
-            `\`\`\`\n${hexAscii}\n\`\`\`\n**Thượng:** ${upLabel}\n**Hạ:** ${lowLabel}\n${titleLine}` },
-          { name: "Lời quẻ", value: (hexRec.judgment || "—").slice(0, 256), inline: false },
-          { name: "Tượng", value: (hexRec.image || "—").slice(0, 256), inline: false },
-          { name: "Nên", value: (hexRec.do || []).slice(0, 3).map(i => `• ${i}`).join("\n") || "—", inline: true },
-          { name: "Tránh", value: (hexRec.dont || []).slice(0, 3).map(i => `• ${i}`).join("\n") || "—", inline: true },
-          { name: "Gợi ý 4 mặt", value: luckLines, inline: false },
-        );
-      }
-
-      // Phụ trợ
-      embed.addFields(
-        { name: "Hành khí", value: element, inline: true },
-        { name: "Màu cát tường", value: hexRec?.colorHint || displayColorName, inline: true },
-        { name: "Con số may mắn", value: `${luckyNumber}`, inline: true },
-        { name: "Phương hướng thuận", value: hexRec?.directionHint || displayDirection, inline: true },
-        { name: "Lời nhắn", value: tip, inline: false }
-      );
-
-      // Quẻ hợp
-      const upperCompatLabel = `${triLabel(compat.upperCompat.upper.code)} trên ${triLabel(compat.upperCompat.lower.code)}`;
-      const lowerCompatLabel = `${triLabel(compat.lowerCompat.upper.code)} trên ${triLabel(compat.lowerCompat.lower.code)}`;
-      const doubleCompatLabel = `${triLabel(compat.doubleCompat.upper.code)} trên ${triLabel(compat.doubleCompat.lower.code)}`;
-
-      embed.addFields(
-        { name: "Quẻ hợp (theo Thượng)", value: upperCompatLabel, inline: true },
-        { name: "Quẻ hợp (theo Hạ)", value: lowerCompatLabel, inline: true },
-        { name: "Song hợp", value: doubleCompatLabel, inline: true },
-      );
-
-      embed.setFooter({ text: "Đổi ngày (JST) sẽ đổi khí vận. Dùng: -khivan [@user]" });
-
-      await message.channel.send({ embeds: [embed] });
-    } catch (err) {
-      console.error("[khivan] error:", err);
-      await message.channel.send("😵 Đã có lỗi nhỏ khi bói khí vận. Thử lại sau nhé!");
+  // Most loaders in this project call `cmd.run(client, message, args)`.
+  // We'll support both:
+  run: async function () {
+    // Accept (client, message, args) or (message, args)
+    if (arguments.length === 3) {
+      const [client, message, args] = arguments;
+      return _khivanHandle(message, args || [], client);
+    } else if (arguments.length === 2) {
+      const [message, args] = arguments;
+      return _khivanHandle(message, args || [], null);
+    } else if (arguments.length === 1) {
+      const [message] = arguments;
+      return _khivanHandle(message, [], null);
+    } else {
+      throw new Error("khivan.run: invalid arguments");
     }
   },
+  // Also export execute(message, args) for compatibility with other loaders
+  execute: async function (message, args, client) {
+    return _khivanHandle(message, args || [], client);
+  },
 };
+
