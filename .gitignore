@@ -1,4 +1,4 @@
-# Node modules & build
+﻿# Node modules & build
 node_modules/
 dist/
 build/
@@ -18,7 +18,7 @@ Thumbs.db
 .env
 
 # Data files (runtime, không sync)
-data/users.json
+
 
 # PM2 logs
 pids
