@@ -14,15 +14,15 @@
           "chatCdAt": 1760836484367
         },
         "844374494416076801": {
-          "rela": 442,
+          "rela": 444,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760982443316
+          "chatCdAt": 1761063680425
         },
         "1340629997018288178": {
           "rela": 5844,
@@ -58,23 +58,23 @@
           "chatCdAt": 1760983408210
         },
         "1345081917300674625": {
-          "rela": 12276,
+          "rela": 12446,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 3,
+            "reply": 1
           },
           "chatCdAt": 1761003243658
         },
         "543058474070966272": {
-          "rela": 2834,
+          "rela": 2978,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 2,
+            "date": "2025-10-22",
+            "mention": 1,
             "reply": 1
           },
           "chatCdAt": 1761005009288
@@ -102,15 +102,15 @@
           "chatCdAt": 1760436482135
         },
         "847701545436184587": {
-          "rela": 10244,
+          "rela": 10298,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 0
           },
-          "chatCdAt": 1761002042273
+          "chatCdAt": 1761085175401
         },
         "904932475476779058": {
           "rela": 4404,
@@ -201,26 +201,26 @@
           "chatCdAt": 1760622574136
         },
         "1347552701457895444": {
-          "rela": 314,
+          "rela": 316,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
           "chatCdAt": 1760866377721
         },
         "1014894855400476692": {
-          "rela": 1932,
+          "rela": 1938,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760833748573
+          "chatCdAt": 1761107871743
         },
         "660857900822167553": {
           "rela": 206,
@@ -300,13 +300,13 @@
           "chatCdAt": 1760807850318
         },
         "1029371234103861248": {
-          "rela": 2124,
+          "rela": 2126,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1760979924715
         },
@@ -488,8 +488,8 @@
         }
       }
     },
-    "exp": 5,
-    "lt": 1386,
+    "exp": 94,
+    "lt": 1392,
     "race": "nhan",
     "element": "kim",
     "level": 36,
@@ -554,24 +554,24 @@
           "chatCdAt": 1760845889771
         },
         "543058474070966272": {
-          "rela": 958,
+          "rela": 1102,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 0,
-            "reply": 0
-          },
-          "chatCdAt": 1761009051139
-        },
-        "1340629997018288178": {
-          "rela": 2682,
-          "daoDuyen": 0,
-          "status": "none",
-          "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 1,
             "reply": 1
+          },
+          "chatCdAt": 1761062663324
+        },
+        "1340629997018288178": {
+          "rela": 2752,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1760862735212
         },
@@ -742,8 +742,8 @@
         }
       }
     },
-    "exp": 143,
-    "lt": 238,
+    "exp": 152,
+    "lt": 239,
     "race": "nhan",
     "element": "kim",
     "level": 16,
@@ -775,26 +775,26 @@
           "chatCdAt": 1760850450900
         },
         "591920818611814401": {
-          "rela": 442,
+          "rela": 444,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
           "chatCdAt": 1760982443010
         },
         "1359360311702061250": {
-          "rela": 10394,
+          "rela": 10636,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 6,
-            "reply": 5
+            "date": "2025-10-22",
+            "mention": 2,
+            "reply": 1
           },
-          "chatCdAt": 1761019890011
+          "chatCdAt": 1761097408409
         },
         "1345081917300674625": {
           "rela": 3168,
@@ -830,37 +830,37 @@
           "chatCdAt": 1760968522562
         },
         "543058474070966272": {
-          "rela": 3022,
+          "rela": 3166,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 2,
-            "reply": 2
-          },
-          "chatCdAt": 1761019170545
-        },
-        "597254170436960266": {
-          "rela": 404,
-          "daoDuyen": 0,
-          "status": "none",
-          "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 1,
             "reply": 1
+          },
+          "chatCdAt": 1761097098563
+        },
+        "597254170436960266": {
+          "rela": 406,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1761020968546
         },
         "904932475476779058": {
-          "rela": 2138,
+          "rela": 2140,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 6,
-            "reply": 5
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
-          "chatCdAt": 1761021400169
+          "chatCdAt": 1761063531698
         },
         "1014894855400476692": {
           "rela": 808,
@@ -1040,8 +1040,8 @@
         }
       }
     },
-    "exp": 647,
-    "lt": 809,
+    "exp": 686,
+    "lt": 812,
     "race": "nhan",
     "element": "kim",
     "level": 29,
@@ -1073,13 +1073,13 @@
           "chatCdAt": 1760850420453
         },
         "844374494416076801": {
-          "rela": 10394,
+          "rela": 10636,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 8,
-            "reply": 8
+            "date": "2025-10-22",
+            "mention": 2,
+            "reply": 1
           },
           "chatCdAt": 1761019889738
         },
@@ -1095,26 +1095,26 @@
           "chatCdAt": 1760975653355
         },
         "543058474070966272": {
-          "rela": 12908,
+          "rela": 14070,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 9,
+            "reply": 8
           },
-          "chatCdAt": 1761019411663
+          "chatCdAt": 1761101008247
         },
         "1345081917300674625": {
-          "rela": 7566,
+          "rela": 7572,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 1,
-            "reply": 1
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
-          "chatCdAt": 1761019471065
+          "chatCdAt": 1761093913570
         },
         "906490001880141826": {
           "rela": 2754,
@@ -1139,15 +1139,15 @@
           "chatCdAt": 1760968603960
         },
         "597254170436960266": {
-          "rela": 1780,
+          "rela": 1782,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 1,
-            "reply": 1
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
-          "chatCdAt": 1761019837556
+          "chatCdAt": 1761097420620
         },
         "847701545436184587": {
           "rela": 11398,
@@ -1183,15 +1183,15 @@
           "chatCdAt": 1760945357132
         },
         "904932475476779058": {
-          "rela": 2892,
+          "rela": 2894,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1761019906397
+          "chatCdAt": 1761093706026
         },
         "1347552701457895444": {
           "rela": 2350,
@@ -1216,13 +1216,13 @@
           "chatCdAt": 1761019604968
         },
         "1014894855400476692": {
-          "rela": 5798,
+          "rela": 5848,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1760944947309
         },
@@ -1382,8 +1382,8 @@
         }
       }
     },
-    "exp": 401524620,
-    "lt": 2647,
+    "exp": 401524964,
+    "lt": 2672,
     "race": "nhan",
     "element": "kim",
     "level": 207,
@@ -1428,35 +1428,35 @@
           "chatCdAt": 1760978795446
         },
         "1345081917300674625": {
-          "rela": 2976,
+          "rela": 3478,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 2,
-            "reply": 2
+            "date": "2025-10-22",
+            "mention": 3,
+            "reply": 3
           },
-          "chatCdAt": 1761022386829
+          "chatCdAt": 1761060607646
         },
         "543058474070966272": {
-          "rela": 1756,
+          "rela": 1758,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760968001035
+          "chatCdAt": 1761060380419
         },
         "260758385786355713": {
-          "rela": 2682,
+          "rela": 2752,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 0,
-            "reply": 0
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 1
           },
           "chatCdAt": 1760862249985
         },
@@ -1494,26 +1494,26 @@
           "chatCdAt": 0
         },
         "597254170436960266": {
-          "rela": 5142,
+          "rela": 5290,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 5,
-            "reply": 4
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 1
           },
-          "chatCdAt": 1761022579659
+          "chatCdAt": 1761060669996
         },
         "904932475476779058": {
-          "rela": 6662,
+          "rela": 7104,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 5,
-            "reply": 5
+            "date": "2025-10-22",
+            "mention": 4,
+            "reply": 4
           },
-          "chatCdAt": 1761022623753
+          "chatCdAt": 1761060793524
         },
         "1245365930243129345": {
           "rela": 1536,
@@ -1869,8 +1869,8 @@
         }
       }
     },
-    "exp": 221,
-    "lt": 713,
+    "exp": 408,
+    "lt": 726,
     "race": "nhan",
     "element": "kim",
     "level": 28,
@@ -1902,26 +1902,26 @@
           "chatCdAt": 1760983407509
         },
         "1359360311702061250": {
-          "rela": 1780,
+          "rela": 1782,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
           "chatCdAt": 1761019824210
         },
         "904932475476779058": {
-          "rela": 8366,
+          "rela": 8878,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 8,
-            "reply": 1
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 0
           },
-          "chatCdAt": 1761022534431
+          "chatCdAt": 1761104331250
         },
         "847701545436184587": {
           "rela": 1856,
@@ -1935,15 +1935,15 @@
           "chatCdAt": 1760976924323
         },
         "1340629997018288178": {
-          "rela": 5142,
+          "rela": 5290,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 4,
-            "reply": 2
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 1
           },
-          "chatCdAt": 1761022595912
+          "chatCdAt": 1761060809381
         },
         "1369926327586525184": {
           "rela": 86,
@@ -1957,15 +1957,15 @@
           "chatCdAt": 1760940800417
         },
         "1345081917300674625": {
-          "rela": 2652,
+          "rela": 2802,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 1,
             "reply": 1
           },
-          "chatCdAt": 1761022406693
+          "chatCdAt": 1761060926170
         },
         "900718662913237022": {
           "rela": 2382,
@@ -1990,37 +1990,37 @@
           "chatCdAt": 1760805136108
         },
         "543058474070966272": {
-          "rela": 756,
+          "rela": 760,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1761021816990
+          "chatCdAt": 1761106020513
         },
         "844374494416076801": {
-          "rela": 404,
+          "rela": 406,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1761020222094
+          "chatCdAt": 1761097408875
         },
         "1014894855400476692": {
-          "rela": 540,
+          "rela": 616,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760883762988
+          "chatCdAt": 1761104292079
         },
         "260758385786355713": {
           "rela": 1056,
@@ -2343,8 +2343,8 @@
         }
       }
     },
-    "exp": 262,
-    "lt": 915,
+    "exp": 422,
+    "lt": 926,
     "race": "nhan",
     "element": "kim",
     "level": 31,
@@ -2365,13 +2365,13 @@
     "relationships": {
       "partners": {
         "591920818611814401": {
-          "rela": 12276,
+          "rela": 12446,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1761001064990
         },
@@ -2398,48 +2398,48 @@
           "chatCdAt": 1760864352853
         },
         "543058474070966272": {
-          "rela": 2356,
+          "rela": 2360,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
+          },
+          "chatCdAt": 1761093912876
+        },
+        "1359360311702061250": {
+          "rela": 7572,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
+          },
+          "chatCdAt": 1761101238617
+        },
+        "1340629997018288178": {
+          "rela": 3478,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 4,
+            "reply": 4
+          },
+          "chatCdAt": 1761060600600
+        },
+        "906490001880141826": {
+          "rela": 864,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
             "mention": 2,
             "reply": 2
           },
-          "chatCdAt": 1761022026513
-        },
-        "1359360311702061250": {
-          "rela": 7566,
-          "daoDuyen": 0,
-          "status": "none",
-          "daily": {
-            "date": "2025-10-21",
-            "mention": 0,
-            "reply": 0
-          },
-          "chatCdAt": 1761019615667
-        },
-        "1340629997018288178": {
-          "rela": 2976,
-          "daoDuyen": 0,
-          "status": "none",
-          "daily": {
-            "date": "2025-10-21",
-            "mention": 5,
-            "reply": 5
-          },
-          "chatCdAt": 1761022404770
-        },
-        "906490001880141826": {
-          "rela": 718,
-          "daoDuyen": 0,
-          "status": "none",
-          "daily": {
-            "date": "2025-10-21",
-            "mention": 0,
-            "reply": 0
-          },
-          "chatCdAt": 1761019566874
+          "chatCdAt": 1761061301818
         },
         "847701545436184587": {
           "rela": 12626,
@@ -2453,26 +2453,26 @@
           "chatCdAt": 1761022288231
         },
         "1420422930445373491": {
-          "rela": 1440,
+          "rela": 1442,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 6,
-            "reply": 6
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1760972327366
         },
         "904932475476779058": {
-          "rela": 10752,
+          "rela": 11536,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 6,
+            "reply": 5
           },
-          "chatCdAt": 1761022321472
+          "chatCdAt": 1761061035587
         },
         "1311003535516897294": {
           "rela": 400,
@@ -2497,12 +2497,12 @@
           "chatCdAt": 1760445981097
         },
         "1014894855400476692": {
-          "rela": 2032,
+          "rela": 2034,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 1,
+            "date": "2025-10-22",
+            "mention": 0,
             "reply": 0
           },
           "chatCdAt": 1760883682888
@@ -2541,15 +2541,15 @@
           "chatCdAt": 1760846927200
         },
         "597254170436960266": {
-          "rela": 2652,
+          "rela": 2802,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 8,
-            "reply": 4
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 1
           },
-          "chatCdAt": 1761022408890
+          "chatCdAt": 1761060953320
         },
         "863000711109541908": {
           "rela": 526,
@@ -2707,8 +2707,8 @@
         }
       }
     },
-    "exp": 422,
-    "lt": 1542,
+    "exp": 661,
+    "lt": 1560,
     "race": "nhan",
     "element": "kim",
     "level": 37,
@@ -2729,90 +2729,90 @@
     "relationships": {
       "partners": {
         "1359360311702061250": {
-          "rela": 12908,
+          "rela": 14070,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 6
+            "date": "2025-10-22",
+            "mention": 8,
+            "reply": 5
           },
-          "chatCdAt": 1761021792472
+          "chatCdAt": 1761100992172
         },
         "260758385786355713": {
-          "rela": 958,
+          "rela": 1102,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 1
+          },
+          "chatCdAt": 1761062753861
+        },
+        "1345081917300674625": {
+          "rela": 2360,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760850199253
-        },
-        "1345081917300674625": {
-          "rela": 2356,
-          "daoDuyen": 0,
-          "status": "none",
-          "daily": {
-            "date": "2025-10-21",
-            "mention": 1,
-            "reply": 1
-          },
-          "chatCdAt": 1761014835242
+          "chatCdAt": 1761102197872
         },
         "591920818611814401": {
-          "rela": 2834,
+          "rela": 2978,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 1,
             "reply": 1
           },
-          "chatCdAt": 1761007718362
+          "chatCdAt": 1761108433934
         },
         "1340629997018288178": {
-          "rela": 1756,
+          "rela": 1758,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
           "chatCdAt": 1761011009822
         },
         "906490001880141826": {
-          "rela": 618,
+          "rela": 698,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 0,
-            "reply": 0
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 1
           },
-          "chatCdAt": 1761018072851
+          "chatCdAt": 1761061777388
         },
         "904932475476779058": {
-          "rela": 1286,
+          "rela": 1318,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1761021992613
+          "chatCdAt": 1761104871340
         },
         "1420422930445373491": {
-          "rela": 550,
+          "rela": 620,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
-            "mention": 0,
-            "reply": 0
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 1
           },
           "chatCdAt": 1760881914836
         },
@@ -2850,15 +2850,15 @@
           "chatCdAt": 1760451311176
         },
         "900718662913237022": {
-          "rela": 6096,
+          "rela": 6548,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 7
+            "date": "2025-10-22",
+            "mention": 5,
+            "reply": 2
           },
-          "chatCdAt": 1761021958663
+          "chatCdAt": 1761105779114
         },
         "809350077235724319": {
           "rela": 918,
@@ -2872,48 +2872,48 @@
           "chatCdAt": 1760712041647
         },
         "1014894855400476692": {
-          "rela": 1742,
+          "rela": 2338,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 1,
-            "reply": 0
+            "date": "2025-10-22",
+            "mention": 2,
+            "reply": 2
           },
-          "chatCdAt": 1760802322981
+          "chatCdAt": 1761100359772
         },
         "1347552701457895444": {
-          "rela": 250,
+          "rela": 252,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
           "chatCdAt": 1761014667203
         },
         "844374494416076801": {
-          "rela": 3022,
+          "rela": 3166,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 1,
             "reply": 1
           },
-          "chatCdAt": 1761014994075
+          "chatCdAt": 1761097112705
         },
         "597254170436960266": {
-          "rela": 756,
+          "rela": 760,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 1,
-            "reply": 1
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
-          "chatCdAt": 1761022190941
+          "chatCdAt": 1761107202225
         },
         "948925697022390322": {
           "rela": 50,
@@ -2949,15 +2949,15 @@
           "chatCdAt": 1760596865802
         },
         "863000711109541908": {
-          "rela": 268,
+          "rela": 346,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760887499119
+          "chatCdAt": 1761090768307
         },
         "1311003535516897294": {
           "rela": 312,
@@ -2993,11 +2993,11 @@
           "chatCdAt": 1760628532073
         },
         "1029371234103861248": {
-          "rela": 12,
+          "rela": 82,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -3136,12 +3136,12 @@
           "chatCdAt": 0
         },
         "688280422114787328": {
-          "rela": 2,
+          "rela": 52,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
-            "mention": 0,
+            "date": "2025-10-22",
+            "mention": 1,
             "reply": 0
           },
           "chatCdAt": 0
@@ -3181,8 +3181,8 @@
         }
       }
     },
-    "exp": 569,
-    "lt": 1677,
+    "exp": 1336,
+    "lt": 1826,
     "race": "nhan",
     "element": "kim",
     "level": 35,
@@ -3226,15 +3226,15 @@
           "chatCdAt": 1760978804982
         },
         "1345081917300674625": {
-          "rela": 718,
+          "rela": 864,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1761019504463
+          "chatCdAt": 1761060995097
         },
         "1359360311702061250": {
           "rela": 2754,
@@ -3248,15 +3248,15 @@
           "chatCdAt": 1761019776429
         },
         "904932475476779058": {
-          "rela": 5014,
+          "rela": 5956,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 1,
-            "reply": 1
+            "date": "2025-10-22",
+            "mention": 4,
+            "reply": 4
           },
-          "chatCdAt": 1761022567176
+          "chatCdAt": 1761070311993
         },
         "260758385786355713": {
           "rela": 282,
@@ -3270,35 +3270,35 @@
           "chatCdAt": 1760842343758
         },
         "543058474070966272": {
-          "rela": 618,
+          "rela": 698,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1761013714112
+          "chatCdAt": 1761062823734
         },
         "1420422930445373491": {
-          "rela": 218,
+          "rela": 288,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
+            "date": "2025-10-22",
             "mention": 1,
             "reply": 1
           },
           "chatCdAt": 1760971455410
         },
         "847701545436184587": {
-          "rela": 2986,
+          "rela": 2988,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 1,
-            "reply": 1
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1760889906004
         },
@@ -3336,15 +3336,15 @@
           "chatCdAt": 1760806897357
         },
         "900718662913237022": {
-          "rela": 776,
+          "rela": 840,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 2,
-            "reply": 2
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
-          "chatCdAt": 1761021068936
+          "chatCdAt": 1761070284280
         },
         "863000711109541908": {
           "rela": 160,
@@ -3391,15 +3391,15 @@
           "chatCdAt": 1760780180235
         },
         "1311003535516897294": {
-          "rela": 32,
+          "rela": 34,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760890768048
+          "chatCdAt": 1761061428250
         },
         "554182644464746517": {
           "rela": 28,
@@ -3543,22 +3543,33 @@
             "reply": 0
           },
           "chatCdAt": 0
+        },
+        "1347552701457895444": {
+          "rela": 2,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
+          },
+          "chatCdAt": 1761061722349
         }
       }
     },
-    "exp": 464,
-    "lt": 397,
+    "exp": 331,
+    "lt": 424,
     "race": "nhan",
     "element": "kim",
-    "level": 21,
+    "level": 22,
     "realm": "Trúc Cơ - Tầng 1",
-    "hp": 4875,
-    "maxHp": 3010,
-    "mp": 1575,
+    "hp": 4999,
+    "maxHp": 3110,
+    "mp": 1599,
     "maxMp": 810,
-    "atk": 922,
-    "def": 922,
-    "spd": 172,
+    "atk": 946,
+    "def": 946,
+    "spd": 176,
     "fury": 0,
     "buffs": [],
     "shield": 0,
@@ -3568,59 +3579,59 @@
     "relationships": {
       "partners": {
         "906490001880141826": {
-          "rela": 5014,
+          "rela": 5956,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 10,
-            "reply": 8
+            "reply": 6
           },
-          "chatCdAt": 1761022563732
+          "chatCdAt": 1761070312803
         },
         "597254170436960266": {
-          "rela": 8366,
+          "rela": 8878,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 9,
+            "reply": 0
           },
-          "chatCdAt": 1761022498242
+          "chatCdAt": 1761104319798
         },
         "543058474070966272": {
-          "rela": 1286,
+          "rela": 1318,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1761021832068
+          "chatCdAt": 1761108663535
         },
         "847701545436184587": {
-          "rela": 9154,
+          "rela": 9204,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 6,
-            "reply": 4
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1761022294984
         },
         "1345081917300674625": {
-          "rela": 10752,
+          "rela": 11536,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 6
+            "date": "2025-10-22",
+            "mention": 5,
+            "reply": 5
           },
-          "chatCdAt": 1761022322447
+          "chatCdAt": 1761061046595
         },
         "591920818611814401": {
           "rela": 4404,
@@ -3634,15 +3645,15 @@
           "chatCdAt": 1761005069393
         },
         "1340629997018288178": {
-          "rela": 6662,
+          "rela": 7104,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 9,
-            "reply": 2
+            "date": "2025-10-22",
+            "mention": 2,
+            "reply": 1
           },
-          "chatCdAt": 1761022320970
+          "chatCdAt": 1761060712797
         },
         "809350077235724319": {
           "rela": 3928,
@@ -3656,11 +3667,11 @@
           "chatCdAt": 1760943383722
         },
         "1359360311702061250": {
-          "rela": 2892,
+          "rela": 2894,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -3689,15 +3700,15 @@
           "chatCdAt": 1760450107028
         },
         "1014894855400476692": {
-          "rela": 1130,
+          "rela": 1634,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760978389492
+          "chatCdAt": 1761104733381
         },
         "1245365930243129345": {
           "rela": 306,
@@ -3711,15 +3722,15 @@
           "chatCdAt": 1761022556714
         },
         "900718662913237022": {
-          "rela": 9498,
+          "rela": 9890,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 3,
+            "reply": 1
           },
-          "chatCdAt": 1761022620033
+          "chatCdAt": 1761070031912
         },
         "1311003535516897294": {
           "rela": 126,
@@ -3744,11 +3755,11 @@
           "chatCdAt": 1760978344796
         },
         "844374494416076801": {
-          "rela": 2138,
+          "rela": 2140,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -3777,11 +3788,11 @@
           "chatCdAt": 1760795176641
         },
         "1112334088574083176": {
-          "rela": 370,
+          "rela": 420,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-18",
+            "date": "2025-10-22",
             "mention": 1,
             "reply": 0
           },
@@ -3843,12 +3854,12 @@
           "chatCdAt": 1760806865014
         },
         "863000711109541908": {
-          "rela": 3002,
+          "rela": 3004,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 1,
+            "date": "2025-10-22",
+            "mention": 0,
             "reply": 0
           },
           "chatCdAt": 1760930574820
@@ -3865,11 +3876,11 @@
           "chatCdAt": 1760939681493
         },
         "697698324962345002": {
-          "rela": 438,
+          "rela": 440,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -3986,15 +3997,15 @@
           "chatCdAt": 1760893816312
         },
         "1029371234103861248": {
-          "rela": 2356,
+          "rela": 2358,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 6
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
-          "chatCdAt": 1760979497746
+          "chatCdAt": 1761065735665
         },
         "1382478806232727643": {
           "rela": 38,
@@ -4130,8 +4141,8 @@
         }
       }
     },
-    "exp": 1273,
-    "lt": 1996,
+    "exp": 1958,
+    "lt": 2055,
     "race": "nhan",
     "element": "kim",
     "level": 40,
@@ -4495,15 +4506,15 @@
           "chatCdAt": 1760975685448
         },
         "591920818611814401": {
-          "rela": 10244,
+          "rela": 10298,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 9
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
-          "chatCdAt": 1761001631587
+          "chatCdAt": 1761083613833
         },
         "1345081917300674625": {
           "rela": 12626,
@@ -4528,26 +4539,26 @@
           "chatCdAt": 1761022342689
         },
         "904932475476779058": {
-          "rela": 9154,
+          "rela": 9204,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 5
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 0
           },
           "chatCdAt": 1761022294661
         },
         "906490001880141826": {
-          "rela": 2986,
+          "rela": 2988,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 4,
-            "reply": 2
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
-          "chatCdAt": 1760971700267
+          "chatCdAt": 1761107533940
         },
         "597254170436960266": {
           "rela": 1856,
@@ -4594,13 +4605,13 @@
           "chatCdAt": 1761022604533
         },
         "1014894855400476692": {
-          "rela": 1522,
+          "rela": 1524,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
-            "mention": 6,
-            "reply": 3
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1760883940690
         },
@@ -4627,15 +4638,15 @@
           "chatCdAt": 1761022193762
         },
         "900718662913237022": {
-          "rela": 4768,
+          "rela": 4840,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 4,
-            "reply": 4
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 1
           },
-          "chatCdAt": 1761022284980
+          "chatCdAt": 1761107593115
         },
         "1347552701457895444": {
           "rela": 2568,
@@ -4969,8 +4980,8 @@
         }
       }
     },
-    "exp": 381,
-    "lt": 2267,
+    "exp": 438,
+    "lt": 2271,
     "race": "nhan",
     "element": "kim",
     "level": 42,
@@ -5002,11 +5013,11 @@
           "chatCdAt": 1760438765438
         },
         "543058474070966272": {
-          "rela": 550,
+          "rela": 620,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -5024,22 +5035,22 @@
           "chatCdAt": 0
         },
         "1345081917300674625": {
-          "rela": 1440,
+          "rela": 1442,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 7,
-            "reply": 7
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
-          "chatCdAt": 1760972134383
+          "chatCdAt": 1761061378221
         },
         "906490001880141826": {
-          "rela": 218,
+          "rela": 288,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -5121,11 +5132,22 @@
             "reply": 0
           },
           "chatCdAt": 1760971029293
+        },
+        "1311003535516897294": {
+          "rela": 2,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
+          },
+          "chatCdAt": 0
         }
       }
     },
-    "exp": 50,
-    "lt": 42,
+    "exp": 62,
+    "lt": 43,
     "race": "nhan",
     "element": "kim",
     "level": 5,
@@ -5278,11 +5300,11 @@
           "chatCdAt": 1760792453135
         },
         "906490001880141826": {
-          "rela": 32,
+          "rela": 34,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -5474,11 +5496,22 @@
             "reply": 0
           },
           "chatCdAt": 1760862846914
+        },
+        "1420422930445373491": {
+          "rela": 2,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
+          },
+          "chatCdAt": 1761061415413
         }
       }
     },
-    "exp": 81,
-    "lt": 264,
+    "exp": 86,
+    "lt": 265,
     "race": "nhan",
     "element": "kim",
     "level": 18,
@@ -5521,37 +5554,37 @@
           "chatCdAt": 1761022582923
         },
         "847701545436184587": {
-          "rela": 4768,
+          "rela": 4840,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 3,
-            "reply": 3
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1761022617805
         },
         "904932475476779058": {
-          "rela": 9498,
+          "rela": 9890,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 3,
+            "reply": 2
           },
-          "chatCdAt": 1761022284649
+          "chatCdAt": 1761105651229
         },
         "543058474070966272": {
-          "rela": 6096,
+          "rela": 6548,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 2,
+            "reply": 2
           },
-          "chatCdAt": 1761021876790
+          "chatCdAt": 1761107550746
         },
         "1359360311702061250": {
           "rela": 4986,
@@ -5675,22 +5708,22 @@
           "chatCdAt": 1760887586415
         },
         "906490001880141826": {
-          "rela": 776,
+          "rela": 840,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 6,
-            "reply": 5
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 0
           },
-          "chatCdAt": 1761021076281
+          "chatCdAt": 1761070015867
         },
         "1014894855400476692": {
-          "rela": 84,
+          "rela": 86,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -5951,8 +5984,8 @@
         }
       }
     },
-    "exp": 245,
-    "lt": 1071,
+    "exp": 454,
+    "lt": 1087,
     "race": "nhan",
     "element": "kim",
     "level": 33,
@@ -6408,70 +6441,70 @@
           "chatCdAt": 0
         },
         "847701545436184587": {
-          "rela": 1522,
+          "rela": 1524,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
-            "mention": 4,
-            "reply": 4
-          },
-          "chatCdAt": 1760883802904
-        },
-        "904932475476779058": {
-          "rela": 1130,
-          "daoDuyen": 0,
-          "status": "none",
-          "daily": {
-            "date": "2025-10-21",
-            "mention": 1,
-            "reply": 1
-          },
-          "chatCdAt": 1760978389408
-        },
-        "1345081917300674625": {
-          "rela": 2032,
-          "daoDuyen": 0,
-          "status": "none",
-          "daily": {
-            "date": "2025-10-20",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760883961122
+          "chatCdAt": 1761107811163
+        },
+        "904932475476779058": {
+          "rela": 1634,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 7,
+            "reply": 6
+          },
+          "chatCdAt": 1761104263227
+        },
+        "1345081917300674625": {
+          "rela": 2034,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
+          },
+          "chatCdAt": 1761098765088
         },
         "543058474070966272": {
-          "rela": 1742,
+          "rela": 2338,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 1,
-            "reply": 1
+            "date": "2025-10-22",
+            "mention": 6,
+            "reply": 6
           },
-          "chatCdAt": 1760942726349
+          "chatCdAt": 1761093534034
         },
         "591920818611814401": {
-          "rela": 1932,
+          "rela": 1938,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
-            "mention": 5,
-            "reply": 5
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1760883665238
         },
         "597254170436960266": {
-          "rela": 540,
+          "rela": 616,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
+            "date": "2025-10-22",
             "mention": 1,
             "reply": 1
           },
-          "chatCdAt": 1760941824750
+          "chatCdAt": 1761104460115
         },
         "260758385786355713": {
           "rela": 754,
@@ -6496,13 +6529,13 @@
           "chatCdAt": 1760800312869
         },
         "1359360311702061250": {
-          "rela": 5798,
+          "rela": 5848,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 0
           },
           "chatCdAt": 1760944936182
         },
@@ -6551,15 +6584,15 @@
           "chatCdAt": 1760884059558
         },
         "900718662913237022": {
-          "rela": 84,
+          "rela": 86,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760883677342
+          "chatCdAt": 1761081612671
         },
         "464279167672909824": {
           "rela": 74,
@@ -6717,19 +6750,19 @@
         }
       }
     },
-    "exp": 306,
-    "lt": 304,
+    "exp": 288,
+    "lt": 333,
     "race": "nhan",
     "element": "kim",
-    "level": 18,
+    "level": 19,
     "realm": "Trúc Cơ - Tầng 4",
-    "hp": 2878,
-    "maxHp": 2782,
-    "mp": 1038,
+    "hp": 3002,
+    "maxHp": 2882,
+    "mp": 1062,
     "maxMp": 942,
-    "atk": 543,
-    "def": 543,
-    "spd": 103,
+    "atk": 567,
+    "def": 567,
+    "spd": 107,
     "fury": 0,
     "buffs": [],
     "shield": 0,
@@ -6948,15 +6981,15 @@
           "chatCdAt": 1761014661602
         },
         "591920818611814401": {
-          "rela": 314,
+          "rela": 316,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760700100106
+          "chatCdAt": 1761089310841
         },
         "900718662913237022": {
           "rela": 20,
@@ -6981,15 +7014,15 @@
           "chatCdAt": 1760866048959
         },
         "543058474070966272": {
-          "rela": 250,
+          "rela": 252,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760624199638
+          "chatCdAt": 1761061646681
         },
         "597254170436960266": {
           "rela": 140,
@@ -7036,11 +7069,11 @@
           "chatCdAt": 1760682207467
         },
         "863000711109541908": {
-          "rela": 6,
+          "rela": 8,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -7056,11 +7089,22 @@
             "reply": 0
           },
           "chatCdAt": 1760882350284
+        },
+        "906490001880141826": {
+          "rela": 2,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
+          },
+          "chatCdAt": 0
         }
       }
     },
-    "exp": 11,
-    "lt": 151,
+    "exp": 36,
+    "lt": 153,
     "race": "nhan",
     "element": "kim",
     "level": 13,
@@ -7269,15 +7313,15 @@
           "chatCdAt": 1760927157591
         },
         "543058474070966272": {
-          "rela": 268,
+          "rela": 346,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 0,
-            "reply": 0
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 1
           },
-          "chatCdAt": 1760887515565
+          "chatCdAt": 1761062424702
         },
         "1359360311702061250": {
           "rela": 1448,
@@ -7302,15 +7346,15 @@
           "chatCdAt": 1760803224722
         },
         "904932475476779058": {
-          "rela": 3002,
+          "rela": 3004,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-20",
-            "mention": 1,
-            "reply": 1
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
-          "chatCdAt": 1760879747119
+          "chatCdAt": 1761062311715
         },
         "900718662913237022": {
           "rela": 5112,
@@ -7577,15 +7621,15 @@
           "chatCdAt": 1760863261188
         },
         "1347552701457895444": {
-          "rela": 6,
+          "rela": 8,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1760863893758
+          "chatCdAt": 1761089625066
         },
         "1148917801277476864": {
           "rela": 210,
@@ -7600,8 +7644,8 @@
         }
       }
     },
-    "exp": 82,
-    "lt": 365,
+    "exp": 106,
+    "lt": 368,
     "race": "nhan",
     "element": "kim",
     "level": 21,
@@ -7809,11 +7853,11 @@
           "chatCdAt": 1760804603545
         },
         "543058474070966272": {
-          "rela": 2,
+          "rela": 52,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-19",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -7898,24 +7942,24 @@
           "chatCdAt": 1760977690367
         },
         "591920818611814401": {
-          "rela": 2124,
+          "rela": 2126,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
-          },
-          "chatCdAt": 1760979936668
-        },
-        "543058474070966272": {
-          "rela": 12,
-          "daoDuyen": 0,
-          "status": "none",
-          "daily": {
-            "date": "2025-10-19",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
+          },
+          "chatCdAt": 1761065682598
+        },
+        "543058474070966272": {
+          "rela": 82,
+          "daoDuyen": 0,
+          "status": "none",
+          "daily": {
+            "date": "2025-10-22",
+            "mention": 1,
+            "reply": 1
           },
           "chatCdAt": 1760802165621
         },
@@ -7953,13 +7997,13 @@
           "chatCdAt": 1760805883426
         },
         "904932475476779058": {
-          "rela": 2356,
+          "rela": 2358,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
-            "mention": 10,
-            "reply": 10
+            "date": "2025-10-22",
+            "mention": 0,
+            "reply": 0
           },
           "chatCdAt": 1760979581379
         },
@@ -8152,8 +8196,8 @@
         }
       }
     },
-    "exp": 228,
-    "lt": 172,
+    "exp": 237,
+    "lt": 173,
     "race": "nhan",
     "element": "kim",
     "level": 13,
@@ -8439,11 +8483,11 @@
     "relationships": {
       "partners": {
         "904932475476779058": {
-          "rela": 370,
+          "rela": 420,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-18",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
@@ -8605,15 +8649,15 @@
           "chatCdAt": 1760937846444
         },
         "904932475476779058": {
-          "rela": 438,
+          "rela": 440,
           "daoDuyen": 0,
           "status": "none",
           "daily": {
-            "date": "2025-10-21",
+            "date": "2025-10-22",
             "mention": 0,
             "reply": 0
           },
-          "chatCdAt": 1761014984321
+          "chatCdAt": 1761096760851
         },
         "997331422765404292": {
           "rela": 6,
@@ -8760,8 +8804,8 @@
         }
       }
     },
-    "exp": 15,
-    "lt": 54,
+    "exp": 32,
+    "lt": 55,
     "race": "nhan",
     "element": "kim",
     "level": 6,
