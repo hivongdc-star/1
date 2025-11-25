@@ -29,6 +29,10 @@ function computeExpBonusPercent(user) {
     }
   }
 
+  // ĐÃ BỎ bonus từ nhẫn cưới / relationships
+  return bonus;
+}
+
   // Bonus từ nhẫn cưới (relationship)
   if (
     user &&

@@ -4,9 +4,6 @@ const aliases = require("./aliases");
 const { loadUsers, saveUsers } = require("./storage");
 const { addXp, getRealm } = require("./xp");
 const { earnFromChat, rewardGameResults } = require("./currency");
-
-// --- Rela ---
-const { handleMessageEvent } = require("./relaUtils");
 const { saveImageFromUrl, saveImageFromBuffer } = require("./imageStore");
 
 let commands = new Map();
@@ -60,24 +57,7 @@ function startDispatcher(client) {
   client.on("messageCreate", async (msg) => {
     if (msg.author.bot) return;
 
-    // --- RELA ---
-    const mentionedIds = msg.mentions.users
-      .filter((u) => !u.bot && u.id !== msg.author.id)
-      .map((u) => u.id);
-
-    let repliedUserId = null;
-    if (msg.type === 19 && msg.mentions.repliedUser && !msg.mentions.repliedUser.bot) {
-      repliedUserId = msg.mentions.repliedUser.id;
-    }
-
-    handleMessageEvent({
-      channelId: msg.channel.id,
-      authorId: msg.author.id,
-      mentionedIds,
-      repliedUserId,
-    });
-
-
+ 
     // --- Auto EXP mỗi 15s ---
     const now = Date.now();
     const last = cooldowns.get(msg.author.id) || 0;
