@@ -128,6 +128,27 @@ module.exports = {
 
         addLT(msg.author.id, ltFinal);
         addXp(msg.author.id, xp);
+        // --- Lưu cá vào bộ sưu tập (Fish Inventory + Fishdex) ---
+if (!me.fishInventory) me.fishInventory = {};
+if (!me.fishdex) me.fishdex = {};
+
+const fishId = fish.id;
+
+// tăng số lượng cá trong kho
+me.fishInventory[fishId] = (me.fishInventory[fishId] || 0) + 1;
+
+// cập nhật fishdex
+if (!me.fishdex[fishId]) me.fishdex[fishId] = { count: 0, maxSize: 0 };
+me.fishdex[fishId].count += 1;
+if (size > (me.fishdex[fishId].maxSize || 0)) {
+    me.fishdex[fishId].maxSize = size;
+}
+
+// lưu lại
+const all = loadUsers();
+all[msg.author.id] = me;
+require("../utils/storage").saveUsers(all);
+
 
         const lines = [];
         if (!clicked) lines.push("⚠️ Bạn **giật hơi trễ** — cá ít giá trị hơn.");
