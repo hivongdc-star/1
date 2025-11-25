@@ -1,24 +1,25 @@
 // utils/xp.js
 //
 // Quản lý EXP, Level Up, cập nhật chỉ số theo Race + Element
-// Bản đã loại bỏ hoàn toàn RELA (không có ringBonus, partnerBonus)
+// ĐÃ LOẠI BỎ hoàn toàn RELA (không có ringBonus, partnerBonus)
 
 const { loadUsers, saveUsers } = require("./storage");
-const races = require("./races");
-const elements = require("./elements");
 const realms = require("./realms");
+const elements = require("./element");  // ✅ đúng file: element.js
+const races = require("./races");
+const { baseExp, expMultiplier } = require("./config");
 
-// Tính EXP cần cho mỗi level
+/**
+ * EXP cần để lên cấp
+ */
 function getExpNeeded(level) {
-  const cfg = realms.expConfig || { baseExp: 100, expMultiplier: 1.25 };
-  const base = cfg.baseExp || 100;
-  const mul = cfg.expMultiplier || 1.25;
-
-  return Math.floor(base * Math.pow(mul, level - 1));
+  return Math.floor(baseExp * Math.pow(expMultiplier, level - 1));
 }
 
-// Chỉ còn bonus từ trang bị (equipments)
-// ĐÃ GỠ sạch bonus từ nhẫn cưới / relationship
+/**
+ * Tính % bonus EXP chỉ từ TRANG BỊ
+ * (đã bỏ bonus từ nhẫn cưới / relationships)
+ */
 function computeExpBonusPercent(user) {
   let bonus = 0;
 
@@ -27,12 +28,12 @@ function computeExpBonusPercent(user) {
       const it = user.equipments[key];
       if (!it) continue;
 
-      // exp_percent đặt thẳng trong item
+      // exp_percent đặt trực tiếp trên item
       if (typeof it.exp_percent === "number") {
         bonus += it.exp_percent;
       }
 
-      // bonus.exp_percent từ object con
+      // bonus.exp_percent trong object con
       if (it.bonus && typeof it.bonus.exp_percent === "number") {
         bonus += it.bonus.exp_percent;
       }
@@ -42,41 +43,42 @@ function computeExpBonusPercent(user) {
   return bonus;
 }
 
-// Tăng chỉ số khi level up dựa theo Race
-function applyRaceBonus(stats, race) {
-  if (!races[race]) return stats;
-  const b = races[race].growth || {};
+/**
+ * Cộng tăng chỉ số theo chủng tộc mỗi lần lên cấp
+ */
+function applyRaceBonus(stats, raceKey) {
+  const race = races[raceKey];
+  if (!race || !race.gain) return stats;
+
+  const g = race.gain;
   return {
-    attack: stats.attack + (b.attack || 0),
-    defense: stats.defense + (b.defense || 0),
-    hp: stats.hp + (b.hp || 0),
-    mp: stats.mp + (b.mp || 0),
+    hp: stats.hp + (g.hp || 0),
+    mp: stats.mp + (g.mp || 0),
+    atk: stats.atk + (g.atk || 0),
+    def: stats.def + (g.def || 0),
+    spd: stats.spd + (g.spd || 0),
   };
 }
 
-// Tăng chỉ số khi level up dựa theo Element
-function applyElementBonus(stats, element) {
-  if (!elements[element]) return stats;
-  const b = elements[element].growth || {};
+/**
+ * Cộng tăng chỉ số theo hệ mỗi lần lên cấp
+ */
+function applyElementBonus(stats, elementKey) {
+  const el = elements[elementKey];
+  if (!el) return stats;
+
   return {
-    attack: stats.attack + (b.attack || 0),
-    defense: stats.defense + (b.defense || 0),
-    hp: stats.hp + (b.hp || 0),
-    mp: stats.mp + (b.mp || 0),
+    hp: stats.hp + (el.hp || 0),
+    mp: stats.mp + (el.mp || 0),
+    atk: stats.atk + (el.atk || 0),
+    def: stats.def + (el.def || 0),
+    spd: stats.spd + (el.spd || 0),
   };
 }
 
-// Lấy cảnh giới theo level
-function getRealm(level) {
-  const list = realms.realms || [];
-  let realmName = "Phàm Nhân";
-  for (const r of list) {
-    if (level >= r.minLevel) realmName = r.name;
-  }
-  return realmName;
-}
-
-// Hàm cộng EXP chính
+/**
+ * Thêm EXP cho 1 user
+ */
 function addXp(userId, amount) {
   const users = loadUsers();
   const user = users[userId];
@@ -87,22 +89,24 @@ function addXp(userId, amount) {
   const realGain = Math.floor(amount * (1 + bonusPercent / 100));
 
   user.exp = (user.exp || 0) + realGain;
+  if (!user.level) user.level = 1;
 
   let upgraded = false;
 
-  // Kiểm tra đủ EXP để lên cấp
+  // Nếu đủ EXP thì lên cấp nhiều lần
   while (user.exp >= getExpNeeded(user.level)) {
     user.exp -= getExpNeeded(user.level);
-    user.level++;
+    user.level += 1;
     upgraded = true;
 
-    // Áp dụng tăng chỉ số theo Race
-    let st = user.stats || {
-      attack: 0, defense: 0, hp: 0, mp: 0
-    };
-    st = applyRaceBonus(st, user.race);
-    st = applyElementBonus(st, user.element);
-    user.stats = st;
+    // Đảm bảo stats có đủ field
+    if (!user.stats) {
+      user.stats = { hp: 0, mp: 0, atk: 0, def: 0, spd: 0 };
+    }
+
+    // Áp dụng tăng theo Race và Element
+    user.stats = applyRaceBonus(user.stats, user.race);
+    user.stats = applyElementBonus(user.stats, user.element);
   }
 
   saveUsers(users);
@@ -113,6 +117,18 @@ function addXp(userId, amount) {
     levelUp: upgraded,
     realm: getRealm(user.level),
   };
+}
+
+/**
+ * Lấy cảnh giới từ level
+ * Mỗi 10 level = 1 cảnh giới trong mảng realms
+ */
+function getRealm(level) {
+  if (!level || level < 1) level = 1;
+  const realmIndex = Math.floor((level - 1) / 10);
+  const stage = ((level - 1) % 10) + 1;
+  const name = realms[realmIndex] || "Phàm Nhân";
+  return `${name} - Tầng ${stage}`;
 }
 
 module.exports = {
