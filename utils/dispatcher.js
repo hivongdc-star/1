@@ -5,9 +5,6 @@ const { loadUsers, saveUsers } = require("./storage");
 const { addXp, getRealm } = require("./xp");
 const { earnFromChat, rewardGameResults } = require("./currency");
 
-// --- Nối từ (Noitu) ---
-const { getGame, addTurn, stopGame } = require("../noitu/noituState");
-
 // --- Rela ---
 const { handleMessageEvent } = require("./relaUtils");
 const { saveImageFromUrl, saveImageFromBuffer } = require("./imageStore");
@@ -80,37 +77,6 @@ function startDispatcher(client) {
       repliedUserId,
     });
 
-    // --- Nối từ ---
-    const state = getGame(msg.channel.id);
-    if (state && state.active && !msg.content.startsWith("-")) {
-      const result = addTurn(msg.channel.id, msg.author.id, msg.content.trim());
-
-      if (!result.success) {
-        msg.react("❌");
-      } else {
-        msg.react("✅");
-
-        if (state.wordCount >= state.maxWords) {
-          const finished = stopGame(msg.channel.id);
-          const results = rewardGameResults(finished.players);
-
-          let board = results.length
-            ? results
-                .map(
-                  (r, i) =>
-                    `${i + 1}. <@${r.userId}> - ${r.words} từ → +${r.reward} LT`
-                )
-                .join("\n")
-            : "Không có ai tham gia 😢";
-
-          msg.channel.send(
-            `🎉 Game nối từ đã hoàn thành ${finished.maxWords}/${finished.maxWords} từ!\n\n${board}`
-          );
-        }
-      }
-
-      return;
-    }
 
     // --- Auto EXP mỗi 15s ---
     const now = Date.now();
