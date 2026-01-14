@@ -1,13 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 const aliases = require("./aliases");
-const { loadUsers, saveUsers } = require("./storage");
-const { addXp, getRealm } = require("./xp");
-const { earnFromChat, rewardGameResults } = require("./currency");
 const { saveImageFromUrl, saveImageFromBuffer } = require("./imageStore");
 
 let commands = new Map();
-const cooldowns = new Map();
 
 function loadCommands() {
   const cmdFiles = fs
@@ -20,10 +16,7 @@ function loadCommands() {
 
     commands.set(cmd.name, cmd);
 
-    if (cmd.aliases) {
-      cmd.aliases.forEach((a) => commands.set(a, cmd));
-    }
-
+    // Giữ đúng cơ chế alias hiện tại: chỉ dùng utils/aliases.js
     if (aliases[cmd.name]) {
       aliases[cmd.name].forEach((a) => commands.set(a, cmd));
     }
@@ -40,8 +33,19 @@ function handleCommand(client, msg, args) {
     return msg.reply(`❌ Không tìm thấy lệnh: **${cmdName}**`);
   }
 
+  // Context stub để tránh crash nếu còn sót command cũ destructuring {loadUsers,saveUsers}
+  // Nhưng nếu command cố gọi vào hệ nhân vật, sẽ nổ rõ ràng (thay vì âm thầm sai dữ liệu).
+  const ctx = {
+    loadUsers: () => {
+      throw new Error("CHARACTER_SYSTEM_REMOVED");
+    },
+    saveUsers: () => {
+      throw new Error("CHARACTER_SYSTEM_REMOVED");
+    },
+  };
+
   try {
-    cmd.run(client, msg, args.slice(1), { loadUsers, saveUsers });
+    cmd.run(client, msg, args.slice(1), ctx);
   } catch (err) {
     console.error(err);
     msg.reply("⚠️ Đã xảy ra lỗi khi chạy lệnh này.");
@@ -51,43 +55,11 @@ function handleCommand(client, msg, args) {
 function startDispatcher(client) {
   loadCommands();
 
-  // 🔔 Lên lịch quay số (19:50 nhắc, 20:00 quay)
-  require("./lotteryScheduler")(client);
+  // Đồng bộ với commands/reload.js (nó thao tác client.commands)
+  client.commands = commands;
 
   client.on("messageCreate", async (msg) => {
     if (msg.author.bot) return;
-
- 
-    // --- Auto EXP mỗi 15s ---
-    const now = Date.now();
-    const last = cooldowns.get(msg.author.id) || 0;
-    if (now - last >= 15000) {
-      const users = loadUsers();
-      let expGain = Math.floor(Math.random() * 16) + 5;
-
-      if (users[msg.author.id]) {
-        if (users[msg.author.id].race === "nhan")
-          expGain = Math.floor(expGain * 1.05);
-        if (users[msg.author.id].race === "than")
-          expGain = Math.floor(expGain * 0.95);
-      }
-
-      const gained = addXp(msg.author.id, expGain);
-      earnFromChat(msg.author.id);
-      cooldowns.set(msg.author.id, now);
-
-      if (gained > 0) {
-        const updatedUsers = loadUsers();
-        const u = updatedUsers[msg.author.id];
-        const displayName = u?.name || msg.author.username;
-
-        msg.channel.send(
-          `⚡ **${displayName}** đã đột phá **${gained} cấp**!\n` +
-            `📖 Hiện tại cảnh giới: **${u ? getRealm(u.level) : "???"}**`
-        );
-      }
-    }
-
 
     // --- Image save ---
     try {
@@ -97,17 +69,23 @@ function startDispatcher(client) {
           if (ctype.startsWith("image/")) {
             const result = await saveImageFromUrl(att.url, {
               mime: ctype,
-              originalName: att.name || "image"
+              originalName: att.name || "image",
             });
             console.log("Saved image:", result.relPath, result.bytes, "bytes");
           }
         }
       }
+
       // data URL in message content
-      const m = msg.content?.match(/data:image\/[a-zA-Z0-9.+-]+;base64,([A-Za-z0-9+/=]+)/);
+      const m = msg.content?.match(
+        /data:image\/[a-zA-Z0-9.+-]+;base64,([A-Za-z0-9+/=]+)/
+      );
       if (m) {
         const buf = Buffer.from(m[1], "base64");
-        const res2 = saveImageFromBuffer(buf, { mime: "image/auto", originalName: "pasted" });
+        const res2 = saveImageFromBuffer(buf, {
+          mime: "image/auto",
+          originalName: "pasted",
+        });
         console.log("Saved inline image:", res2.relPath);
       }
     } catch (e) {
